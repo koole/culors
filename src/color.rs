@@ -1,7 +1,7 @@
 //! Dynamic color enum.
 
 use crate::spaces::{
-    Cubehelix, Dlab, Dlch, Hsl, Hsv, Hwb, Jab, Lab, Lch, LinearRgb, Oklab, Oklch, ProphotoRgb,
+    Cubehelix, Dlab, Dlch, Hsl, Hsv, Hwb, Jab, Jch, Lab, Lch, LinearRgb, Oklab, Oklch, ProphotoRgb,
     Rec2020, Rgb, Xyz50, Xyz65, A98, P3,
 };
 
@@ -47,6 +47,8 @@ pub enum Color {
     Dlch(Dlch),
     /// JzAzBz (HDR perceptual Lab).
     Jab(Jab),
+    /// JzCzHz (polar form of JzAzBz).
+    Jch(Jch),
 }
 
 impl From<Rgb> for Color {
@@ -160,5 +162,11 @@ impl From<Dlch> for Color {
 impl From<Jab> for Color {
     fn from(c: Jab) -> Self {
         Color::Jab(c)
+    }
+}
+
+impl From<Jch> for Color {
+    fn from(c: Jch) -> Self {
+        Color::Jch(c)
     }
 }
