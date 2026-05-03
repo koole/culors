@@ -2,6 +2,7 @@
 
 mod hsl;
 mod hsv;
+mod hwb;
 mod lab;
 mod lrgb;
 mod oklab;
@@ -11,6 +12,7 @@ mod xyz65;
 
 pub use hsl::Hsl;
 pub use hsv::Hsv;
+pub use hwb::Hwb;
 pub use lab::Lab;
 pub use lrgb::LinearRgb;
 pub use oklab::Oklab;
