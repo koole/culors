@@ -20,8 +20,8 @@
 
 use crate::color::Color;
 use crate::spaces::{
-    Hsl, Hwb, Lab, Lab65, Lch, LinearRgb, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb, Xyz50, Xyz65,
-    A98, P3,
+    Hsl, Hwb, Lab, Lab65, Lch, Lch65, LinearRgb, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb, Xyz50,
+    Xyz65, A98, P3,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -844,6 +844,12 @@ fn parse_color_function(tokens: &[Token]) -> Option<Color> {
             l: c1,
             a: c2,
             b: c3,
+            alpha,
+        })),
+        "--lch-d65" => Some(Color::Lch65(Lch65 {
+            l: c1,
+            c: c2,
+            h: c3,
             alpha,
         })),
         _ => None,

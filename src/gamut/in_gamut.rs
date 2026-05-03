@@ -58,6 +58,7 @@ pub(crate) fn color_to_rgb(c: Color) -> Rgb {
         Color::Lab(x) => crate::convert::<crate::spaces::Lab, Rgb>(x),
         Color::Lab65(x) => crate::convert::<crate::spaces::Lab65, Rgb>(x),
         Color::Lch(x) => crate::convert::<crate::spaces::Lch, Rgb>(x),
+        Color::Lch65(x) => crate::convert::<crate::spaces::Lch65, Rgb>(x),
         Color::Oklab(x) => crate::convert::<crate::spaces::Oklab, Rgb>(x),
         Color::Oklch(x) => crate::convert::<crate::spaces::Oklch, Rgb>(x),
         Color::Xyz50(x) => crate::convert::<crate::spaces::Xyz50, Rgb>(x),

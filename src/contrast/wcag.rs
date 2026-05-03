@@ -61,6 +61,7 @@ fn to_xyz65(c: Color) -> Xyz65 {
         Color::Lab(x) => x.to_xyz65(),
         Color::Lab65(x) => x.to_xyz65(),
         Color::Lch(x) => x.to_xyz65(),
+        Color::Lch65(x) => x.to_xyz65(),
         Color::Oklab(x) => x.to_xyz65(),
         Color::Oklch(x) => x.to_xyz65(),
         Color::Xyz50(x) => x.to_xyz65(),
