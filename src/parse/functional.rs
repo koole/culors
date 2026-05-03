@@ -21,7 +21,7 @@
 #![allow(dead_code)] // wired up by parse::mod.rs in a later commit
 
 use crate::color::Color;
-use crate::spaces::{Hsl, Hwb, Rgb};
+use crate::spaces::{Hsl, Hwb, Lab, Lch, Oklab, Oklch, Rgb};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) enum Tok {
@@ -561,6 +561,144 @@ fn parse_hwb(parsed: &Modern) -> Option<Hwb> {
     })
 }
 
+fn parse_lab(parsed: &Modern) -> Option<Lab> {
+    if parsed.func != "lab" {
+        return None;
+    }
+    let [l, a, b, alpha] = &parsed.coords;
+    if matches!(l.kind, Tok::Hue) || matches!(a.kind, Tok::Hue) || matches!(b.kind, Tok::Hue) {
+        return None;
+    }
+    // L: number 0..100 or percentage 0..100% (clamped to that range, like culori).
+    let l_val = match l.kind {
+        Tok::None => f64::NAN,
+        Tok::Number | Tok::Percentage => l.value.clamp(0.0, 100.0),
+        _ => return None,
+    };
+    // a/b: number => raw; percentage => value * 125 / 100 (culori scales to ±125).
+    let a_val = match a.kind {
+        Tok::None => f64::NAN,
+        Tok::Number => a.value,
+        Tok::Percentage => a.value * 125.0 / 100.0,
+        _ => return None,
+    };
+    let b_val = match b.kind {
+        Tok::None => f64::NAN,
+        Tok::Number => b.value,
+        Tok::Percentage => b.value * 125.0 / 100.0,
+        _ => return None,
+    };
+    Some(Lab {
+        l: l_val,
+        a: a_val,
+        b: b_val,
+        alpha: alpha_value(alpha),
+    })
+}
+
+fn parse_lch(parsed: &Modern) -> Option<Lch> {
+    if parsed.func != "lch" {
+        return None;
+    }
+    let [l, c, h, alpha] = &parsed.coords;
+    let l_val = match l.kind {
+        Tok::None => f64::NAN,
+        Tok::Hue => return None,
+        Tok::Number | Tok::Percentage => l.value.clamp(0.0, 100.0),
+        _ => return None,
+    };
+    // C: number => raw (clamped to >=0); percentage => value * 150 / 100.
+    let c_val = match c.kind {
+        Tok::None => f64::NAN,
+        Tok::Hue => return None,
+        Tok::Number => c.value.max(0.0),
+        Tok::Percentage => (c.value * 150.0 / 100.0).max(0.0),
+        _ => return None,
+    };
+    let h_val = match h.kind {
+        Tok::None => f64::NAN,
+        Tok::Number | Tok::Hue => h.value,
+        Tok::Percentage => return None,
+        _ => return None,
+    };
+    Some(Lch {
+        l: l_val,
+        c: c_val,
+        h: h_val,
+        alpha: alpha_value(alpha),
+    })
+}
+
+fn parse_oklab(parsed: &Modern) -> Option<Oklab> {
+    if parsed.func != "oklab" {
+        return None;
+    }
+    let [l, a, b, alpha] = &parsed.coords;
+    if matches!(l.kind, Tok::Hue) || matches!(a.kind, Tok::Hue) || matches!(b.kind, Tok::Hue) {
+        return None;
+    }
+    // L: number 0..1 (clamped) or percentage / 100 (also clamped).
+    let l_val = match l.kind {
+        Tok::None => f64::NAN,
+        Tok::Number => l.value.clamp(0.0, 1.0),
+        Tok::Percentage => (l.value / 100.0).clamp(0.0, 1.0),
+        _ => return None,
+    };
+    // a/b: number => raw; percentage => value * 0.4 / 100 (culori scales to ±0.4).
+    let a_val = match a.kind {
+        Tok::None => f64::NAN,
+        Tok::Number => a.value,
+        Tok::Percentage => a.value * 0.4 / 100.0,
+        _ => return None,
+    };
+    let b_val = match b.kind {
+        Tok::None => f64::NAN,
+        Tok::Number => b.value,
+        Tok::Percentage => b.value * 0.4 / 100.0,
+        _ => return None,
+    };
+    Some(Oklab {
+        l: l_val,
+        a: a_val,
+        b: b_val,
+        alpha: alpha_value(alpha),
+    })
+}
+
+fn parse_oklch(parsed: &Modern) -> Option<Oklch> {
+    if parsed.func != "oklch" {
+        return None;
+    }
+    let [l, c, h, alpha] = &parsed.coords;
+    let l_val = match l.kind {
+        Tok::None => f64::NAN,
+        Tok::Hue => return None,
+        Tok::Number => l.value.clamp(0.0, 1.0),
+        Tok::Percentage => (l.value / 100.0).clamp(0.0, 1.0),
+        _ => return None,
+    };
+    // C: number => raw (clamped to >=0); percentage => value * 0.4 / 100.
+    let c_val = match c.kind {
+        Tok::None => f64::NAN,
+        Tok::Hue => return None,
+        Tok::Number => c.value.max(0.0),
+        Tok::Percentage => (c.value * 0.4 / 100.0).max(0.0),
+        _ => return None,
+    };
+    let h_val = match h.kind {
+        Tok::None => f64::NAN,
+        Tok::Number | Tok::Hue => h.value,
+        Tok::Percentage => return None,
+        _ => return None,
+    };
+    Some(Oklch {
+        l: l_val,
+        c: c_val,
+        h: h_val,
+        alpha: alpha_value(alpha),
+    })
+}
+
 /// Try every functional notation handled by this module. Returns
 /// `Some(Color)` on a recognized + valid call, `None` on either a
 /// non-functional input or a malformed call. Callers above this layer
@@ -577,6 +715,18 @@ pub(crate) fn parse_functional(input: &str) -> Option<Color> {
             }
             if let Some(c) = parse_hwb(&parsed) {
                 return Some(Color::Hwb(c));
+            }
+            if let Some(c) = parse_lab(&parsed) {
+                return Some(Color::Lab(c));
+            }
+            if let Some(c) = parse_lch(&parsed) {
+                return Some(Color::Lch(c));
+            }
+            if let Some(c) = parse_oklab(&parsed) {
+                return Some(Color::Oklab(c));
+            }
+            if let Some(c) = parse_oklch(&parsed) {
+                return Some(Color::Oklch(c));
             }
         }
     }
@@ -820,5 +970,124 @@ mod tests {
     #[test]
     fn extra_token_after_paren_close_fails() {
         assert!(parse_functional("rgb(1 2 3)x").is_none());
+    }
+
+    #[test]
+    fn lab_pct_l() {
+        let Color::Lab(c) = parse_functional("lab(50% 40 -30)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.l, 50.0);
+        assert_eq!(c.a, 40.0);
+        assert_eq!(c.b, -30.0);
+        assert_eq!(c.alpha, None);
+    }
+
+    #[test]
+    fn lab_number_l() {
+        let Color::Lab(c) = parse_functional("lab(50 40 -30)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.l, 50.0);
+    }
+
+    #[test]
+    fn lab_l_clamped_to_100() {
+        let Color::Lab(c) = parse_functional("lab(150 40 -30)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.l, 100.0);
+    }
+
+    #[test]
+    fn lab_pct_ab_scales_to_125() {
+        let Color::Lab(c) = parse_functional("lab(50% 50% -50% / 50%)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.l, 50.0);
+        assert_eq!(c.a, 62.5);
+        assert_eq!(c.b, -62.5);
+        assert_eq!(c.alpha, Some(0.5));
+    }
+
+    #[test]
+    fn lab_none_channels_become_nan() {
+        let Color::Lab(c) = parse_functional("lab(none none none / 0.5)").unwrap() else {
+            panic!()
+        };
+        assert!(c.l.is_nan());
+        assert!(c.a.is_nan());
+        assert!(c.b.is_nan());
+        assert_eq!(c.alpha, Some(0.5));
+    }
+
+    #[test]
+    fn lch_basic() {
+        let Color::Lch(c) = parse_functional("lch(50% 40 30deg)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.l, 50.0);
+        assert_eq!(c.c, 40.0);
+        assert_eq!(c.h, 30.0);
+    }
+
+    #[test]
+    fn lch_negative_c_clamped() {
+        let Color::Lch(c) = parse_functional("lch(50 -10 30)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.c, 0.0);
+    }
+
+    #[test]
+    fn lch_pct_c_scales_to_150() {
+        let Color::Lch(c) = parse_functional("lch(50% 50% 30deg)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.c, 75.0);
+    }
+
+    #[test]
+    fn oklab_number_l() {
+        let Color::Oklab(c) = parse_functional("oklab(0.5 0.1 -0.1)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.l, 0.5);
+        assert_eq!(c.a, 0.1);
+        assert_eq!(c.b, -0.1);
+    }
+
+    #[test]
+    fn oklab_pct_l_maps_to_unit() {
+        let Color::Oklab(c) = parse_functional("oklab(50% 0.1 -0.1)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.l, 0.5);
+    }
+
+    #[test]
+    fn oklab_l_clamped_to_one() {
+        let Color::Oklab(c) = parse_functional("oklab(150% 0 0)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.l, 1.0);
+    }
+
+    #[test]
+    fn oklch_pct_l() {
+        let Color::Oklch(c) = parse_functional("oklch(70% 0.15 30deg)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.l, 0.7);
+        assert_eq!(c.c, 0.15);
+        assert_eq!(c.h, 30.0);
+    }
+
+    #[test]
+    fn oklch_pct_c_scales_to_point_four() {
+        let Color::Oklch(c) = parse_functional("oklch(50% 50% 30deg)").unwrap() else {
+            panic!()
+        };
+        assert!((c.c - 0.2).abs() < 1e-12);
     }
 }
