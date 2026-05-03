@@ -23,3 +23,50 @@
 pub(crate) mod functional;
 pub(crate) mod hex;
 pub(crate) mod named;
+
+use crate::color::Color;
+use crate::spaces::Rgb;
+
+/// Parse a CSS color string into a [`Color`].
+///
+/// Returns `None` if the input does not parse as any supported syntax.
+/// The grammar matches CSS Color Module 4 with the same set of profiles
+/// culori 4.0.2 ships, except that `color()` profiles for spaces culor
+/// has not yet implemented (`display-p3`, `rec2020`, `prophoto-rgb`,
+/// `a98-rgb`) return `None` until those spaces land.
+///
+/// Out-of-range channel values pass through unclamped, mirroring culori.
+/// `none` channels become `f64::NAN` for that channel; `none` for alpha
+/// becomes `alpha: None`.
+pub fn parse(input: &str) -> Option<Color> {
+    if let Some(c) = parse_named_or_transparent(input) {
+        return Some(Color::Rgb(c));
+    }
+    if let Some(c) = hex::parse_hex(input) {
+        return Some(Color::Rgb(c));
+    }
+    functional::parse_functional(input)
+}
+
+fn parse_named_or_transparent(input: &str) -> Option<Rgb> {
+    if input == "transparent" {
+        return Some(Rgb {
+            r: 0.0,
+            g: 0.0,
+            b: 0.0,
+            alpha: Some(0.0),
+        });
+    }
+    let lower = input.to_ascii_lowercase();
+    let packed = named::lookup(&lower)?;
+    Some(unpack_rgb(packed))
+}
+
+fn unpack_rgb(packed: u32) -> Rgb {
+    Rgb {
+        r: ((packed >> 16) & 0xff) as f64 / 255.0,
+        g: ((packed >> 8) & 0xff) as f64 / 255.0,
+        b: (packed & 0xff) as f64 / 255.0,
+        alpha: None,
+    }
+}

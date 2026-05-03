@@ -7,7 +7,6 @@
 
 /// Returns the 24-bit packed RGB value for the given lowercase CSS color
 /// name, or `None` if unknown.
-#[allow(dead_code)] // wired up in parse::mod.rs in a later commit
 pub(crate) fn lookup(name: &str) -> Option<u32> {
     NAMED
         .binary_search_by(|probe| probe.0.cmp(name))
@@ -17,7 +16,6 @@ pub(crate) fn lookup(name: &str) -> Option<u32> {
 
 /// Sorted list of (name, 24-bit RGB) pairs from culori's `named.js`.
 /// Keeping it sorted lets us use `binary_search_by`.
-#[allow(dead_code)] // wired up in parse::mod.rs in a later commit
 const NAMED: &[(&str, u32)] = &[
     ("aliceblue", 0xf0f8ff),
     ("antiquewhite", 0xfaebd7),

@@ -18,8 +18,6 @@
 //! `none` becomes `alpha: None`, matching culori's behavior of omitting
 //! the field entirely.
 
-#![allow(dead_code)] // wired up by parse::mod.rs in a later commit
-
 use crate::color::Color;
 use crate::spaces::{Hsl, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
 

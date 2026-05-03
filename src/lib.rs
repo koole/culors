@@ -15,4 +15,5 @@ pub(crate) mod util;
 
 pub use color::Color;
 pub use convert::convert;
+pub use parse::parse;
 pub use traits::ColorSpace;

@@ -15,7 +15,6 @@ use crate::spaces::Rgb;
 
 /// Parse a hex color literal. Returns `None` for any input that doesn't
 /// fit one of the four hex lengths or contains non-hex characters.
-#[allow(dead_code)] // wired up by parse::mod.rs in a later commit
 pub(crate) fn parse_hex(input: &str) -> Option<Rgb> {
     let body = input.strip_prefix('#').unwrap_or(input);
     if !body.bytes().all(|b| b.is_ascii_hexdigit()) {
