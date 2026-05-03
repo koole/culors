@@ -26,7 +26,7 @@
 /// - `n == 1` returns `[0.5]`.
 /// - `n >= 2` returns `[0, 1/(n-1), 2/(n-1), …, 1]`.
 ///
-/// Pair with [`crate::interpolate`] to drive evenly spaced ramp generation:
+/// Pair with [`crate::interpolate()`] to drive evenly spaced ramp generation:
 ///
 /// ```rust
 /// use culor::{interpolate, parse, samples};
