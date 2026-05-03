@@ -114,10 +114,9 @@ fn clamp_rgb_handles_missing_components() {
     close(out.b, 0.0, "b");
 }
 
-// NOTE: culors' `in_gamut`/`clamp_gamut` only accept sRGB-family modes
-// (`"rgb" | "hsl" | "hsv" | "hwb"`); culori's wide-gamut variants
-// (`"p3"`, `"rec2020"`, …) aren't yet wired into the gamut module, so the
-// p3-specific scenarios from culori's `clamp.test.js` are out of scope here.
+// Wide-gamut profiles share the same gamut module since v1.4.0 — see
+// `tests/ported_clamp_wide_gamut.rs` for the p3 / rec2020 / a98 / prophoto
+// boundary checks.
 
 // ----- clamp_chroma corner cases -----
 

@@ -11,11 +11,14 @@
 //! - [`to_gamut`] — CSS Color Module 4 gamut-mapping algorithm, mirrors
 //!   culori's `toGamut(dest, mode)`.
 //!
-//! The `mode` argument names the destination gamut. Only `"rgb"`, `"hsl"`,
-//! `"hsv"`, and `"hwb"` carry a gamut definition in culori; every other mode
-//! returns `true` from `inGamut` and is a no-op for `clamp_gamut`. The
-//! gamut for the cylindrical sRGB modes (`hsl` / `hsv` / `hwb`) is
-//! `"rgb"`, so the four mode strings collapse to the same boundary check.
+//! The `mode` argument names the destination gamut. Modes that carry a
+//! gamut definition in culori: `"rgb"`, `"hsl"`, `"hsv"`, `"hwb"`, plus
+//! the four wide-gamut RGB profiles (`"p3"`, `"rec2020"`, `"a98"`,
+//! `"prophoto"`). Every other mode returns `true` from `in_gamut` and is a
+//! no-op for `clamp_gamut`. The gamut for the cylindrical sRGB modes
+//! (`hsl` / `hsv` / `hwb`) is `"rgb"`, so those four mode strings collapse
+//! to the same boundary check; each wide-gamut profile defines its own
+//! `[0, 1]` linear-RGB box.
 
 mod clamp;
 mod in_gamut;

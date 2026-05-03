@@ -1,8 +1,10 @@
 //! `clamp_gamut` (naïve per-channel clip) and `clamp_chroma` (chroma
 //! bisection in an LCh-like space). Both mirror culori 4.0.2's `clamp.js`.
 
-use crate::gamut::in_gamut::{color_to_rgb, in_gamut};
-use crate::spaces::{Hsl, Hsv, Hwb, Lch, LinearRgb, Oklch, Rgb};
+use crate::gamut::in_gamut::{
+    color_to_a98, color_to_p3, color_to_prophoto, color_to_rec2020, color_to_rgb, in_gamut,
+};
+use crate::spaces::{Hsl, Hsv, Hwb, Lch, LinearRgb, Oklch, ProphotoRgb, Rec2020, Rgb, A98, P3};
 use crate::Color;
 
 /// Naïve per-channel clamp into the gamut named by `mode`.
@@ -24,9 +26,68 @@ pub fn clamp_gamut(color: Color, mode: &str) -> Color {
             let clamped_rgb = clamp_rgb_channels(color_to_rgb(color));
             convert_rgb_back_to_source_mode(clamped_rgb, color)
         }
+        "p3" => clamp_wide_gamut(color, mode, color_to_p3, |v| {
+            Color::P3(P3 {
+                r: clamp01(v.r),
+                g: clamp01(v.g),
+                b: clamp01(v.b),
+                alpha: v.alpha,
+            })
+        }),
+        "rec2020" => clamp_wide_gamut(color, mode, color_to_rec2020, |v| {
+            Color::Rec2020(Rec2020 {
+                r: clamp01(v.r),
+                g: clamp01(v.g),
+                b: clamp01(v.b),
+                alpha: v.alpha,
+            })
+        }),
+        "a98" => clamp_wide_gamut(color, mode, color_to_a98, |v| {
+            Color::A98(A98 {
+                r: clamp01(v.r),
+                g: clamp01(v.g),
+                b: clamp01(v.b),
+                alpha: v.alpha,
+            })
+        }),
+        "prophoto" => clamp_wide_gamut(color, mode, color_to_prophoto, |v| {
+            Color::ProphotoRgb(ProphotoRgb {
+                r: clamp01(v.r),
+                g: clamp01(v.g),
+                b: clamp01(v.b),
+                alpha: v.alpha,
+            })
+        }),
         "lrgb" | "lab" | "lch" | "oklab" | "oklch" | "xyz50" | "xyz65" => color,
         other => panic!("clamp_gamut: unknown mode '{other}'"),
     }
+}
+
+// Generic wide-gamut clamp helper. Converts the input to the destination
+// gamut, returns the original if already in gamut, else clamps each
+// channel to [0, 1] and converts back to the source mode. Mirrors
+// culori's `clampGamut('p3' | 'rec2020' | …)`.
+fn clamp_wide_gamut<T, F, C>(color: Color, mode: &str, to_dest: F, clamp_channels: C) -> Color
+where
+    F: Fn(Color) -> T,
+    C: Fn(T) -> Color,
+{
+    if in_gamut(&color, mode) {
+        return color;
+    }
+    let dest_color = clamp_channels(to_dest(color));
+    convert_color_back_to_source_mode(dest_color, color)
+}
+
+// Convert `dest_color` (already in the wide-gamut destination space) back
+// to the source `template`'s mode. Falls back to round-tripping through
+// XYZ65 when the source mode differs from the destination.
+fn convert_color_back_to_source_mode(dest_color: Color, template: Color) -> Color {
+    if std::mem::discriminant(&dest_color) == std::mem::discriminant(&template) {
+        return dest_color;
+    }
+    let xyz = to_xyz65(dest_color);
+    crate::gamut::clamp::from_xyz65_in_mode_of(xyz, template)
 }
 
 fn clamp_rgb_channels(c: Rgb) -> Rgb {

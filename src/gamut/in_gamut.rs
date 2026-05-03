@@ -1,6 +1,7 @@
 //! `in_gamut` — predicate matching culori's `inGamut(mode)`.
 
-use crate::spaces::{Hsv, Rgb};
+use crate::convert::convert;
+use crate::spaces::{Hsv, ProphotoRgb, Rec2020, Rgb, A98, P3};
 use crate::Color;
 
 /// Returns `true` if `color` is inside the gamut of `mode`.
@@ -10,30 +11,76 @@ use crate::Color;
 /// - `"rgb"`, `"hsl"`, `"hsv"`, `"hwb"` — convert `color` to sRGB and
 ///   require every channel in `[0, 1]`. The cylindrical modes have
 ///   `gamut: 'rgb'` in their definitions, so they share the sRGB box.
+/// - `"p3"`, `"rec2020"`, `"a98"`, `"prophoto"` — convert `color` to that
+///   wide-gamut RGB space and require every channel in `[0, 1]`.
 /// - any other mode (`"lab"`, `"lch"`, `"oklab"`, `"oklch"`, `"lrgb"`,
 ///   `"xyz50"`, `"xyz65"`) — culori's mode definition has no `gamut`
 ///   field, and `inGamut` returns the constant `true`.
 ///
 /// Panics on an unknown mode string. Callers should validate `mode` up
-/// front; in practice the four "real" gamut modes are `rgb` / `hsl` /
-/// `hsv` / `hwb`.
+/// front; the gamut-bearing modes are sRGB / its cylindricals plus the
+/// four wide-gamut RGB profiles.
 pub fn in_gamut(color: &Color, mode: &str) -> bool {
     match mode {
         "rgb" | "hsl" | "hsv" | "hwb" => {
             let rgb = color_to_rgb(*color);
-            inrange_rgb(&rgb)
+            inrange_rgb_channels(rgb.r, rgb.g, rgb.b)
+        }
+        "p3" => {
+            let v: P3 = color_to_p3(*color);
+            inrange_rgb_channels(v.r, v.g, v.b)
+        }
+        "rec2020" => {
+            let v: Rec2020 = color_to_rec2020(*color);
+            inrange_rgb_channels(v.r, v.g, v.b)
+        }
+        "a98" => {
+            let v: A98 = color_to_a98(*color);
+            inrange_rgb_channels(v.r, v.g, v.b)
+        }
+        "prophoto" => {
+            let v: ProphotoRgb = color_to_prophoto(*color);
+            inrange_rgb_channels(v.r, v.g, v.b)
         }
         "lrgb" | "lab" | "lch" | "oklab" | "oklch" | "xyz50" | "xyz65" => true,
         other => panic!("in_gamut: unknown mode '{other}'"),
     }
 }
 
-fn inrange_rgb(c: &Rgb) -> bool {
+pub(crate) fn color_to_p3(c: Color) -> P3 {
+    match c {
+        Color::P3(x) => x,
+        other => convert::<crate::spaces::Xyz65, P3>(super::clamp::to_xyz65(other)),
+    }
+}
+
+pub(crate) fn color_to_rec2020(c: Color) -> Rec2020 {
+    match c {
+        Color::Rec2020(x) => x,
+        other => convert::<crate::spaces::Xyz65, Rec2020>(super::clamp::to_xyz65(other)),
+    }
+}
+
+pub(crate) fn color_to_a98(c: Color) -> A98 {
+    match c {
+        Color::A98(x) => x,
+        other => convert::<crate::spaces::Xyz65, A98>(super::clamp::to_xyz65(other)),
+    }
+}
+
+pub(crate) fn color_to_prophoto(c: Color) -> ProphotoRgb {
+    match c {
+        Color::ProphotoRgb(x) => x,
+        other => convert::<crate::spaces::Xyz65, ProphotoRgb>(super::clamp::to_xyz65(other)),
+    }
+}
+
+fn inrange_rgb_channels(r: f64, g: f64, b: f64) -> bool {
     // culori's `inrange_rgb` accepts `c.r === undefined` (channel absent).
     // Our typed structs always have channels, but NaN can stand in for an
     // absent channel after operations like interpolation. Match culori by
     // treating a NaN channel as in-range.
-    in_range(c.r) && in_range(c.g) && in_range(c.b)
+    in_range(r) && in_range(g) && in_range(b)
 }
 
 fn in_range(v: f64) -> bool {

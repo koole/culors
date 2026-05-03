@@ -30,7 +30,10 @@ pub fn to_gamut(color: Color, mode: &str) -> Color {
     // For lab/lch/oklab/oklch/xyz/lrgb the mode has no gamut: there is
     // nothing to map. culori still calls the destination converter; we do
     // the same so the output mode matches `mode`.
-    let dest_has_gamut = matches!(mode, "rgb" | "hsl" | "hsv" | "hwb");
+    let dest_has_gamut = matches!(
+        mode,
+        "rgb" | "hsl" | "hsv" | "hwb" | "p3" | "rec2020" | "a98" | "prophoto"
+    );
     if !dest_has_gamut {
         return convert_to_mode(color, mode);
     }
@@ -142,7 +145,9 @@ fn to_oklch(color: Color) -> Oklch {
 }
 
 fn convert_to_mode(color: Color, mode: &str) -> Color {
-    use crate::spaces::{Hsl, Hsv, Hwb, Lab, Lch, LinearRgb, Xyz50, Xyz65};
+    use crate::spaces::{
+        Hsl, Hsv, Hwb, Lab, Lch, LinearRgb, ProphotoRgb, Rec2020, Xyz50, Xyz65, A98, P3,
+    };
     let rgb = color_to_rgb(color);
     match mode {
         "rgb" => Color::Rgb(rgb),
@@ -156,6 +161,10 @@ fn convert_to_mode(color: Color, mode: &str) -> Color {
         "oklch" => Color::Oklch(Oklch::from(rgb)),
         "xyz50" => Color::Xyz50(crate::convert::<Rgb, Xyz50>(rgb)),
         "xyz65" => Color::Xyz65(crate::convert::<Rgb, Xyz65>(rgb)),
+        "p3" => Color::P3(crate::convert::<Rgb, P3>(rgb)),
+        "rec2020" => Color::Rec2020(crate::convert::<Rgb, Rec2020>(rgb)),
+        "a98" => Color::A98(crate::convert::<Rgb, A98>(rgb)),
+        "prophoto" => Color::ProphotoRgb(crate::convert::<Rgb, ProphotoRgb>(rgb)),
         other => panic!("to_gamut: unknown mode '{other}'"),
     }
 }
