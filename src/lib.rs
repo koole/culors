@@ -168,7 +168,7 @@ pub(crate) mod util;
 
 pub use average::{average, average_angle, average_number};
 pub use blend::{blend, blend_str, BlendMode};
-pub use color::Color;
+pub use color::{Color, ColorVariantMismatch};
 pub use contrast::{wcag_contrast, wcag_luminance};
 pub use convert::convert;
 pub use difference::{

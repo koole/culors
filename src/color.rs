@@ -5,6 +5,7 @@ use crate::spaces::{
     Lchuv, LinearRgb, Luv, Okhsl, Okhsv, Oklab, Oklch, Prismatic, ProphotoRgb, Rec2020, Rgb, Xyb,
     Xyz50, Xyz65, Yiq, A98, P3,
 };
+use crate::traits::ColorSpace;
 
 /// Tagged union over every supported color space. Variants are added as each
 /// space lands.
@@ -275,4 +276,124 @@ impl From<Prismatic> for Color {
     fn from(c: Prismatic) -> Self {
         Color::Prismatic(c)
     }
+}
+
+impl Color {
+    /// Returns the culori `mode` string for this color's underlying space
+    /// (`"rgb"`, `"lab"`, `"oklch"`, etc.). Identical to the corresponding
+    /// space struct's [`ColorSpace::MODE`].
+    pub fn mode(&self) -> &'static str {
+        match self {
+            Color::Rgb(_) => Rgb::MODE,
+            Color::LinearRgb(_) => LinearRgb::MODE,
+            Color::Hsl(_) => Hsl::MODE,
+            Color::Hsv(_) => Hsv::MODE,
+            Color::Hwb(_) => Hwb::MODE,
+            Color::Lab(_) => Lab::MODE,
+            Color::Lab65(_) => Lab65::MODE,
+            Color::Lch(_) => Lch::MODE,
+            Color::Lch65(_) => Lch65::MODE,
+            Color::Oklab(_) => Oklab::MODE,
+            Color::Oklch(_) => Oklch::MODE,
+            Color::Xyz50(_) => Xyz50::MODE,
+            Color::Xyz65(_) => Xyz65::MODE,
+            Color::P3(_) => P3::MODE,
+            Color::Rec2020(_) => Rec2020::MODE,
+            Color::A98(_) => A98::MODE,
+            Color::ProphotoRgb(_) => ProphotoRgb::MODE,
+            Color::Cubehelix(_) => Cubehelix::MODE,
+            Color::Dlab(_) => Dlab::MODE,
+            Color::Dlch(_) => Dlch::MODE,
+            Color::Jab(_) => Jab::MODE,
+            Color::Jch(_) => Jch::MODE,
+            Color::Yiq(_) => Yiq::MODE,
+            Color::Hsi(_) => Hsi::MODE,
+            Color::Hsluv(_) => Hsluv::MODE,
+            Color::Hpluv(_) => Hpluv::MODE,
+            Color::Okhsl(_) => Okhsl::MODE,
+            Color::Okhsv(_) => Okhsv::MODE,
+            Color::Itp(_) => Itp::MODE,
+            Color::Xyb(_) => Xyb::MODE,
+            Color::Luv(_) => Luv::MODE,
+            Color::Lchuv(_) => Lchuv::MODE,
+            Color::Prismatic(_) => Prismatic::MODE,
+        }
+    }
+}
+
+/// Error returned when [`TryFrom<Color>`] is asked for a space that does
+/// not match the color's underlying variant.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ColorVariantMismatch {
+    /// The mode that was requested (target space).
+    pub expected: &'static str,
+    /// The mode of the [`Color`] that was supplied.
+    pub actual: &'static str,
+}
+
+impl core::fmt::Display for ColorVariantMismatch {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(
+            f,
+            "Color variant mismatch: expected `{}`, found `{}`",
+            self.expected, self.actual
+        )
+    }
+}
+
+impl std::error::Error for ColorVariantMismatch {}
+
+macro_rules! impl_try_from_color {
+    ($($variant:ident => $ty:ty),* $(,)?) => {
+        $(
+            impl TryFrom<Color> for $ty {
+                type Error = ColorVariantMismatch;
+                fn try_from(c: Color) -> Result<Self, Self::Error> {
+                    match c {
+                        Color::$variant(inner) => Ok(inner),
+                        other => Err(ColorVariantMismatch {
+                            expected: <$ty>::MODE,
+                            actual: other.mode(),
+                        }),
+                    }
+                }
+            }
+        )*
+    };
+}
+
+impl_try_from_color! {
+    Rgb => Rgb,
+    LinearRgb => LinearRgb,
+    Hsl => Hsl,
+    Hsv => Hsv,
+    Hwb => Hwb,
+    Lab => Lab,
+    Lab65 => Lab65,
+    Lch => Lch,
+    Lch65 => Lch65,
+    Oklab => Oklab,
+    Oklch => Oklch,
+    Xyz50 => Xyz50,
+    Xyz65 => Xyz65,
+    P3 => P3,
+    Rec2020 => Rec2020,
+    A98 => A98,
+    ProphotoRgb => ProphotoRgb,
+    Cubehelix => Cubehelix,
+    Dlab => Dlab,
+    Dlch => Dlch,
+    Jab => Jab,
+    Jch => Jch,
+    Yiq => Yiq,
+    Hsi => Hsi,
+    Hsluv => Hsluv,
+    Hpluv => Hpluv,
+    Okhsl => Okhsl,
+    Okhsv => Okhsv,
+    Itp => Itp,
+    Xyb => Xyb,
+    Luv => Luv,
+    Lchuv => Lchuv,
+    Prismatic => Prismatic,
 }
