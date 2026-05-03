@@ -99,3 +99,50 @@ fn jch_round_trip_via_xyz() {
     common::assert_close(back.h, original.h, 1e-5);
     assert_eq!(back.alpha, Some(0.5));
 }
+
+/// PQ_inv negative-value regression. culori's `convertJabToXyz65.js`
+/// guards `jabPqDecode(v)` with `if (v < 0) return 0` because the
+/// inverse PQ formula contains `(C1 - vp) / (C3 * vp - C2)` raised to a
+/// fractional power; without the clamp a negative `v` (which arises
+/// naturally for `j < 0` Jab/Jch inputs) yields NaN through `Math.pow`.
+///
+/// This test feeds a negative `j` Jch through the XYZ65 hub and asserts
+/// the output is the all-zero XYZ tristimulus — the exact value culori
+/// 4.0.2 produces — rather than NaN.
+#[test]
+fn jch_pq_inv_negative_value_regression() {
+    let j = Jch {
+        j: -0.05,
+        c: 0.05,
+        h: 200.0,
+        alpha: None,
+    };
+    let xyz = j.to_xyz65();
+    assert!(
+        !xyz.x.is_nan() && !xyz.y.is_nan() && !xyz.z.is_nan(),
+        "PQ_inv produced NaN for negative input: x={}, y={}, z={}",
+        xyz.x, xyz.y, xyz.z
+    );
+    common::assert_close(xyz.x, 0.0, 1e-15);
+    common::assert_close(xyz.y, 0.0, 1e-15);
+    common::assert_close(xyz.z, 0.0, 1e-15);
+}
+
+/// Variant of the regression with both negative `j` and a non-trivial
+/// chroma. Without the clamp the LMS triple goes through PQ_inv with
+/// negative arguments on each channel; the all-zero output still holds
+/// because each PQ_inv component clamps to 0 independently.
+#[test]
+fn jch_pq_inv_negative_with_chroma() {
+    let j = Jch {
+        j: -0.1,
+        c: 0.15,
+        h: 30.0,
+        alpha: None,
+    };
+    let xyz = j.to_xyz65();
+    assert!(!xyz.x.is_nan() && !xyz.y.is_nan() && !xyz.z.is_nan());
+    common::assert_close(xyz.x, 0.0, 1e-15);
+    common::assert_close(xyz.y, 0.0, 1e-15);
+    common::assert_close(xyz.z, 0.0, 1e-15);
+}
