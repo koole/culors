@@ -167,6 +167,67 @@ pub fn interpolate(colors: &[Color], mode: &str) -> Box<dyn Fn(f64) -> Color + S
     interpolate_with(colors, mode, InterpolateOptions::default())
 }
 
+/// Build an interpolator that premultiplies each input by its alpha,
+/// interpolates, then divides the result back out.
+///
+/// Mirrors culori 4.0.2's `interpolateWithPremultipliedAlpha` (defined in
+/// `interpolate/interpolate.js` as `interpolateWith(mapAlphaMultiply,
+/// mapAlphaDivide)`). Premultiplication is the right default for blending
+/// semi-transparent colors: a 50/50 mix of opaque red and fully transparent
+/// blue stays red, since the transparent blue contributes no color energy.
+///
+/// # Panics
+///
+/// Panics if `colors` is empty or `mode` is unknown.
+pub fn interpolate_with_premultiplied_alpha(
+    colors: &[Color],
+    mode: &str,
+    options: InterpolateOptions,
+) -> Box<dyn Fn(f64) -> Color + Send + Sync> {
+    use crate::map::{map_alpha_divide, map_alpha_multiply, mapper};
+
+    assert!(
+        !colors.is_empty(),
+        "interpolate_with_premultiplied_alpha: at least one color is required"
+    );
+    let mode_static = mode_static_str(mode);
+
+    // Pre-multiply each input color's non-alpha channels by its alpha.
+    let pre = mapper(map_alpha_multiply(), mode_static, false);
+    let premapped: Vec<Color> = colors.iter().map(&pre).collect();
+
+    // Build the inner interpolator on the premultiplied stops.
+    let inner = interpolate_with(&premapped, mode, options);
+
+    // culori's `interpolate_fn` short-circuits `t <= positions[0]` and
+    // `t > positions[n]` to return the *unmapped* boundary colors; the
+    // post-divide then divides those originals by their alpha. To mirror
+    // that, keep the original first / last colors and route the boundary
+    // values through `post` directly.
+    let first = pre_converted(colors[0], mode_static);
+    let last = pre_converted(colors[colors.len() - 1], mode_static);
+    let post = mapper(map_alpha_divide(), mode_static, false);
+    Box::new(move |t: f64| {
+        let t_clamped = t.clamp(0.0, 1.0);
+        if t_clamped <= 0.0 {
+            return post(&first);
+        }
+        if t_clamped >= 1.0 {
+            return post(&last);
+        }
+        post(&inner(t_clamped))
+    })
+}
+
+// Convert a color into the working mode without any premapping. Used for
+// the boundary short-circuit in `interpolate_with_premultiplied_alpha`.
+fn pre_converted(color: Color, mode: &'static str) -> Color {
+    use crate::map::mapper;
+    // mapper with an identity function performs the mode conversion only.
+    let identity = |v: f64, _ch: &str, _c: &Color| v;
+    mapper(identity, mode, false)(&color)
+}
+
 /// Build an interpolator with explicit options.
 ///
 /// # Panics
@@ -526,6 +587,10 @@ const PRISMATIC_CHANNELS: &[ChannelInfo] = &[
         is_hue: false,
     },
 ];
+
+fn mode_static_str(mode: &str) -> &'static str {
+    mode_info(mode).mode_str
+}
 
 fn mode_info(mode: &str) -> ModeInfo {
     match mode {
