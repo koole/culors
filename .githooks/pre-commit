@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# Pre-commit hook that prevents fixture-generator drift.
+#
+# Refuses commits where the fixture generators (fixtures-gen/*.mjs,
+# parse-inputs.mjs, etc.) are modified but the regenerated output in
+# tests/fixtures/ doesn't match what the generator produces.
+#
+# Enable once per clone with:
+#     git config core.hooksPath .githooks
+set -euo pipefail
+
+# Only run if the index has staged changes touching the generator,
+# OR if any committed fixture is being staged (so we also catch
+# manual edits to JSON files that drift from the generator).
+staged="$(git diff --cached --name-only --diff-filter=ACMR)"
+relevant=false
+echo "$staged" | grep -qE '^(fixtures-gen/|tests/fixtures/|package(-lock)?\.json$)' && relevant=true
+
+if [ "$relevant" != true ]; then
+    exit 0
+fi
+
+# Regenerate into a tmp tree and diff. Use the actual scripts.
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+
+# Snapshot the staged tree so the check matches what's about to land,
+# not what's in the working directory.
+git checkout-index --prefix="$tmp/" -a >/dev/null
+
+cd "$tmp"
+if ! [ -d node_modules ]; then
+    npm ci --silent >/dev/null 2>&1 || {
+        echo "pre-commit: npm ci failed; cannot verify fixture freshness" >&2
+        exit 1
+    }
+fi
+
+npm run gen-fixtures --silent >/dev/null 2>&1
+npm run gen-parse-fixtures --silent >/dev/null 2>&1
+npm run gen-format-fixtures --silent >/dev/null 2>&1
+
+# Compare against the originally-staged tree using the tolerance check.
+# We keep a separate copy of the staged fixtures because the regen
+# overwrote them.
+staged_copy="$(mktemp -d)"
+trap 'rm -rf "$tmp" "$staged_copy"' EXIT
+git checkout-index --prefix="$staged_copy/" -a -- tests/fixtures >/dev/null
+
+if ! node fixtures-gen/check-drift.mjs "$staged_copy/tests/fixtures" tests/fixtures; then
+    cat <<'MSG' >&2
+
+pre-commit: fixture generator output diverges from staged fixtures.
+
+This usually means you modified fixtures-gen/*.mjs (or one of its
+inputs) without re-running the generators. Fix with:
+
+    npm run gen-fixtures
+    npm run gen-parse-fixtures
+    npm run gen-format-fixtures
+    git add tests/fixtures/
+
+then commit again. If you intentionally hand-edited fixtures, also
+update the generator so its output matches.
+MSG
+    exit 1
+fi
+
+exit 0
