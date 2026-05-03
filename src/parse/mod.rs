@@ -20,5 +20,6 @@
 //! `xyz-d50`, `xyz-d65`. Other profiles (`display-p3`, `rec2020`,
 //! `prophoto-rgb`, `a98-rgb`) return `None` until those spaces land.
 
+pub(crate) mod functional;
 pub(crate) mod hex;
 pub(crate) mod named;
