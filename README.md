@@ -128,19 +128,6 @@ closures with the same shape.
 
 ## Known divergences from culori
 
-- The generic `convert::<A, B>()` routes through XYZ D65 for any pair
-  without a direct `From` impl, even when culori's public
-  `converter(mode)` API takes a shorter path. Output drifts from
-  culori by ~1e-14, well below any practical color tolerance, but
-  not bit-for-bit. For bit-exact parity, use either the direct `From`
-  impls or the v1.2 dynamic-mode APIs `Color::convert_to(mode)` /
-  `convert_culori<A, B>` — both follow culori's per-pair routing.
-- culori's `convertRgbToLab` and `convertRgbToOklab` snap `a` and `b`
-  to exactly zero when `r == g == b`. The XYZ-hub path in
-  `convert::<>()` leaves a residual on the order of 1e-6 (Lab) or
-  1e-16 (Oklab) and feeds a phantom hue into `Lch` / `Oklch`. The
-  direct `From` impls and the new `convert_to` / `convert_culori` paths
-  perform the snap; only the generic `convert<>` does not.
 - `Prismatic` follows the Hauke 2009 definition because culori 4.0.2
   ships no `prismatic` mode against which to fixture-test. The
   literature contains other definitions under the same name; this
