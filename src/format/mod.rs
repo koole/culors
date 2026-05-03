@@ -35,7 +35,7 @@ use crate::color::Color;
 ///
 /// Output matches `culori.formatCss(c)` for any `Color` whose channels
 /// originate from culori-equivalent inputs. Round-tripping through
-/// [`crate::parse`] is stable for canonical inputs (anything the
+/// [`crate::parse()`] is stable for canonical inputs (anything the
 /// formatter itself produces).
 pub fn format_css(color: &Color) -> String {
     match color {
