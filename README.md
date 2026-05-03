@@ -6,7 +6,7 @@
 
 A Rust port of [culori](https://github.com/evercoder/culori), the JavaScript color library by Dan Burzo. Color spaces, conversion, CSS Color Module 4 parsing and formatting, interpolation, gamut mapping, ΔE, blending, averaging, WCAG contrast, and CSS filters. Output values match culori 4.0.2 within 1e-10 across an exhaustive fixture set.
 
-Used in production by [Spectralite](https://spectralite.app), a professional lighting-control application whose UI relies on culori. We needed the Rust render core to produce the same colors as the JS layer, end to end — culors is the result.
+Used in production by [Spectralite](https://spectralite.app), a lighting-control application whose UI relies on culori. We needed the Rust render core to produce the same colors as the JS layer, end to end — culors is the result.
 
 ## Features (v1.1)
 
