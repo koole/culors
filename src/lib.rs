@@ -192,7 +192,7 @@ pub use filter::{
     filter_deficiency_trit, filter_grayscale, filter_hue_rotate, filter_invert, filter_saturate,
     filter_sepia,
 };
-pub use format::{format_css, format_hex, format_hex8, format_rgb};
+pub use format::{format_css, format_hex, format_hex8, format_hsl, format_rgb};
 pub use gamut::{clamp_chroma, clamp_gamut, clamp_rgb, displayable, in_gamut, to_gamut};
 pub use interpolate::{interpolate, interpolate_with, HueFixup, InterpolateOptions};
 pub use lerp::{blerp, lerp, trilerp, unlerp};

@@ -37,9 +37,11 @@
 
 mod css;
 pub(crate) mod hex;
+pub(crate) mod hsl;
 pub(crate) mod rgb;
 
 pub use hex::{format_hex, format_hex8};
+pub use hsl::format_hsl;
 pub use rgb::format_rgb;
 
 use crate::color::Color;
