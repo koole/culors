@@ -1,6 +1,8 @@
 //! Color-difference (ΔE) factories. Mirrors culori 4.0.2's
-//! `difference.js` family: each public function returns a closure that
-//! computes the configured metric on a pair of colors.
+//! `difference.js` family, plus forward-looking placeholders for v0.4
+//! spaces (`difference_jz`, `difference_itp`). Each public function
+//! returns a closure that computes the configured metric on a pair of
+//! colors.
 //!
 //! Every factory takes its parameters once and returns a `Fn(&Color,
 //! &Color) -> f64`, matching culori's curried API:

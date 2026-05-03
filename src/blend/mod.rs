@@ -48,9 +48,20 @@ pub enum BlendMode {
     Multiply,
     /// `B(b, s) = b + s - b*s`.
     Screen,
-    /// `B(b, s) = if s<0.5 { b*2*s } else { 2*s*(1-b)-1 }` (culori formula).
+    /// Hard-light blend mode.
+    ///
+    /// Culori's formula: `if s < 0.5 { 2*s*b } else { 2*s*(1-b) - 1 }`.
+    ///
+    /// (CSS Compositing 1 § 5.7.4 expresses the formula equivalently using a
+    /// screen branch; culori's algebraic form is identical for valid inputs.)
     HardLight,
-    /// `B(b, s) = if b<0.5 { s*2*b } else { 2*b*(1-s)-1 }` (culori formula).
+    /// Overlay blend mode.
+    ///
+    /// Culori's formula: `if b < 0.5 { s*2*b } else { 2*b*(1-s) - 1 }`.
+    ///
+    /// CSS Compositing 1 § 5.7.3 defines overlay as `hard-light(s, b)` —
+    /// the same formula but with the branch driven by `s`, not `b`. Culori 4.0.2
+    /// deviates from the spec; this implementation mirrors culori for parity.
     Overlay,
     /// `B(b, s) = min(b, s)`.
     Darken,
