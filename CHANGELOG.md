@@ -11,7 +11,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Seven spline channel-interpolator factories matching culori's
+  `interpolate/splineBasis.js`, `splineNatural.js`, and `splineMonotone.js`:
+  `interpolator_spline_basis` (and `_closed`), `interpolator_spline_natural`
+  (and `_closed`), `interpolator_spline_monotone`,
+  `interpolator_spline_monotone_2`, `interpolator_spline_monotone_closed`.
+  Each factory builds a per-channel sampler `Fn(f64) -> f64` over the stops
+  and returns a `ChannelInterpFactory` so it slots into
+  `InterpolateOptions::channel_interpolator`.
+- `InterpolateOptions::channel_interpolators` — per-channel
+  interpolator-factory map. When set for a named channel (or `"alpha"`),
+  it replaces the default linear sampler with the supplied factory.
+- `interpolate_with_premultiplied_alpha(colors, mode, options)` — mirrors
+  culori's `interpolateWithPremultipliedAlpha`. Pre-multiplies each input
+  color's non-alpha channels by its alpha before lerping, divides at the
+  output. Boundary semantics match culori: at `t = 0` and `t = 1` the
+  *original* boundary color is divided by its alpha (so a stop with
+  `(r=1, alpha=0.5)` returns `r=2` at the boundary).
+- `in_gamut`, `clamp_gamut`, and `to_gamut` accept the four wide-gamut RGB
+  profiles `"p3"`, `"rec2020"`, `"a98"`, `"prophoto"`. Each profile's
+  gamut boundary is the `[0, 1]` linear-RGB box in that space, matching
+  culori's `clampGamut('p3' | 'rec2020' | 'a98' | 'prophoto')`.
+
 ### Stability
+
+As of v1.4 culors is in maintenance/upstream-tracking mode. The library
+tracks culori 4.0.2 with feature parity for everything Rust-idiomatic.
+New features land in [culori](https://github.com/Evercoder/culori) first;
+once accepted upstream they're mirrored here. Bug fixes and culori
+version bumps remain in scope.
 
 ## [1.3.0]
 

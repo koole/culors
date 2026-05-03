@@ -136,6 +136,15 @@
 //! - `serde` (off by default): derives `Serialize` and `Deserialize`
 //!   for every space struct and for [`Color`].
 //!
+//! # Status
+//!
+//! As of v1.4 culors is in maintenance/upstream-tracking mode. The
+//! library tracks culori 4.0.2 with feature parity for everything
+//! Rust-idiomatic. New features land in
+//! [culori](https://github.com/Evercoder/culori) first; once accepted
+//! upstream they're mirrored here. Bug fixes and culori version bumps
+//! remain in scope.
+//!
 //! # Further reading
 //!
 //! See the project [README](https://github.com/koole/culors#readme) for

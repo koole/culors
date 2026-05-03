@@ -8,6 +8,10 @@ A Rust port of [culori](https://github.com/evercoder/culori), the JavaScript col
 
 Used in production by [Spectralite](https://spectralite.studio), a lighting-control application whose UI relies on culori. We needed the Rust render core to produce the same colors as the JS layer, end to end — culors is the result.
 
+## Status
+
+As of v1.4 culors is in maintenance/upstream-tracking mode. The library tracks culori 4.0.2 with feature parity for everything Rust-idiomatic. New features land in [culori](https://github.com/Evercoder/culori) first; once accepted upstream they're mirrored here. Bug fixes and culori version bumps remain in scope.
+
 ## Features (v1.2)
 
 | Feature | Coverage |
