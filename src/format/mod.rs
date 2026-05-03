@@ -62,5 +62,6 @@ pub fn format_css(color: &Color) -> String {
         Color::Rec2020(c) => css::format_color_fn("rec2020", &[c.r, c.g, c.b], c.alpha),
         Color::A98(c) => css::format_color_fn("a98-rgb", &[c.r, c.g, c.b], c.alpha),
         Color::ProphotoRgb(c) => css::format_color_fn("prophoto-rgb", &[c.r, c.g, c.b], c.alpha),
+        Color::Cubehelix(c) => css::format_color_fn("--cubehelix", &[c.h, c.s, c.l], c.alpha),
     }
 }

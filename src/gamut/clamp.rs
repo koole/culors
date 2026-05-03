@@ -70,6 +70,7 @@ fn convert_rgb_back_to_source_mode(rgb: Rgb, template: Color) -> Color {
         Color::Rec2020(_) => Color::Rec2020(crate::convert(rgb)),
         Color::A98(_) => Color::A98(crate::convert(rgb)),
         Color::ProphotoRgb(_) => Color::ProphotoRgb(crate::convert(rgb)),
+        Color::Cubehelix(_) => Color::Cubehelix(rgb.into()),
     }
 }
 
@@ -193,6 +194,7 @@ pub(crate) fn to_xyz65(c: Color) -> crate::spaces::Xyz65 {
         Color::Rec2020(x) => x.to_xyz65(),
         Color::A98(x) => x.to_xyz65(),
         Color::ProphotoRgb(x) => x.to_xyz65(),
+        Color::Cubehelix(x) => x.to_xyz65(),
     }
 }
 
@@ -214,5 +216,6 @@ fn from_xyz65_in_mode_of(xyz: crate::spaces::Xyz65, template: Color) -> Color {
         Color::Rec2020(_) => Color::Rec2020(crate::spaces::Rec2020::from_xyz65(xyz)),
         Color::A98(_) => Color::A98(crate::spaces::A98::from_xyz65(xyz)),
         Color::ProphotoRgb(_) => Color::ProphotoRgb(crate::spaces::ProphotoRgb::from_xyz65(xyz)),
+        Color::Cubehelix(_) => Color::Cubehelix(crate::spaces::Cubehelix::from_xyz65(xyz)),
     }
 }
