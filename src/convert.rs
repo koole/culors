@@ -22,8 +22,27 @@ use crate::traits::ColorSpace;
 /// [`Hwb`](crate::spaces::Hwb), [`LinearRgb`](crate::spaces::LinearRgb) ↔
 /// [`Oklab`](crate::spaces::Oklab), [`Oklab`](crate::spaces::Oklab) ↔
 /// [`Oklch`](crate::spaces::Oklch), [`Xyz50`](crate::spaces::Xyz50) ↔
-/// [`Lab`](crate::spaces::Lab), and [`Lab`](crate::spaces::Lab) ↔
-/// [`Lch`](crate::spaces::Lch).
+/// [`Lab`](crate::spaces::Lab), [`Lab`](crate::spaces::Lab) ↔
+/// [`Lch`](crate::spaces::Lch), [`Rgb`](crate::spaces::Rgb) →
+/// [`Lab`](crate::spaces::Lab) / [`Lch`](crate::spaces::Lch) /
+/// [`Oklab`](crate::spaces::Oklab) / [`Oklch`](crate::spaces::Oklch).
+///
+/// # Pairs that diverge from culori's public API
+///
+/// The following pairs land at non-zero output through `convert<>()` where
+/// culori's `converter(mode)` API produces an exact zero, because culori
+/// snaps achromatic inputs (`r == g == b`) on the way through `Rgb`:
+///
+/// - `Rgb` (or any RGB-derived source) → [`Lab`](crate::spaces::Lab):
+///   `convert<>()` leaves a residual ~1e-6 in `a` and `b`.
+/// - `Rgb` (or any RGB-derived source) → [`Oklab`](crate::spaces::Oklab):
+///   `convert<>()` leaves a residual ~1e-16 in `a` and `b`.
+/// - `Rgb` (or any RGB-derived source) → [`Lch`](crate::spaces::Lch) or
+///   [`Oklch`](crate::spaces::Oklch): `convert<>()` synthesizes a phantom
+///   hue when chroma should be zero.
+///
+/// To match culori's snapped output, call `Lab::from(rgb)` / `Oklab::from(rgb)` /
+/// `Lch::from(rgb)` / `Oklch::from(rgb)` directly.
 ///
 /// Alpha is preserved by the hub conversions on both sides.
 pub fn convert<A: ColorSpace, B: ColorSpace>(c: A) -> B {
