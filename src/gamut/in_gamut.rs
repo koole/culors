@@ -71,5 +71,6 @@ pub(crate) fn color_to_rgb(c: Color) -> Rgb {
         Color::Jab(x) => crate::convert::<crate::spaces::Jab, Rgb>(x),
         Color::Jch(x) => crate::convert::<crate::spaces::Jch, Rgb>(x),
         Color::Yiq(x) => Rgb::from(x),
+        Color::Hsi(x) => Rgb::from(x),
     }
 }

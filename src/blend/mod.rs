@@ -206,6 +206,7 @@ fn color_to_xyz65(c: Color) -> Xyz65 {
         Color::Jab(x) => x.to_xyz65(),
         Color::Jch(x) => x.to_xyz65(),
         Color::Yiq(x) => x.to_xyz65(),
+        Color::Hsi(x) => x.to_xyz65(),
     }
 }
 

@@ -68,5 +68,6 @@ pub fn format_css(color: &Color) -> String {
         Color::Jab(c) => css::format_color_fn("--jzazbz", &[c.j, c.a, c.b], c.alpha),
         Color::Jch(c) => css::format_color_fn("--jzczhz", &[c.j, c.c, c.h], c.alpha),
         Color::Yiq(c) => css::format_color_fn("--yiq", &[c.y, c.i, c.q], c.alpha),
+        Color::Hsi(c) => css::format_color_fn("--hsi", &[c.h, c.s, c.i], c.alpha),
     }
 }
