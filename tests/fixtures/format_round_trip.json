@@ -1,0 +1,1216 @@
+{
+	"rows": [
+		{
+			"input": "aliceblue",
+			"formatted": "color(srgb 0.9411764705882353 0.9725490196078431 1)"
+		},
+		{
+			"input": "aqua",
+			"formatted": "color(srgb 0 1 1)"
+		},
+		{
+			"input": "aquamarine",
+			"formatted": "color(srgb 0.4980392156862745 1 0.8313725490196079)"
+		},
+		{
+			"input": "black",
+			"formatted": "color(srgb 0 0 0)"
+		},
+		{
+			"input": "blue",
+			"formatted": "color(srgb 0 0 1)"
+		},
+		{
+			"input": "blueviolet",
+			"formatted": "color(srgb 0.5411764705882353 0.16862745098039217 0.8862745098039215)"
+		},
+		{
+			"input": "brown",
+			"formatted": "color(srgb 0.6470588235294118 0.16470588235294117 0.16470588235294117)"
+		},
+		{
+			"input": "burlywood",
+			"formatted": "color(srgb 0.8705882352941177 0.7215686274509804 0.5294117647058824)"
+		},
+		{
+			"input": "chartreuse",
+			"formatted": "color(srgb 0.4980392156862745 1 0)"
+		},
+		{
+			"input": "cornflowerblue",
+			"formatted": "color(srgb 0.39215686274509803 0.5843137254901961 0.9294117647058824)"
+		},
+		{
+			"input": "crimson",
+			"formatted": "color(srgb 0.8627450980392157 0.0784313725490196 0.23529411764705882)"
+		},
+		{
+			"input": "cyan",
+			"formatted": "color(srgb 0 1 1)"
+		},
+		{
+			"input": "darkblue",
+			"formatted": "color(srgb 0 0 0.5450980392156862)"
+		},
+		{
+			"input": "darkgray",
+			"formatted": "color(srgb 0.6627450980392157 0.6627450980392157 0.6627450980392157)"
+		},
+		{
+			"input": "darkgrey",
+			"formatted": "color(srgb 0.6627450980392157 0.6627450980392157 0.6627450980392157)"
+		},
+		{
+			"input": "darkkhaki",
+			"formatted": "color(srgb 0.7411764705882353 0.7176470588235294 0.4196078431372549)"
+		},
+		{
+			"input": "darkolivegreen",
+			"formatted": "color(srgb 0.3333333333333333 0.4196078431372549 0.1843137254901961)"
+		},
+		{
+			"input": "darkslategray",
+			"formatted": "color(srgb 0.1843137254901961 0.30980392156862746 0.30980392156862746)"
+		},
+		{
+			"input": "darkslategrey",
+			"formatted": "color(srgb 0.1843137254901961 0.30980392156862746 0.30980392156862746)"
+		},
+		{
+			"input": "deeppink",
+			"formatted": "color(srgb 1 0.0784313725490196 0.5764705882352941)"
+		},
+		{
+			"input": "dimgray",
+			"formatted": "color(srgb 0.4117647058823529 0.4117647058823529 0.4117647058823529)"
+		},
+		{
+			"input": "dimgrey",
+			"formatted": "color(srgb 0.4117647058823529 0.4117647058823529 0.4117647058823529)"
+		},
+		{
+			"input": "dodgerblue",
+			"formatted": "color(srgb 0.11764705882352941 0.5647058823529412 1)"
+		},
+		{
+			"input": "firebrick",
+			"formatted": "color(srgb 0.6980392156862745 0.13333333333333333 0.13333333333333333)"
+		},
+		{
+			"input": "floralwhite",
+			"formatted": "color(srgb 1 0.9803921568627451 0.9411764705882353)"
+		},
+		{
+			"input": "forestgreen",
+			"formatted": "color(srgb 0.13333333333333333 0.5450980392156862 0.13333333333333333)"
+		},
+		{
+			"input": "fuchsia",
+			"formatted": "color(srgb 1 0 1)"
+		},
+		{
+			"input": "gainsboro",
+			"formatted": "color(srgb 0.8627450980392157 0.8627450980392157 0.8627450980392157)"
+		},
+		{
+			"input": "gold",
+			"formatted": "color(srgb 1 0.8431372549019608 0)"
+		},
+		{
+			"input": "goldenrod",
+			"formatted": "color(srgb 0.8549019607843137 0.6470588235294118 0.12549019607843137)"
+		},
+		{
+			"input": "gray",
+			"formatted": "color(srgb 0.5019607843137255 0.5019607843137255 0.5019607843137255)"
+		},
+		{
+			"input": "green",
+			"formatted": "color(srgb 0 0.5019607843137255 0)"
+		},
+		{
+			"input": "greenyellow",
+			"formatted": "color(srgb 0.6784313725490196 1 0.1843137254901961)"
+		},
+		{
+			"input": "grey",
+			"formatted": "color(srgb 0.5019607843137255 0.5019607843137255 0.5019607843137255)"
+		},
+		{
+			"input": "hotpink",
+			"formatted": "color(srgb 1 0.4117647058823529 0.7058823529411765)"
+		},
+		{
+			"input": "indianred",
+			"formatted": "color(srgb 0.803921568627451 0.3607843137254902 0.3607843137254902)"
+		},
+		{
+			"input": "indigo",
+			"formatted": "color(srgb 0.29411764705882354 0 0.5098039215686274)"
+		},
+		{
+			"input": "khaki",
+			"formatted": "color(srgb 0.9411764705882353 0.9019607843137255 0.5490196078431373)"
+		},
+		{
+			"input": "lavender",
+			"formatted": "color(srgb 0.9019607843137255 0.9019607843137255 0.9803921568627451)"
+		},
+		{
+			"input": "lavenderblush",
+			"formatted": "color(srgb 1 0.9411764705882353 0.9607843137254902)"
+		},
+		{
+			"input": "lemonchiffon",
+			"formatted": "color(srgb 1 0.9803921568627451 0.803921568627451)"
+		},
+		{
+			"input": "lightblue",
+			"formatted": "color(srgb 0.6784313725490196 0.8470588235294118 0.9019607843137255)"
+		},
+		{
+			"input": "lightgoldenrodyellow",
+			"formatted": "color(srgb 0.9803921568627451 0.9803921568627451 0.8235294117647058)"
+		},
+		{
+			"input": "lightgray",
+			"formatted": "color(srgb 0.8274509803921568 0.8274509803921568 0.8274509803921568)"
+		},
+		{
+			"input": "lightgrey",
+			"formatted": "color(srgb 0.8274509803921568 0.8274509803921568 0.8274509803921568)"
+		},
+		{
+			"input": "lightseagreen",
+			"formatted": "color(srgb 0.12549019607843137 0.6980392156862745 0.6666666666666666)"
+		},
+		{
+			"input": "lightslategray",
+			"formatted": "color(srgb 0.4666666666666667 0.5333333333333333 0.6)"
+		},
+		{
+			"input": "lightslategrey",
+			"formatted": "color(srgb 0.4666666666666667 0.5333333333333333 0.6)"
+		},
+		{
+			"input": "lime",
+			"formatted": "color(srgb 0 1 0)"
+		},
+		{
+			"input": "limegreen",
+			"formatted": "color(srgb 0.19607843137254902 0.803921568627451 0.19607843137254902)"
+		},
+		{
+			"input": "magenta",
+			"formatted": "color(srgb 1 0 1)"
+		},
+		{
+			"input": "maroon",
+			"formatted": "color(srgb 0.5019607843137255 0 0)"
+		},
+		{
+			"input": "mediumaquamarine",
+			"formatted": "color(srgb 0.4 0.803921568627451 0.6666666666666666)"
+		},
+		{
+			"input": "mediumorchid",
+			"formatted": "color(srgb 0.7294117647058823 0.3333333333333333 0.8274509803921568)"
+		},
+		{
+			"input": "mediumpurple",
+			"formatted": "color(srgb 0.5764705882352941 0.4392156862745098 0.8588235294117647)"
+		},
+		{
+			"input": "mediumvioletred",
+			"formatted": "color(srgb 0.7803921568627451 0.08235294117647059 0.5215686274509804)"
+		},
+		{
+			"input": "midnightblue",
+			"formatted": "color(srgb 0.09803921568627451 0.09803921568627451 0.4392156862745098)"
+		},
+		{
+			"input": "navy",
+			"formatted": "color(srgb 0 0 0.5019607843137255)"
+		},
+		{
+			"input": "olive",
+			"formatted": "color(srgb 0.5019607843137255 0.5019607843137255 0)"
+		},
+		{
+			"input": "olivedrab",
+			"formatted": "color(srgb 0.4196078431372549 0.5568627450980392 0.13725490196078433)"
+		},
+		{
+			"input": "orange",
+			"formatted": "color(srgb 1 0.6470588235294118 0)"
+		},
+		{
+			"input": "orangered",
+			"formatted": "color(srgb 1 0.27058823529411763 0)"
+		},
+		{
+			"input": "orchid",
+			"formatted": "color(srgb 0.8549019607843137 0.4392156862745098 0.8392156862745098)"
+		},
+		{
+			"input": "papayawhip",
+			"formatted": "color(srgb 1 0.9372549019607843 0.8352941176470589)"
+		},
+		{
+			"input": "peachpuff",
+			"formatted": "color(srgb 1 0.8549019607843137 0.7254901960784313)"
+		},
+		{
+			"input": "pink",
+			"formatted": "color(srgb 1 0.7529411764705882 0.796078431372549)"
+		},
+		{
+			"input": "plum",
+			"formatted": "color(srgb 0.8666666666666667 0.6274509803921569 0.8666666666666667)"
+		},
+		{
+			"input": "purple",
+			"formatted": "color(srgb 0.5019607843137255 0 0.5019607843137255)"
+		},
+		{
+			"input": "rebeccapurple",
+			"formatted": "color(srgb 0.4 0.2 0.6)"
+		},
+		{
+			"input": "red",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "royalblue",
+			"formatted": "color(srgb 0.2549019607843137 0.4117647058823529 0.8823529411764706)"
+		},
+		{
+			"input": "saddlebrown",
+			"formatted": "color(srgb 0.5450980392156862 0.27058823529411763 0.07450980392156863)"
+		},
+		{
+			"input": "salmon",
+			"formatted": "color(srgb 0.9803921568627451 0.5019607843137255 0.4470588235294118)"
+		},
+		{
+			"input": "seagreen",
+			"formatted": "color(srgb 0.1803921568627451 0.5450980392156862 0.3411764705882353)"
+		},
+		{
+			"input": "silver",
+			"formatted": "color(srgb 0.7529411764705882 0.7529411764705882 0.7529411764705882)"
+		},
+		{
+			"input": "skyblue",
+			"formatted": "color(srgb 0.5294117647058824 0.807843137254902 0.9215686274509803)"
+		},
+		{
+			"input": "slategray",
+			"formatted": "color(srgb 0.4392156862745098 0.5019607843137255 0.5647058823529412)"
+		},
+		{
+			"input": "slategrey",
+			"formatted": "color(srgb 0.4392156862745098 0.5019607843137255 0.5647058823529412)"
+		},
+		{
+			"input": "steelblue",
+			"formatted": "color(srgb 0.27450980392156865 0.5098039215686274 0.7058823529411765)"
+		},
+		{
+			"input": "tan",
+			"formatted": "color(srgb 0.8235294117647058 0.7058823529411765 0.5490196078431373)"
+		},
+		{
+			"input": "teal",
+			"formatted": "color(srgb 0 0.5019607843137255 0.5019607843137255)"
+		},
+		{
+			"input": "tomato",
+			"formatted": "color(srgb 1 0.38823529411764707 0.2784313725490196)"
+		},
+		{
+			"input": "turquoise",
+			"formatted": "color(srgb 0.25098039215686274 0.8784313725490196 0.8156862745098039)"
+		},
+		{
+			"input": "violet",
+			"formatted": "color(srgb 0.9333333333333333 0.5098039215686274 0.9333333333333333)"
+		},
+		{
+			"input": "white",
+			"formatted": "color(srgb 1 1 1)"
+		},
+		{
+			"input": "whitesmoke",
+			"formatted": "color(srgb 0.9607843137254902 0.9607843137254902 0.9607843137254902)"
+		},
+		{
+			"input": "yellow",
+			"formatted": "color(srgb 1 1 0)"
+		},
+		{
+			"input": "yellowgreen",
+			"formatted": "color(srgb 0.6039215686274509 0.803921568627451 0.19607843137254902)"
+		},
+		{
+			"input": "#000",
+			"formatted": "color(srgb 0 0 0)"
+		},
+		{
+			"input": "#fff",
+			"formatted": "color(srgb 1 1 1)"
+		},
+		{
+			"input": "#f00",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "#0f0",
+			"formatted": "color(srgb 0 1 0)"
+		},
+		{
+			"input": "#00f",
+			"formatted": "color(srgb 0 0 1)"
+		},
+		{
+			"input": "#abc",
+			"formatted": "color(srgb 0.6666666666666666 0.7333333333333333 0.8)"
+		},
+		{
+			"input": "#ABC",
+			"formatted": "color(srgb 0.6666666666666666 0.7333333333333333 0.8)"
+		},
+		{
+			"input": "#aBc",
+			"formatted": "color(srgb 0.6666666666666666 0.7333333333333333 0.8)"
+		},
+		{
+			"input": "#abcd",
+			"formatted": "color(srgb 0.6666666666666666 0.7333333333333333 0.8 / 0.8666666666666667)"
+		},
+		{
+			"input": "#ABCD",
+			"formatted": "color(srgb 0.6666666666666666 0.7333333333333333 0.8 / 0.8666666666666667)"
+		},
+		{
+			"input": "#aBcD",
+			"formatted": "color(srgb 0.6666666666666666 0.7333333333333333 0.8 / 0.8666666666666667)"
+		},
+		{
+			"input": "#000000",
+			"formatted": "color(srgb 0 0 0)"
+		},
+		{
+			"input": "#ffffff",
+			"formatted": "color(srgb 1 1 1)"
+		},
+		{
+			"input": "#ff0000",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "#00ff00",
+			"formatted": "color(srgb 0 1 0)"
+		},
+		{
+			"input": "#0000ff",
+			"formatted": "color(srgb 0 0 1)"
+		},
+		{
+			"input": "#FF0000",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "#fF00aA",
+			"formatted": "color(srgb 1 0 0.6666666666666666)"
+		},
+		{
+			"input": "#deadbe",
+			"formatted": "color(srgb 0.8705882352941177 0.6784313725490196 0.7450980392156863)"
+		},
+		{
+			"input": "#00000000",
+			"formatted": "color(srgb 0 0 0 / 0)"
+		},
+		{
+			"input": "#ffffffff",
+			"formatted": "color(srgb 1 1 1)"
+		},
+		{
+			"input": "#ff000080",
+			"formatted": "color(srgb 1 0 0 / 0.5019607843137255)"
+		},
+		{
+			"input": "#FF000080",
+			"formatted": "color(srgb 1 0 0 / 0.5019607843137255)"
+		},
+		{
+			"input": "#abcdef12",
+			"formatted": "color(srgb 0.6705882352941176 0.803921568627451 0.9372549019607843 / 0.07058823529411765)"
+		},
+		{
+			"input": "100000",
+			"formatted": "color(srgb 0.06274509803921569 0 0)"
+		},
+		{
+			"input": "rgb(0 0 0)",
+			"formatted": "color(srgb 0 0 0)"
+		},
+		{
+			"input": "rgb(255 0 0)",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "rgb(0 255 0)",
+			"formatted": "color(srgb 0 1 0)"
+		},
+		{
+			"input": "rgb(0 0 255)",
+			"formatted": "color(srgb 0 0 1)"
+		},
+		{
+			"input": "rgb(255 255 255)",
+			"formatted": "color(srgb 1 1 1)"
+		},
+		{
+			"input": "rgb(128 64 32)",
+			"formatted": "color(srgb 0.5019607843137255 0.25098039215686274 0.12549019607843137)"
+		},
+		{
+			"input": "rgb(0% 0% 0%)",
+			"formatted": "color(srgb 0 0 0)"
+		},
+		{
+			"input": "rgb(100% 0% 0%)",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "rgb(50% 50% 50%)",
+			"formatted": "color(srgb 0.5 0.5 0.5)"
+		},
+		{
+			"input": "rgb(50% 25% 0%)",
+			"formatted": "color(srgb 0.5 0.25 0)"
+		},
+		{
+			"input": "rgb(255 0 0 / 0.5)",
+			"formatted": "color(srgb 1 0 0 / 0.5)"
+		},
+		{
+			"input": "rgb(255 0 0 / 50%)",
+			"formatted": "color(srgb 1 0 0 / 0.5)"
+		},
+		{
+			"input": "rgb(255 0 0 / 0)",
+			"formatted": "color(srgb 1 0 0 / 0)"
+		},
+		{
+			"input": "rgb(255 0 0 / 1)",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "rgb(255 0 0 / 100%)",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "rgb(300 0 0)",
+			"formatted": "color(srgb 1.1764705882352942 0 0)"
+		},
+		{
+			"input": "rgb(-50 0 0)",
+			"formatted": "color(srgb -0.19607843137254902 0 0)"
+		},
+		{
+			"input": "rgb(255 -10 510)",
+			"formatted": "color(srgb 1 -0.0392156862745098 2)"
+		},
+		{
+			"input": "rgb(150% 0% 0%)",
+			"formatted": "color(srgb 1.5 0 0)"
+		},
+		{
+			"input": "rgb(-50% 0% 0%)",
+			"formatted": "color(srgb -0.5 0 0)"
+		},
+		{
+			"input": "rgb(none 0 0)",
+			"formatted": "color(srgb none 0 0)"
+		},
+		{
+			"input": "rgb(255 none 0)",
+			"formatted": "color(srgb 1 none 0)"
+		},
+		{
+			"input": "rgb(255 0 none)",
+			"formatted": "color(srgb 1 0 none)"
+		},
+		{
+			"input": "rgb(none none none)",
+			"formatted": "color(srgb none none none)"
+		},
+		{
+			"input": "rgb(255 0 0 / none)",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "rgb(none none none / none)",
+			"formatted": "color(srgb none none none)"
+		},
+		{
+			"input": "rgba(255 0 0)",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "rgba(255 0 0 / 0.5)",
+			"formatted": "color(srgb 1 0 0 / 0.5)"
+		},
+		{
+			"input": "rgb(255, 0, 0)",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "rgb(0, 255, 0)",
+			"formatted": "color(srgb 0 1 0)"
+		},
+		{
+			"input": "rgb(0, 0, 0)",
+			"formatted": "color(srgb 0 0 0)"
+		},
+		{
+			"input": "rgb(255, 255, 255)",
+			"formatted": "color(srgb 1 1 1)"
+		},
+		{
+			"input": "rgba(255, 0, 0, 0.5)",
+			"formatted": "color(srgb 1 0 0 / 0.5)"
+		},
+		{
+			"input": "rgba(255, 0, 0, 0)",
+			"formatted": "color(srgb 1 0 0 / 0)"
+		},
+		{
+			"input": "rgba(255, 0, 0, 1)",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "rgba(255, 0, 0, 50%)",
+			"formatted": "color(srgb 1 0 0 / 0.5)"
+		},
+		{
+			"input": "rgb(50%, 25%, 0%)",
+			"formatted": "color(srgb 0.5 0.25 0)"
+		},
+		{
+			"input": "rgba(50%, 25%, 0%, 0.5)",
+			"formatted": "color(srgb 0.5 0.25 0 / 0.5)"
+		},
+		{
+			"input": "rgb( 255 0 0 )",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "  rgb(255 0 0)  ",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "rgb(  255  ,  0  ,  0  )",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "hsl(0 100% 50%)",
+			"formatted": "hsl(0 100% 50%)"
+		},
+		{
+			"input": "hsl(120 100% 50%)",
+			"formatted": "hsl(120 100% 50%)"
+		},
+		{
+			"input": "hsl(240 100% 50%)",
+			"formatted": "hsl(240 100% 50%)"
+		},
+		{
+			"input": "hsl(360 100% 50%)",
+			"formatted": "hsl(360 100% 50%)"
+		},
+		{
+			"input": "hsl(180 50% 50%)",
+			"formatted": "hsl(180 50% 50%)"
+		},
+		{
+			"input": "hsl(0 0% 0%)",
+			"formatted": "hsl(0 0% 0%)"
+		},
+		{
+			"input": "hsl(0 0% 100%)",
+			"formatted": "hsl(0 0% 100%)"
+		},
+		{
+			"input": "hsl(0 0% 50%)",
+			"formatted": "hsl(0 0% 50%)"
+		},
+		{
+			"input": "hsl(180deg 50% 50%)",
+			"formatted": "hsl(180 50% 50%)"
+		},
+		{
+			"input": "hsl(0.5turn 50% 50%)",
+			"formatted": "hsl(180 50% 50%)"
+		},
+		{
+			"input": "hsl(200grad 50% 50%)",
+			"formatted": "hsl(180 50% 50%)"
+		},
+		{
+			"input": "hsl(3.14159rad 50% 50%)",
+			"formatted": "hsl(179.9998479605043 50% 50%)"
+		},
+		{
+			"input": "hsl(180 50 50)",
+			"formatted": "hsl(180 50% 50%)"
+		},
+		{
+			"input": "hsl(720 50% 50%)",
+			"formatted": "hsl(720 50% 50%)"
+		},
+		{
+			"input": "hsl(-180 50% 50%)",
+			"formatted": "hsl(-180 50% 50%)"
+		},
+		{
+			"input": "hsl(180 50% 50% / 0.5)",
+			"formatted": "hsl(180 50% 50% / 0.5)"
+		},
+		{
+			"input": "hsl(180 50% 50% / 50%)",
+			"formatted": "hsl(180 50% 50% / 0.5)"
+		},
+		{
+			"input": "hsl(none 50% 50%)",
+			"formatted": "hsl(none 50% 50%)"
+		},
+		{
+			"input": "hsl(180 none 50%)",
+			"formatted": "hsl(180 none 50%)"
+		},
+		{
+			"input": "hsl(180 50% none)",
+			"formatted": "hsl(180 50% none)"
+		},
+		{
+			"input": "hsl(180 50% 50% / none)",
+			"formatted": "hsl(180 50% 50%)"
+		},
+		{
+			"input": "hsla(180 50% 50%)",
+			"formatted": "hsl(180 50% 50%)"
+		},
+		{
+			"input": "hsla(180 50% 50% / 0.5)",
+			"formatted": "hsl(180 50% 50% / 0.5)"
+		},
+		{
+			"input": "hsl(180, 50%, 50%)",
+			"formatted": "hsl(180 50% 50%)"
+		},
+		{
+			"input": "hsl(0, 100%, 50%)",
+			"formatted": "hsl(0 100% 50%)"
+		},
+		{
+			"input": "hsl(120, 100%, 50%)",
+			"formatted": "hsl(120 100% 50%)"
+		},
+		{
+			"input": "hsla(180, 50%, 50%, 0.5)",
+			"formatted": "hsl(180 50% 50% / 0.5)"
+		},
+		{
+			"input": "hsla(180, 50%, 50%, 50%)",
+			"formatted": "hsl(180 50% 50% / 0.5)"
+		},
+		{
+			"input": "hsl(180deg, 50%, 50%)",
+			"formatted": "hsl(180 50% 50%)"
+		},
+		{
+			"input": "hsl(0.5turn, 50%, 50%)",
+			"formatted": "hsl(180 50% 50%)"
+		},
+		{
+			"input": "  hsl(180 50% 50%)  ",
+			"formatted": "hsl(180 50% 50%)"
+		},
+		{
+			"input": "hwb(0 0% 0%)",
+			"formatted": "hwb(0 0% 0%)"
+		},
+		{
+			"input": "hwb(120 25% 25%)",
+			"formatted": "hwb(120 25% 25%)"
+		},
+		{
+			"input": "hwb(240 50% 50%)",
+			"formatted": "hwb(240 50% 50%)"
+		},
+		{
+			"input": "hwb(0 100% 0%)",
+			"formatted": "hwb(0 100% 0%)"
+		},
+		{
+			"input": "hwb(0 0% 100%)",
+			"formatted": "hwb(0 0% 100%)"
+		},
+		{
+			"input": "hwb(180 30% 30%)",
+			"formatted": "hwb(180 30% 30%)"
+		},
+		{
+			"input": "hwb(180deg 30% 30%)",
+			"formatted": "hwb(180 30% 30%)"
+		},
+		{
+			"input": "hwb(0.5turn 30% 30%)",
+			"formatted": "hwb(180 30% 30%)"
+		},
+		{
+			"input": "hwb(200grad 30% 30%)",
+			"formatted": "hwb(180 30% 30%)"
+		},
+		{
+			"input": "hwb(3.14159rad 30% 30%)",
+			"formatted": "hwb(179.9998479605043 30% 30%)"
+		},
+		{
+			"input": "hwb(180 30% 30% / 0.5)",
+			"formatted": "hwb(180 30% 30% / 0.5)"
+		},
+		{
+			"input": "hwb(180 30% 30% / 50%)",
+			"formatted": "hwb(180 30% 30% / 0.5)"
+		},
+		{
+			"input": "hwb(none 30% 30%)",
+			"formatted": "hwb(none 30% 30%)"
+		},
+		{
+			"input": "hwb(180 none 30%)",
+			"formatted": "hwb(180 none 30%)"
+		},
+		{
+			"input": "hwb(180 30% none)",
+			"formatted": "hwb(180 30% none)"
+		},
+		{
+			"input": "  hwb(180 30% 30%)  ",
+			"formatted": "hwb(180 30% 30%)"
+		},
+		{
+			"input": "lab(0 0 0)",
+			"formatted": "lab(0 0 0)"
+		},
+		{
+			"input": "lab(50 25 -25)",
+			"formatted": "lab(50 25 -25)"
+		},
+		{
+			"input": "lab(100 0 0)",
+			"formatted": "lab(100 0 0)"
+		},
+		{
+			"input": "lab(50% 25 -25)",
+			"formatted": "lab(50 25 -25)"
+		},
+		{
+			"input": "lab(50% 50% -50%)",
+			"formatted": "lab(50 62.5 -62.5)"
+		},
+		{
+			"input": "lab(0% 0 0)",
+			"formatted": "lab(0 0 0)"
+		},
+		{
+			"input": "lab(100% 0 0)",
+			"formatted": "lab(100 0 0)"
+		},
+		{
+			"input": "lab(50 25 -25 / 0.5)",
+			"formatted": "lab(50 25 -25 / 0.5)"
+		},
+		{
+			"input": "lab(50 25 -25 / 50%)",
+			"formatted": "lab(50 25 -25 / 0.5)"
+		},
+		{
+			"input": "lab(none 25 -25)",
+			"formatted": "lab(none 25 -25)"
+		},
+		{
+			"input": "lab(50 none -25)",
+			"formatted": "lab(50 none -25)"
+		},
+		{
+			"input": "lab(50 25 none)",
+			"formatted": "lab(50 25 none)"
+		},
+		{
+			"input": "lab(50 25 -25 / none)",
+			"formatted": "lab(50 25 -25)"
+		},
+		{
+			"input": "lab(150 25 -25)",
+			"formatted": "lab(100 25 -25)"
+		},
+		{
+			"input": "lab(-10 25 -25)",
+			"formatted": "lab(0 25 -25)"
+		},
+		{
+			"input": "lab(150% 25 -25)",
+			"formatted": "lab(100 25 -25)"
+		},
+		{
+			"input": "  lab(50 25 -25)  ",
+			"formatted": "lab(50 25 -25)"
+		},
+		{
+			"input": "lch(0 0 0)",
+			"formatted": "lch(0 0 0)"
+		},
+		{
+			"input": "lch(50 30 180)",
+			"formatted": "lch(50 30 180)"
+		},
+		{
+			"input": "lch(100 0 0)",
+			"formatted": "lch(100 0 0)"
+		},
+		{
+			"input": "lch(50% 30 180)",
+			"formatted": "lch(50 30 180)"
+		},
+		{
+			"input": "lch(50 50% 180)",
+			"formatted": "lch(50 75 180)"
+		},
+		{
+			"input": "lch(50 30 180deg)",
+			"formatted": "lch(50 30 180)"
+		},
+		{
+			"input": "lch(50 30 0.5turn)",
+			"formatted": "lch(50 30 180)"
+		},
+		{
+			"input": "lch(50 30 200grad)",
+			"formatted": "lch(50 30 180)"
+		},
+		{
+			"input": "lch(50 30 3.14159rad)",
+			"formatted": "lch(50 30 179.9998479605043)"
+		},
+		{
+			"input": "lch(50 30 180 / 0.5)",
+			"formatted": "lch(50 30 180 / 0.5)"
+		},
+		{
+			"input": "lch(50 30 180 / 50%)",
+			"formatted": "lch(50 30 180 / 0.5)"
+		},
+		{
+			"input": "lch(none 30 180)",
+			"formatted": "lch(none 30 180)"
+		},
+		{
+			"input": "lch(50 none 180)",
+			"formatted": "lch(50 none 180)"
+		},
+		{
+			"input": "lch(50 30 none)",
+			"formatted": "lch(50 30 none)"
+		},
+		{
+			"input": "lch(150 30 180)",
+			"formatted": "lch(100 30 180)"
+		},
+		{
+			"input": "lch(-10 30 180)",
+			"formatted": "lch(0 30 180)"
+		},
+		{
+			"input": "lch(50 -30 180)",
+			"formatted": "lch(50 0 180)"
+		},
+		{
+			"input": "lch(50 30 720)",
+			"formatted": "lch(50 30 720)"
+		},
+		{
+			"input": "  lch(50 30 180)  ",
+			"formatted": "lch(50 30 180)"
+		},
+		{
+			"input": "oklab(0 0 0)",
+			"formatted": "oklab(0 0 0)"
+		},
+		{
+			"input": "oklab(0.5 0.1 -0.1)",
+			"formatted": "oklab(0.5 0.1 -0.1)"
+		},
+		{
+			"input": "oklab(1 0 0)",
+			"formatted": "oklab(1 0 0)"
+		},
+		{
+			"input": "oklab(50% 0.1 -0.1)",
+			"formatted": "oklab(0.5 0.1 -0.1)"
+		},
+		{
+			"input": "oklab(50% 50% -50%)",
+			"formatted": "oklab(0.5 0.2 -0.2)"
+		},
+		{
+			"input": "oklab(0% 0 0)",
+			"formatted": "oklab(0 0 0)"
+		},
+		{
+			"input": "oklab(100% 0 0)",
+			"formatted": "oklab(1 0 0)"
+		},
+		{
+			"input": "oklab(0.5 0.1 -0.1 / 0.5)",
+			"formatted": "oklab(0.5 0.1 -0.1 / 0.5)"
+		},
+		{
+			"input": "oklab(0.5 0.1 -0.1 / 50%)",
+			"formatted": "oklab(0.5 0.1 -0.1 / 0.5)"
+		},
+		{
+			"input": "oklab(none 0.1 -0.1)",
+			"formatted": "oklab(none 0.1 -0.1)"
+		},
+		{
+			"input": "oklab(0.5 none -0.1)",
+			"formatted": "oklab(0.5 none -0.1)"
+		},
+		{
+			"input": "oklab(0.5 0.1 none)",
+			"formatted": "oklab(0.5 0.1 none)"
+		},
+		{
+			"input": "oklab(1.5 0.1 -0.1)",
+			"formatted": "oklab(1 0.1 -0.1)"
+		},
+		{
+			"input": "oklab(-0.1 0.1 -0.1)",
+			"formatted": "oklab(0 0.1 -0.1)"
+		},
+		{
+			"input": "oklab(150% 0.1 -0.1)",
+			"formatted": "oklab(1 0.1 -0.1)"
+		},
+		{
+			"input": "  oklab(0.5 0.1 -0.1)  ",
+			"formatted": "oklab(0.5 0.1 -0.1)"
+		},
+		{
+			"input": "oklch(0 0 0)",
+			"formatted": "oklch(0 0 0)"
+		},
+		{
+			"input": "oklch(0.5 0.1 180)",
+			"formatted": "oklch(0.5 0.1 180)"
+		},
+		{
+			"input": "oklch(1 0 0)",
+			"formatted": "oklch(1 0 0)"
+		},
+		{
+			"input": "oklch(50% 0.1 180)",
+			"formatted": "oklch(0.5 0.1 180)"
+		},
+		{
+			"input": "oklch(0.5 50% 180)",
+			"formatted": "oklch(0.5 0.2 180)"
+		},
+		{
+			"input": "oklch(0.5 0.1 180deg)",
+			"formatted": "oklch(0.5 0.1 180)"
+		},
+		{
+			"input": "oklch(0.5 0.1 0.5turn)",
+			"formatted": "oklch(0.5 0.1 180)"
+		},
+		{
+			"input": "oklch(0.5 0.1 200grad)",
+			"formatted": "oklch(0.5 0.1 180)"
+		},
+		{
+			"input": "oklch(0.5 0.1 3.14159rad)",
+			"formatted": "oklch(0.5 0.1 179.9998479605043)"
+		},
+		{
+			"input": "oklch(0.5 0.1 180 / 0.5)",
+			"formatted": "oklch(0.5 0.1 180 / 0.5)"
+		},
+		{
+			"input": "oklch(0.5 0.1 180 / 50%)",
+			"formatted": "oklch(0.5 0.1 180 / 0.5)"
+		},
+		{
+			"input": "oklch(none 0.1 180)",
+			"formatted": "oklch(none 0.1 180)"
+		},
+		{
+			"input": "oklch(0.5 none 180)",
+			"formatted": "oklch(0.5 none 180)"
+		},
+		{
+			"input": "oklch(0.5 0.1 none)",
+			"formatted": "oklch(0.5 0.1 none)"
+		},
+		{
+			"input": "oklch(1.5 0.1 180)",
+			"formatted": "oklch(1 0.1 180)"
+		},
+		{
+			"input": "oklch(0.5 -0.1 180)",
+			"formatted": "oklch(0.5 0 180)"
+		},
+		{
+			"input": "  oklch(0.5 0.1 180)  ",
+			"formatted": "oklch(0.5 0.1 180)"
+		},
+		{
+			"input": "color(srgb 1 0 0)",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "color(srgb 0 1 0)",
+			"formatted": "color(srgb 0 1 0)"
+		},
+		{
+			"input": "color(srgb 0 0 1)",
+			"formatted": "color(srgb 0 0 1)"
+		},
+		{
+			"input": "color(srgb 0.5 0.5 0.5)",
+			"formatted": "color(srgb 0.5 0.5 0.5)"
+		},
+		{
+			"input": "color(srgb 1 0 0 / 0.5)",
+			"formatted": "color(srgb 1 0 0 / 0.5)"
+		},
+		{
+			"input": "color(srgb 1 0 0 / 50%)",
+			"formatted": "color(srgb 1 0 0 / 0.5)"
+		},
+		{
+			"input": "color(srgb none 0 0)",
+			"formatted": "color(srgb none 0 0)"
+		},
+		{
+			"input": "color(srgb 1 none 0)",
+			"formatted": "color(srgb 1 none 0)"
+		},
+		{
+			"input": "color(srgb 1 0 none)",
+			"formatted": "color(srgb 1 0 none)"
+		},
+		{
+			"input": "color(srgb none none none)",
+			"formatted": "color(srgb none none none)"
+		},
+		{
+			"input": "color(srgb 1.5 0 0)",
+			"formatted": "color(srgb 1.5 0 0)"
+		},
+		{
+			"input": "color(srgb -0.5 0 0)",
+			"formatted": "color(srgb -0.5 0 0)"
+		},
+		{
+			"input": "color(srgb 100% 0% 0%)",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "color(srgb 50% 25% 0%)",
+			"formatted": "color(srgb 0.5 0.25 0)"
+		},
+		{
+			"input": "color(srgb-linear 0.5 0.5 0.5)",
+			"formatted": "color(srgb-linear 0.5 0.5 0.5)"
+		},
+		{
+			"input": "color(srgb-linear 1 0 0)",
+			"formatted": "color(srgb-linear 1 0 0)"
+		},
+		{
+			"input": "color(srgb-linear 0 1 0 / 0.5)",
+			"formatted": "color(srgb-linear 0 1 0 / 0.5)"
+		},
+		{
+			"input": "color(srgb-linear none 0 0)",
+			"formatted": "color(srgb-linear none 0 0)"
+		},
+		{
+			"input": "color(xyz 0.5 0.5 0.5)",
+			"formatted": "color(xyz-d65 0.5 0.5 0.5)"
+		},
+		{
+			"input": "color(xyz-d65 0.5 0.5 0.5)",
+			"formatted": "color(xyz-d65 0.5 0.5 0.5)"
+		},
+		{
+			"input": "color(xyz 0 0 0)",
+			"formatted": "color(xyz-d65 0 0 0)"
+		},
+		{
+			"input": "color(xyz-d65 1 1 1)",
+			"formatted": "color(xyz-d65 1 1 1)"
+		},
+		{
+			"input": "color(xyz 0.4 0.5 0.6 / 0.5)",
+			"formatted": "color(xyz-d65 0.4 0.5 0.6 / 0.5)"
+		},
+		{
+			"input": "color(xyz-d50 0.5 0.5 0.5)",
+			"formatted": "color(xyz-d50 0.5 0.5 0.5)"
+		},
+		{
+			"input": "color(xyz-d50 0 0 0)",
+			"formatted": "color(xyz-d50 0 0 0)"
+		},
+		{
+			"input": "color(xyz-d50 1 1 1)",
+			"formatted": "color(xyz-d50 1 1 1)"
+		},
+		{
+			"input": "color(xyz-d50 0.4 0.5 0.6 / 0.5)",
+			"formatted": "color(xyz-d50 0.4 0.5 0.6 / 0.5)"
+		},
+		{
+			"input": "color(xyz-d50 none none none)",
+			"formatted": "color(xyz-d50 none none none)"
+		},
+		{
+			"input": "  color(srgb 1 0 0)  ",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "transparent",
+			"formatted": "color(srgb 0 0 0 / 0)"
+		},
+		{
+			"input": "RED",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "Red",
+			"formatted": "color(srgb 1 0 0)"
+		},
+		{
+			"input": "BLUE",
+			"formatted": "color(srgb 0 0 1)"
+		}
+	]
+}

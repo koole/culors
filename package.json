@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "gen-fixtures": "node fixtures-gen/generate.mjs",
-    "gen-parse-fixtures": "node fixtures-gen/parse-fixtures.mjs"
+    "gen-parse-fixtures": "node fixtures-gen/parse-fixtures.mjs",
+    "gen-format-fixtures": "node fixtures-gen/format-fixtures.mjs"
   },
   "devDependencies": {
     "culori": "4.0.2"
