@@ -54,11 +54,17 @@ toolset. No breaking changes from 1.0.0; everything below is additive.
   every long-tail color space added in v0.4: `cubehelix`, `dlab`,
   `dlch`, `jab`, `jch`, `yiq`, `hsi`, `hsluv`, `hpluv`, `okhsl`,
   `okhsv`, `itp`, `xyb`, `luv`, `lchuv`, `p3`, `rec2020`, `a98`,
-  `prophoto`. Mode-specific channel layouts (rectangular vs.
-  cylindrical, hue position, alpha-as-NaN missing marker) match
-  culori where culori implements them. `hsluv` and `hpluv` remain
-  culor extensions because culori 4.0.2 omits them from
-  `interpolate`.
+  `prophoto`, plus `lab65`, `lch65`, and `prismatic`. Mode-specific
+  channel layouts (rectangular vs. cylindrical, hue position,
+  alpha-as-NaN missing marker) match culori where culori implements
+  them. `hsluv`, `hpluv`, and `prismatic` remain culor extensions
+  because culori 4.0.2 omits them from `interpolate`.
+
+### Changed
+
+- Generalized `interpolate` and `average` internal channel arrays
+  from fixed 3-channel to variable-size, enabling `lab65`, `lch65`,
+  and `prismatic` as interpolation modes. Public API unchanged.
 
 ### Removed limitations
 
@@ -68,13 +74,8 @@ The following items were called out as deferred in the 1.0.0
 - `Prismatic` color space is implemented (see Added).
 - Non-separable blend modes are implemented (see Added).
 - `interpolate` and `average` no longer panic on the v0.4 long-tail
-  modes. The remaining unsupported modes for `interpolate`/`average`
-  are `lab65`, `lch65`, and `prismatic`: these spaces exist as
-  `ColorSpace` implementors and are reachable through `convert()`,
-  but the current `interpolate`/`average` machinery operates on
-  3-channel arrays, and Prismatic is 4-channel while Lab65/Lch65
-  share their interpolation semantics with their D50 counterparts
-  (callers can convert into `Lab` or `Lch` to interpolate).
+  modes, and `lab65` / `lch65` / `prismatic` are now accepted as
+  interpolation and averaging modes alongside the rest.
 
 The remaining 1.0.0 limitation still stands:
 

@@ -14,7 +14,7 @@ A Rust port of [culori](https://github.com/evercoder/culori), the JavaScript col
 | Conversion | generic `convert<A, B>` plus direct `From` impls between adjacent spaces |
 | CSS parser | named colors, hex, functional `rgb`/`hsl`/`hwb`/`lab`/`lch`/`oklab`/`oklch`, `color()` with `srgb`/`srgb-linear`/`xyz`/`xyz-d50`/`xyz-d65`/`display-p3`/`rec2020`/`a98-rgb`/`prophoto-rgb`/`--lab-d65`/`--lch-d65`, plus `color-mix()` |
 | CSS formatter | round-trip stable for canonical CSS Color Module 4 forms, including wide-gamut `color()` profiles and the `--lab-d65` / `--lch-d65` custom profiles |
-| Interpolation | `interpolate` / `interpolate_with` over rgb, lrgb, hsl, hsv, hwb, lab, lch, oklab, oklch, xyz50, xyz65, p3, rec2020, a98, prophoto, cubehelix, dlab, dlch, jab, jch, yiq, hsi, hsluv, hpluv, okhsl, okhsv, itp, xyb, luv, lchuv. Hue-fixup (shorter / longer / increasing / decreasing / raw), per-channel easing |
+| Interpolation | `interpolate` / `interpolate_with` over rgb, lrgb, hsl, hsv, hwb, lab, lab65, lch, lch65, oklab, oklch, xyz50, xyz65, p3, rec2020, a98, prophoto, cubehelix, dlab, dlch, jab, jch, yiq, hsi, hsluv, hpluv, okhsl, okhsv, itp, xyb, luv, lchuv, prismatic. Hue-fixup (shorter / longer / increasing / decreasing / raw), per-channel easing |
 | Gamut mapping | `in_gamut`, `clamp_gamut`, `clamp_chroma`, `to_gamut` (CSS Color Module 4 with ΔE OK) |
 | ΔE | `ciede76`, `ciede94`, `ciede2000`, `cmc`, `euclidean`, `hyab`, `hue_chroma`, `hue_saturation`, `hue_naive`, `ok`, `jz`, `itp`, `euclidean_xyz`, `kotsarenko_ramos` |
 | Blending | 16 modes — 12 separable (normal, multiply, screen, hard-light, overlay, darken, lighten, color-dodge, color-burn, soft-light, difference, exclusion) plus 4 non-separable from CSS Compositing 1 § 5.8 (hue, saturation, color, luminosity) |
@@ -124,15 +124,13 @@ closures with the same shape.
   `convert::<>()` leaves a residual on the order of 1e-6 (Lab) or
   1e-16 (Oklab) and feeds a phantom hue into `Lch` / `Oklch`. The
   direct `From` impls perform the snap; the generic does not.
-- `interpolate` and `average` operate on 3-channel arrays, which
-  excludes `Prismatic` (4 channels) and the D65 Lab/Lch pair
-  (`lab65`, `lch65`). Convert into `Lab` or `Lch` to interpolate; the
-  spaces themselves remain reachable through `convert()` and the CSS
-  round-trip.
 - `Prismatic` follows the Hauke 2009 definition because culori 4.0.2
   ships no `prismatic` mode against which to fixture-test. The
   literature contains other definitions under the same name; this
   one is documented as a culor extension rather than a culori port.
+  `interpolate` and `average` accept `"prismatic"` and operate on the
+  four channels directly; the reference values for those tests are
+  hand-computed rather than derived from culori.
 
 ## Documentation
 
