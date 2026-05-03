@@ -1,8 +1,8 @@
 //! Dynamic color enum.
 
 use crate::spaces::{
-    Cubehelix, Hsl, Hsv, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb, Xyz50,
-    Xyz65, A98, P3,
+    Cubehelix, Dlab, Hsl, Hsv, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb,
+    Xyz50, Xyz65, A98, P3,
 };
 
 /// Tagged union over every supported color space. Variants are added as each
@@ -41,6 +41,8 @@ pub enum Color {
     ProphotoRgb(ProphotoRgb),
     /// Cubehelix (Dave Green's astronomical color scheme as a space).
     Cubehelix(Cubehelix),
+    /// DIN99o Lab (rectangular form of DIN99o LCh).
+    Dlab(Dlab),
 }
 
 impl From<Rgb> for Color {
@@ -136,5 +138,11 @@ impl From<ProphotoRgb> for Color {
 impl From<Cubehelix> for Color {
     fn from(c: Cubehelix) -> Self {
         Color::Cubehelix(c)
+    }
+}
+
+impl From<Dlab> for Color {
+    fn from(c: Dlab) -> Self {
+        Color::Dlab(c)
     }
 }

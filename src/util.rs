@@ -60,3 +60,61 @@ pub(crate) fn xyz65_to_lrgb(x: f64, y: f64, z: f64) -> (f64, f64, f64) {
     let b = x * 0.0556300796969936 - y * 0.2039769588889765 + 1.0569715142428784 * z;
     (r, g, b)
 }
+
+// D65 white reference (verbatim from culori `constants.js`):
+//   D65 = { X: 0.3127 / 0.329, Y: 1, Z: (1 - 0.3127 - 0.329) / 0.329 }
+pub(crate) const D65_X: f64 = 0.3127 / 0.329;
+pub(crate) const D65_Y: f64 = 1.0;
+pub(crate) const D65_Z: f64 = (1.0 - 0.3127 - 0.329) / 0.329;
+// `k = 29^3 / 3^3`, `e = 6^3 / 29^3` from `xyz65/constants.js`.
+pub(crate) const LAB_K: f64 = 24389.0 / 27.0;
+pub(crate) const LAB_E: f64 = 216.0 / 24389.0;
+
+/// CIE Lab D65 forward (XYZ65 → Lab65). Verbatim from culori
+/// `lab65/convertXyz65ToLab65.js`.
+#[inline]
+pub(crate) fn xyz65_to_lab65(x: f64, y: f64, z: f64) -> (f64, f64, f64) {
+    let f = |v: f64| {
+        if v > LAB_E {
+            v.cbrt()
+        } else {
+            (LAB_K * v + 16.0) / 116.0
+        }
+    };
+    let f0 = f(x / D65_X);
+    let f1 = f(y / D65_Y);
+    let f2 = f(z / D65_Z);
+    let l = 116.0 * f1 - 16.0;
+    let a = 500.0 * (f0 - f1);
+    let b = 200.0 * (f1 - f2);
+    (l, a, b)
+}
+
+/// CIE Lab D65 inverse (Lab65 → XYZ65). Verbatim from culori
+/// `lab65/convertLab65ToXyz65.js`.
+#[inline]
+pub(crate) fn lab65_to_xyz65(l: f64, a: f64, b: f64) -> (f64, f64, f64) {
+    let fy = (l + 16.0) / 116.0;
+    let fx = a / 500.0 + fy;
+    let fz = fy - b / 200.0;
+    let inv = |v: f64| {
+        let v3 = v * v * v;
+        if v3 > LAB_E {
+            v3
+        } else {
+            (116.0 * v - 16.0) / LAB_K
+        }
+    };
+    (inv(fx) * D65_X, inv(fy) * D65_Y, inv(fz) * D65_Z)
+}
+
+/// `(hue % 360 + 360) % 360` (matches culori `util/normalizeHue.js`).
+#[inline]
+pub(crate) fn normalize_hue(h: f64) -> f64 {
+    let h = h % 360.0;
+    if h < 0.0 {
+        h + 360.0
+    } else {
+        h
+    }
+}
