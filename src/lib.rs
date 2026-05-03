@@ -143,7 +143,7 @@
 //!
 //! # License
 //!
-//! Dual-licensed under MIT or Apache-2.0.
+//! MIT-licensed.
 
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
