@@ -10,9 +10,12 @@
 use crate::spaces::{Rgb, Xyz50, Xyz65};
 use crate::traits::ColorSpace;
 
-const D50_X: f64 = 0.9642956764295677;
+// Reference white point (D50, CIE 1931 2°) — culori's `D50.X`, `D50.Y`,
+// `D50.Z` from `node_modules/culori/src/constants.js`. Kept as runtime
+// divisions to match JS bit-for-bit.
+const D50_X: f64 = 0.3457 / 0.3585;
 const D50_Y: f64 = 1.0;
-const D50_Z: f64 = 0.8251046025104602;
+const D50_Z: f64 = (1.0 - 0.3457 - 0.3585) / 0.3585;
 const K: f64 = 24389.0 / 27.0;
 const E: f64 = 216.0 / 24389.0;
 

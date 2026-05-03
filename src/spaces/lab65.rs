@@ -12,11 +12,13 @@ use crate::spaces::{Rgb, Xyz65};
 use crate::traits::ColorSpace;
 
 /// Reference white point (D65, CIE 1931 2°) — culori's `D65.X`, `D65.Y`,
-/// `D65.Z`. Computed as `0.3127 / 0.329`, `1`, `(1 - 0.3127 - 0.329) /
-/// 0.329`.
-const D65_X: f64 = 0.9504559270516716;
+/// `D65.Z` from `node_modules/culori/src/constants.js`. Kept as runtime
+/// divisions (rather than precomputed literals) to match JS bit-for-bit
+/// regardless of how the host f64 parser rounds the intermediate
+/// constants.
+const D65_X: f64 = 0.3127 / 0.329;
 const D65_Y: f64 = 1.0;
-const D65_Z: f64 = 1.0890577507598784;
+const D65_Z: f64 = (1.0 - 0.3127 - 0.329) / 0.329;
 
 /// Constants from the CIE Lab specification, matching culori's
 /// `xyz65/constants.js`. `K = 29^3 / 3^3`, `E = 6^3 / 29^3`.

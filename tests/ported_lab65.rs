@@ -17,6 +17,26 @@ fn lab65_metadata() {
     assert_eq!(Lab65::MODE, "lab65");
 }
 
+/// Regression for the JS-parity D65 white point: feed the Lab65 inverse
+/// the exact `(0.3127 / 0.329, 1, (1 - 0.3127 - 0.329) / 0.329)` produced
+/// at runtime — exactly culori's `D65.X / .Y / .Z` — and require the
+/// result `L=100, a=0, b=0`. A precomputed-literal regression in lab65
+/// would land 1 ULP away on `X` in some environments and would surface
+/// here as a non-zero `a` channel.
+#[test]
+fn lab65_d65_white_point_matches_runtime_division() {
+    let white = Xyz65 {
+        x: 0.3127 / 0.329,
+        y: 1.0,
+        z: (1.0 - 0.3127 - 0.329) / 0.329,
+        alpha: None,
+    };
+    let lab = Lab65::from(white);
+    common::assert_close(lab.l, 100.0, 1e-15);
+    common::assert_close(lab.a, 0.0, 1e-15);
+    common::assert_close(lab.b, 0.0, 1e-15);
+}
+
 #[test]
 fn xyz65_d65_white_to_lab65() {
     // D65 white point -> L=100, a=0, b=0.
