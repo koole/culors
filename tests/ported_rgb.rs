@@ -3,8 +3,8 @@
 //! Expected XYZ D65 values are produced by running culori 4.0.2 directly
 //! (see the project README + plan) and pasted verbatim.
 
-use culor::spaces::Rgb;
-use culor::ColorSpace;
+use culors::spaces::Rgb;
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

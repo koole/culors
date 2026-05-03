@@ -1,8 +1,8 @@
 //! Ported tests for ICtCp.
 
-use culor::convert;
-use culor::spaces::{Itp, Rgb};
-use culor::ColorSpace;
+use culors::convert;
+use culors::spaces::{Itp, Rgb};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

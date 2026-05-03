@@ -10,10 +10,10 @@
 //!
 //! and the inverse `(R, G, B) = (l*r, l*g, l*b) / max(r, g, b)`.
 
-use culor::convert;
-use culor::format_css;
-use culor::spaces::{Prismatic, Rgb};
-use culor::Color;
+use culors::convert;
+use culors::format_css;
+use culors::spaces::{Prismatic, Rgb};
+use culors::Color;
 
 const TOL: f64 = 1e-12;
 

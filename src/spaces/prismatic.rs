@@ -35,7 +35,7 @@
 //! Other authors use sum-normalisation paired with intensity = sum/3
 //! instead. Pick this one explicitly so behaviour is well-defined.
 //!
-//! culori 4.0.2 has no Prismatic mode; this is a culor extension. CSS
+//! culori 4.0.2 has no Prismatic mode; this is a culors extension. CSS
 //! has no registered identifier for it either, so the formatter and
 //! parser treat the space using the non-standard `color(--prismatic
 //! ...)` keyword.

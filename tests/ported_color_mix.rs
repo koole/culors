@@ -8,9 +8,9 @@
 //! sub-100% alpha multiplier. Cross-checked against `colorjs.io`'s
 //! `Color.mix(..., {premultiplied: true})` for the alpha-bearing cases.
 
-use culor::parse;
-use culor::spaces::{Hsl, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
-use culor::Color;
+use culors::parse;
+use culors::spaces::{Hsl, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
+use culors::Color;
 
 const EPS: f64 = 1e-12;
 
@@ -319,7 +319,7 @@ fn case_insensitive_method_keywords() {
 #[test]
 fn unsupported_space_returns_none() {
     // hsv is a culori extension, not a CSS Color 5 interpolation space;
-    // display-p3 etc. are CSS spaces but culor doesn't ship them yet.
+    // display-p3 etc. are CSS spaces but culors doesn't ship them yet.
     assert!(parse("color-mix(in hsv, red, blue)").is_none());
     assert!(parse("color-mix(in display-p3, red, blue)").is_none());
     assert!(parse("color-mix(in not-a-space, red, blue)").is_none());

@@ -4,7 +4,7 @@
 //! expected number was produced by `culori.filter*(amount)(c.parse(...))`
 //! and pasted in.
 
-use culor::{
+use culors::{
     filter_brightness, filter_contrast, filter_deficiency_deuter, filter_deficiency_prot,
     filter_deficiency_trit, filter_grayscale, filter_hue_rotate, filter_invert, filter_saturate,
     filter_sepia, parse, Color,

@@ -1,7 +1,7 @@
 //! Ported tests for XYB (JPEG XL).
 
-use culor::spaces::{Rgb, Xyb};
-use culor::ColorSpace;
+use culors::spaces::{Rgb, Xyb};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

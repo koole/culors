@@ -1,7 +1,7 @@
 //! Ported tests for the `Xyz65` hub color space.
 
-use culor::spaces::Xyz65;
-use culor::ColorSpace;
+use culors::spaces::Xyz65;
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

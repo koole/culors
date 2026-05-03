@@ -5,11 +5,11 @@
 //! the `node -e` snippets in the wave brief. Each numeric expected value
 //! was produced by `culori.average([...], '<mode>')` and pasted in.
 
-use culor::spaces::{
+use culors::spaces::{
     Cubehelix, Hsi, Hsl, Itp, Jab, Jch, Lab, Lab65, Lch, Lch65, Lchuv, Oklab, Oklch, Prismatic,
     Rgb, Xyb, Yiq, P3,
 };
-use culor::{average, average_angle, average_number, parse, Color};
+use culors::{average, average_angle, average_number, parse, Color};
 
 const EPS: f64 = 1e-12;
 

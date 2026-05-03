@@ -1,7 +1,7 @@
 //! Ported tests for HSI.
 
-use culor::spaces::{Hsi, Rgb};
-use culor::ColorSpace;
+use culors::spaces::{Hsi, Rgb};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

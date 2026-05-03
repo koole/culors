@@ -1,15 +1,15 @@
 //! Fixture-driven cross-space conversion tests.
 //!
-//! For every ordered pair `(from, to)` of culor's 11 v0.1 color spaces, a
+//! For every ordered pair `(from, to)` of culors's 11 v0.1 color spaces, a
 //! JSON fixture under `tests/fixtures/convert_<from>_to_<to>.json` lists
 //! input rows alongside the expected output produced by culori 4.0.2's
 //! public `converter(mode)` API.
 //!
 //! Each pair runs through one of three routes:
 //!
-//! - The default (`hub`) route calls culor's generic `convert<A, B>()`,
+//! - The default (`hub`) route calls culors's generic `convert<A, B>()`,
 //!   which always goes through XYZ D65.
-//! - `direct` calls a `From<Source> for Target` impl when culor exposes a
+//! - `direct` calls a `From<Source> for Target` impl when culors exposes a
 //!   shorter culori-mirroring path (e.g. `Lab::from(Rgb)` includes the
 //!   achromatic `a == b == 0` snap that the XYZ-hub path lacks).
 //! - A handful of pairs use named helpers (`via_rgb_to_*`, `lab_to_*`,
@@ -24,8 +24,8 @@
 #[path = "common/mod.rs"]
 mod common;
 
-use culor::convert;
-use culor::spaces::{Hsl, Hsv, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
+use culors::convert;
+use culors::spaces::{Hsl, Hsv, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
 use serde::Deserialize;
 use std::fs;
 
@@ -46,7 +46,7 @@ struct Row<I, O> {
 
 // ---- Per-space JSON shape + conversion helpers --------------------------
 
-/// `FromJson` builds a culor `ColorSpace` from a deserialized JSON row,
+/// `FromJson` builds a culors `ColorSpace` from a deserialized JSON row,
 /// mapping a missing hue to `f64::NAN` (culori omits the hue key for
 /// achromatic colors and the Rust types use NaN as the same sentinel).
 trait FromJson {
@@ -510,8 +510,8 @@ where
 }
 
 /// Default "hub" route: through XYZ65 via the generic [`convert`] function.
-/// This is what culor's public generic API gives users.
-fn hub<From: culor::ColorSpace, To: culor::ColorSpace>(c: From) -> To {
+/// This is what culors's public generic API gives users.
+fn hub<From: culors::ColorSpace, To: culors::ColorSpace>(c: From) -> To {
     convert(c)
 }
 
@@ -529,7 +529,7 @@ where
 // ---- culori-routing helpers ---------------------------------------------
 //
 // Each helper mirrors the path culori's public `converter(mode)` API takes
-// for a specific source. They exist for pairs where culor's generic
+// for a specific source. They exist for pairs where culors's generic
 // `convert<>()` (which always routes through XYZ D65) accumulates enough
 // matrix-multiply ULP noise to disagree with culori's shorter path. The
 // extreme cases land in HSL near `r == g == b` (where the formula's
@@ -643,8 +643,8 @@ const EPS_LOOSE: f64 = 1e-8;
 // ---- The 110 pair tests -------------------------------------------------
 
 // Pairs marked with a custom routing closure mirror culori's public
-// `converter(mode)` path. The rest go through culor's generic XYZ65 hub
-// (`hub`). Where culor's hub-routed output drifts from culori's by
+// `converter(mode)` path. The rest go through culors's generic XYZ65 hub
+// (`hub`). Where culors's hub-routed output drifts from culori's by
 // ~1e-14 (matrix-multiply ULP noise), the pair is documented inline.
 
 pair_test!(convert_rgb_to_lrgb, Rgb, LinearRgb, EPS_DEFAULT);

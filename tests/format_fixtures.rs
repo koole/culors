@@ -2,14 +2,14 @@
 //!
 //! `tests/fixtures/format_round_trip.json` lists CSS input strings paired
 //! with culori 4.0.2's `formatCss(parse(input))` output. This test
-//! asserts that `culor::format_css(culor::parse(input).unwrap())`
+//! asserts that `culors::format_css(culors::parse(input).unwrap())`
 //! produces the byte-identical string for every supported input.
 //!
 //! The comparison is a plain string equality. Any divergence is a real
 //! bug — either in the formatter, or (less likely; flagged but not fixed
 //! here) in the parser feeding it.
 
-use culor::{format_css, parse};
+use culors::{format_css, parse};
 use serde::Deserialize;
 use std::fs;
 

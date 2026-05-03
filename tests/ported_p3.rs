@@ -3,8 +3,8 @@
 //! Reference values produced by culori 4.0.2:
 //! `c.xyz65({mode:'p3', r, g, b})`.
 
-use culor::spaces::{Xyz65, P3};
-use culor::ColorSpace;
+use culors::spaces::{Xyz65, P3};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

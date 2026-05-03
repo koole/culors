@@ -1,7 +1,7 @@
 //! Ported tests for Cubehelix.
 
-use culor::spaces::{Cubehelix, Rgb};
-use culor::ColorSpace;
+use culors::spaces::{Cubehelix, Rgb};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

@@ -36,7 +36,7 @@ type Metric = Box<dyn Fn(&Color, &Color) -> f64>;
 /// palette is empty.
 ///
 /// ```rust
-/// use culor::{nearest, parse};
+/// use culors::{nearest, parse};
 ///
 /// let palette: Vec<_> = ["red", "green", "blue"]
 ///     .iter()

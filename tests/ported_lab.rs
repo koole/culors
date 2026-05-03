@@ -2,8 +2,8 @@
 //!
 //! Reference values produced by culori 4.0.2 and pasted verbatim.
 
-use culor::spaces::{Lab, Lch, Rgb, Xyz50, Xyz65};
-use culor::ColorSpace;
+use culors::spaces::{Lab, Lch, Rgb, Xyz50, Xyz65};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

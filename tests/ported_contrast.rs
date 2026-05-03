@@ -13,7 +13,7 @@
 
 #![allow(clippy::approx_constant, clippy::excessive_precision)]
 
-use culor::{parse, wcag_contrast, wcag_luminance};
+use culors::{parse, wcag_contrast, wcag_luminance};
 
 const EPS: f64 = 1e-10;
 

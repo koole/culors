@@ -14,7 +14,7 @@
 //! # Example
 //!
 //! ```rust
-//! use culor::{blend, parse, BlendMode, Color};
+//! use culors::{blend, parse, BlendMode, Color};
 //!
 //! let red = parse("red").unwrap();
 //! let white = parse("white").unwrap();

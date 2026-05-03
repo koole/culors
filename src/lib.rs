@@ -1,7 +1,7 @@
 //! A Rust port of [culori](https://github.com/evercoder/culori), the
 //! JavaScript color library by Dan Burzo.
 //!
-//! culor implements 30+ color spaces, conversion between any pair of
+//! culors implements 30+ color spaces, conversion between any pair of
 //! them, a CSS Color Module 4 string parser and matching formatter,
 //! interpolation, gamut mapping, ΔE, separable blend modes, mode-aware
 //! averaging, WCAG contrast, and the CSS filter set. Output values
@@ -14,7 +14,7 @@
 //! Parse two CSS strings, blend them, and format the result back:
 //!
 //! ```rust
-//! use culor::{blend, format_css, parse, BlendMode};
+//! use culors::{blend, format_css, parse, BlendMode};
 //!
 //! let red = parse("#ff0000").unwrap();
 //! let blue = parse("rgb(0 0 255 / 0.5)").unwrap();
@@ -26,8 +26,8 @@
 //! Parse, convert, and format:
 //!
 //! ```rust
-//! use culor::{convert, format_css, parse, Color};
-//! use culor::spaces::Lab;
+//! use culors::{convert, format_css, parse, Color};
+//! use culors::spaces::Lab;
 //!
 //! let parsed = parse("oklch(70% 0.15 30deg)").expect("valid CSS");
 //! let lab: Lab = match parsed {
@@ -55,7 +55,7 @@
 //! | HSLuv | [`Color::Hsluv`], [`Color::Hpluv`] |
 //! | Other | [`Color::Cubehelix`], [`Color::Hsi`], [`Color::Yiq`], [`Color::Xyb`], [`Color::Prismatic`] |
 //!
-//! [`Color::Prismatic`] is a culor extension; culori 4.0.2 has no
+//! [`Color::Prismatic`] is a culors extension; culori 4.0.2 has no
 //! Prismatic mode.
 //!
 //! # Public API tour
@@ -98,7 +98,7 @@
 //! # Interpolation
 //!
 //! ```rust
-//! use culor::{interpolate, parse};
+//! use culors::{interpolate, parse};
 //!
 //! let a = parse("oklch(70% 0.15 30deg)").unwrap();
 //! let b = parse("oklch(70% 0.15 200deg)").unwrap();
@@ -110,7 +110,7 @@
 //! # WCAG contrast
 //!
 //! ```rust
-//! use culor::{parse, wcag_contrast};
+//! use culors::{parse, wcag_contrast};
 //!
 //! let bg = parse("white").unwrap();
 //! let fg = parse("black").unwrap();
@@ -121,7 +121,7 @@
 //! # ΔE
 //!
 //! ```rust
-//! use culor::{difference_ciede2000, parse};
+//! use culors::{difference_ciede2000, parse};
 //!
 //! let de = difference_ciede2000(1.0, 1.0, 1.0);
 //! let red = parse("red").unwrap();
@@ -136,10 +136,10 @@
 //!
 //! # Further reading
 //!
-//! See the project [README](https://github.com/koole/culor#readme) for
+//! See the project [README](https://github.com/koole/culors#readme) for
 //! the features matrix, comparison to culori, and v1.0 known
 //! divergences. Release history is in
-//! [CHANGELOG.md](https://github.com/koole/culor/blob/main/CHANGELOG.md).
+//! [CHANGELOG.md](https://github.com/koole/culors/blob/main/CHANGELOG.md).
 //!
 //! # License
 //!

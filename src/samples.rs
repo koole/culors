@@ -29,7 +29,7 @@
 /// Pair with [`crate::interpolate()`] to drive evenly spaced ramp generation:
 ///
 /// ```rust
-/// use culor::{interpolate, parse, samples};
+/// use culors::{interpolate, parse, samples};
 /// let a = parse("oklch(70% 0.15 30deg)").unwrap();
 /// let b = parse("oklch(70% 0.15 200deg)").unwrap();
 /// let ramp = interpolate(&[a, b], "oklab");

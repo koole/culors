@@ -1,7 +1,7 @@
 //! Ported tests for OkHSL.
 
-use culor::spaces::{Okhsl, Rgb};
-use culor::ColorSpace;
+use culors::spaces::{Okhsl, Rgb};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;
@@ -86,7 +86,7 @@ fn okhsl_arbitrary() {
 
 #[test]
 fn okhsl_round_trip_via_oklab() {
-    use culor::spaces::Oklab;
+    use culors::spaces::Oklab;
     let original = Okhsl {
         h: 200.0,
         s: 0.5,

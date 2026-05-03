@@ -90,7 +90,7 @@ pub fn average_angle(angles: &[f64]) -> f64 {
 /// `a98`, `prophoto`, `cubehelix`, `dlab`, `dlch`, `jab`, `jch`, `yiq`,
 /// `hsi`, `hsluv`, `hpluv`, `okhsl`, `okhsv`, `itp`, `xyb`, `luv`,
 /// `lchuv`, `prismatic`. `prismatic` is the only four-channel mode.
-/// `hsluv`, `hpluv`, and `prismatic` are culor extensions and not
+/// `hsluv`, `hpluv`, and `prismatic` are culors extensions and not
 /// present in culori 4.0.2.
 ///
 /// # Panics

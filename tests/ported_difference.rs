@@ -16,7 +16,7 @@
 // changing the literals would silently weaken the parity check.
 #![allow(clippy::approx_constant, clippy::excessive_precision)]
 
-use culor::{
+use culors::{
     difference_ciede2000, difference_ciede76, difference_ciede94, difference_ciede94_with,
     difference_cmc, difference_euclidean, difference_euclidean_with, difference_euclidean_xyz,
     difference_hue_chroma, difference_hue_naive, difference_hue_saturation, difference_hyab,
@@ -40,7 +40,7 @@ fn assert_close(label: &str, got: f64, expected: f64) {
     );
 }
 
-fn p(s: &str) -> culor::Color {
+fn p(s: &str) -> culors::Color {
     parse(s).unwrap_or_else(|| panic!("parse failed for {s}"))
 }
 
@@ -82,7 +82,7 @@ fn cie76_one_lsb_in_red() {
 
 #[test]
 fn cie76_lab_inputs_are_d65() {
-    // Lab in culor is D50; the difference uses lab65. Two D50 Lab inputs
+    // Lab in culors is D50; the difference uses lab65. Two D50 Lab inputs
     // with identical numbers therefore have a non-zero distance only if
     // we routed through the wrong illuminant. Same-color identity must
     // still hold though, so check identity here.

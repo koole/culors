@@ -1,7 +1,7 @@
 //! Ported tests for JzCzHz.
 
-use culor::spaces::{Jch, Rgb};
-use culor::ColorSpace;
+use culors::spaces::{Jch, Rgb};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

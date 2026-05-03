@@ -1,8 +1,8 @@
 //! Ported tests for JzAzBz.
 
-use culor::convert;
-use culor::spaces::{Jab, Rgb};
-use culor::ColorSpace;
+use culors::convert;
+use culors::spaces::{Jab, Rgb};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

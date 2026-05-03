@@ -1,8 +1,8 @@
 {
-  "name": "culor-fixtures",
+  "name": "culors-fixtures",
   "version": "0.0.0",
   "private": true,
-  "description": "Fixture generator for the culor Rust crate",
+  "description": "Fixture generator for the culors Rust crate",
   "type": "module",
   "scripts": {
     "gen-fixtures": "node fixtures-gen/generate.mjs",

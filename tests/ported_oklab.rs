@@ -3,8 +3,8 @@
 //! Reference values produced by culori 4.0.2 and pasted verbatim. Oklab is
 //! defined relative to linear sRGB, not gamma-encoded sRGB.
 
-use culor::spaces::{LinearRgb, Oklab, Oklch, Rgb, Xyz65};
-use culor::ColorSpace;
+use culors::spaces::{LinearRgb, Oklab, Oklch, Rgb, Xyz65};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

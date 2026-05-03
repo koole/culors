@@ -6,7 +6,7 @@
 //! &Color) -> f64`, matching culori's curried API:
 //!
 //! ```rust
-//! use culor::{difference_ciede2000, parse};
+//! use culors::{difference_ciede2000, parse};
 //! let de = difference_ciede2000(1.0, 1.0, 1.0);
 //! let red = parse("red").unwrap();
 //! let blue = parse("blue").unwrap();

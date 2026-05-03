@@ -1,8 +1,8 @@
-//! Ported tests for [`culor::round`], matching culori 4.0.2's `round`.
+//! Ported tests for [`culors::round`], matching culori 4.0.2's `round`.
 
 #![allow(clippy::approx_constant)]
 
-use culor::round;
+use culors::round;
 
 const EPS: f64 = 1e-15;
 

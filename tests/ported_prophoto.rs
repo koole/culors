@@ -3,8 +3,8 @@
 //! Native conversion is to XYZ D50; the ColorSpace impl routes through
 //! XYZ D65 via Bradford adaptation.
 
-use culor::spaces::{ProphotoRgb, Xyz50, Xyz65};
-use culor::ColorSpace;
+use culors::spaces::{ProphotoRgb, Xyz50, Xyz65};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

@@ -4,11 +4,11 @@
 //! on the same input string (see `node -e` snippets in the Phase E
 //! report). Channel-mode mapping: culori's modes `rgb`, `hsl`, `hwb`,
 //! `lab`, `lch`, `oklab`, `oklch`, `lrgb`, `xyz65`, `xyz50` correspond
-//! to the matching Rust struct in `culor::spaces`.
+//! to the matching Rust struct in `culors::spaces`.
 
-use culor::parse;
-use culor::spaces::{Hsl, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
-use culor::Color;
+use culors::parse;
+use culors::spaces::{Hsl, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
+use culors::Color;
 
 #[path = "common/mod.rs"]
 mod common;

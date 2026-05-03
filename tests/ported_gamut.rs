@@ -6,8 +6,8 @@
 //! 30deg)')))); })"` against the version of culori vendored in
 //! `node_modules/`.
 
-use culor::spaces::{Lab, Lch, Oklab, Oklch, Rgb};
-use culor::{clamp_chroma, clamp_gamut, in_gamut, parse, to_gamut, Color};
+use culors::spaces::{Lab, Lch, Oklab, Oklch, Rgb};
+use culors::{clamp_chroma, clamp_gamut, in_gamut, parse, to_gamut, Color};
 
 const TOL_RGB: f64 = 1e-12;
 // `clamp_chroma` uses a binary search whose final precision is the loop

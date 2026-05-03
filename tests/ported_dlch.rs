@@ -1,7 +1,7 @@
 //! Ported tests for DIN99o LCh.
 
-use culor::spaces::{Dlch, Rgb};
-use culor::ColorSpace;
+use culors::spaces::{Dlch, Rgb};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

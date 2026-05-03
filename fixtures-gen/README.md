@@ -1,6 +1,6 @@
 # Fixture generator
 
-Emits JSON fixtures under `tests/fixtures/` for `culor`'s integration test
+Emits JSON fixtures under `tests/fixtures/` for `culors`'s integration test
 suite. Reference values are produced by `culori` 4.0.2 (npm). The Rust
 runner reads these files directly; running it does not require Node.
 
@@ -33,8 +33,8 @@ Inputs are deterministic:
   for HWB).
 - 50 random rows per space are drawn from a Park-Miller LCG
   (multiplier `48271`, modulus `2^31 - 1`). The seed is derived from the
-  string `"culor-v0.1"`, decorrelated per space by suffixing the mode
-  name (e.g., `culor-v0.1::rgb`).
+  string `"culors-v0.1"`, decorrelated per space by suffixing the mode
+  name (e.g., `culors-v0.1::rgb`).
 - 20% of random rows include an `alpha` channel.
 
 JSON output uses `JSON.stringify` with tab indentation and the canonical

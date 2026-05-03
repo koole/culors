@@ -1,5 +1,5 @@
 // Fixture generator: emits one JSON file per ordered (from, to) pair across
-// the 11 culor color spaces. Outputs land in tests/fixtures/.
+// the 11 culors color spaces. Outputs land in tests/fixtures/.
 //
 // Idempotent: the input matrix is deterministic (see inputs.mjs) and key
 // order in each row comes from `projectRow`'s own iteration over a fixed

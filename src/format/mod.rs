@@ -17,7 +17,7 @@
 //!
 //! NaN channels render as the CSS keyword `none` for both families. CSS
 //! Color Module 4 specifies `none` as the missing-component keyword for
-//! `color()` as well as for the functional spaces, so culor uses it
+//! `color()` as well as for the functional spaces, so culors uses it
 //! uniformly. culori, by contrast, emits the literal string `"NaN"` for a
 //! `color()` channel that is `Number.NaN`; that path is unreachable from
 //! culori's own pipeline (its converters never emit NaN into a `color()`

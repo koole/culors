@@ -3,8 +3,8 @@
 //! Reference values produced by culori 4.0.2 and pasted verbatim. HWB is
 //! `{h, w, b}` where `b` is "blackness", not blue.
 
-use culor::spaces::{Hsv, Hwb, Rgb};
-use culor::ColorSpace;
+use culors::spaces::{Hsv, Hwb, Rgb};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

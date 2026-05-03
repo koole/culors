@@ -1,7 +1,7 @@
 //! Ported tests for CIELChuv.
 
-use culor::spaces::{Lchuv, Rgb};
-use culor::ColorSpace;
+use culors::spaces::{Lchuv, Rgb};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

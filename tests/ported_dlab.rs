@@ -1,8 +1,8 @@
 //! Ported tests for DIN99o Lab.
 
-use culor::convert;
-use culor::spaces::{Dlab, Rgb};
-use culor::ColorSpace;
+use culors::convert;
+use culors::spaces::{Dlab, Rgb};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

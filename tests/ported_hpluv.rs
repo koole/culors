@@ -1,8 +1,8 @@
 //! Ported tests for HPLuv. Reference values from the official
 //! `hsluv-javascript` package (v1.0.1).
 
-use culor::spaces::{Hpluv, Rgb};
-use culor::ColorSpace;
+use culors::spaces::{Hpluv, Rgb};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

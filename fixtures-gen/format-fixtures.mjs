@@ -2,14 +2,14 @@
 // CSS input string from the parse-fixture set with culori 4.0.2's
 // `formatCss(parse(input))` output. The Rust test in
 // `tests/format_fixtures.rs` asserts that
-// `culor::format_css(culor::parse(input).unwrap())` produces the same
+// `culors::format_css(culors::parse(input).unwrap())` produces the same
 // string as culori for every supported input.
 //
 // Idempotent: input list is deterministic, JSON is written with stable
 // key ordering. Re-running produces zero diff.
 //
 // Inputs whose culori-parsed mode is not in `SUPPORTED_MODES` (e.g.
-// `p3`, `rec2020`) are skipped, since culor cannot represent them and
+// `p3`, `rec2020`) are skipped, since culors cannot represent them and
 // they're verified separately in the Rust unit tests.
 
 import { formatCss, parse } from "culori";

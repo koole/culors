@@ -1,9 +1,9 @@
-//! Ported tests for [`culor::nearest`], matching culori 4.0.2's
+//! Ported tests for [`culors::nearest`], matching culori 4.0.2's
 //! `nearest(colors, metric, accessor)` factory.
 
 #![allow(clippy::type_complexity)]
 
-use culor::{difference_euclidean, nearest, parse, Color};
+use culors::{difference_euclidean, nearest, parse, Color};
 
 fn p(s: &str) -> Color {
     parse(s).unwrap()

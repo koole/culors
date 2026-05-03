@@ -1,8 +1,8 @@
-# culor
+# culors
 
-[![crates.io](https://img.shields.io/crates/v/culor.svg)](https://crates.io/crates/culor)
-[![docs.rs](https://docs.rs/culor/badge.svg)](https://docs.rs/culor)
-[![CI](https://github.com/koole/culor/actions/workflows/ci.yml/badge.svg)](https://github.com/koole/culor/actions/workflows/ci.yml)
+[![crates.io](https://img.shields.io/crates/v/culors.svg)](https://crates.io/crates/culors)
+[![docs.rs](https://docs.rs/culors/badge.svg)](https://docs.rs/culors)
+[![CI](https://github.com/koole/culors/actions/workflows/ci.yml/badge.svg)](https://github.com/koole/culors/actions/workflows/ci.yml)
 
 A Rust port of [culori](https://github.com/evercoder/culori), the JavaScript color library by Dan Burzo. Color spaces, conversion, CSS Color Module 4 parsing and formatting, interpolation, gamut mapping, ΔE, blending, averaging, WCAG contrast, and CSS filters. Output values match culori 4.0.2 within 1e-10 across an exhaustive fixture set.
 
@@ -28,20 +28,20 @@ A Rust port of [culori](https://github.com/evercoder/culori), the JavaScript col
 
 ```toml
 [dependencies]
-culor = "1"
+culors = "1"
 ```
 
 With serde support:
 
 ```toml
 [dependencies]
-culor = { version = "1", features = ["serde"] }
+culors = { version = "1", features = ["serde"] }
 ```
 
 ## Quick start
 
 ```rust
-use culor::{blend, format_css, parse, BlendMode, Color};
+use culors::{blend, format_css, parse, BlendMode, Color};
 
 let red = parse("#ff0000").unwrap();
 let blue = parse("rgb(0 0 255 / 0.5)").unwrap();
@@ -54,8 +54,8 @@ Convert through the generic `convert` function, or use a direct `From`
 impl when bit-for-bit culori parity matters:
 
 ```rust
-use culor::{convert, Color};
-use culor::spaces::{Lab, Oklch, Rgb};
+use culors::{convert, Color};
+use culors::spaces::{Lab, Oklch, Rgb};
 
 let red = Rgb { r: 1.0, g: 0.0, b: 0.0, alpha: None };
 
@@ -74,7 +74,7 @@ assert!(!oklch.l.is_nan());
 Interpolate between two colors in Oklab and sample at `t = 0.5`:
 
 ```rust
-use culor::{interpolate, parse};
+use culors::{interpolate, parse};
 
 let a = parse("oklch(70% 0.15 30deg)").unwrap();
 let b = parse("oklch(70% 0.15 200deg)").unwrap();
@@ -85,15 +85,15 @@ let _ = mid;
 
 ## Comparison to culori
 
-Every public function in culori 4.0.2 has a culor equivalent, with the
+Every public function in culori 4.0.2 has a culors equivalent, with the
 exceptions listed under "Known divergences" below. The mapping is
 direct enough that culori code translates almost mechanically: `culori
-.parse(s)` becomes `culor::parse(s)`, `culori.convert(c, mode)` becomes
+.parse(s)` becomes `culors::parse(s)`, `culori.convert(c, mode)` becomes
 either the generic `convert::<_, T>()` or a direct `T::from(c)`, and
 the curried difference / interpolate / blend factories return Rust
 closures with the same shape.
 
-| culori function | culor equivalent |
+| culori function | culors equivalent |
 |---|---|
 | `parse(str)` | `parse(&str)` |
 | `formatCss(c)` | `format_css(&c)` |
@@ -127,14 +127,14 @@ closures with the same shape.
 - `Prismatic` follows the Hauke 2009 definition because culori 4.0.2
   ships no `prismatic` mode against which to fixture-test. The
   literature contains other definitions under the same name; this
-  one is documented as a culor extension rather than a culori port.
+  one is documented as a culors extension rather than a culori port.
   `interpolate` and `average` accept `"prismatic"` and operate on the
   four channels directly; the reference values for those tests are
   hand-computed rather than derived from culori.
 
 ## Documentation
 
-API reference on [docs.rs](https://docs.rs/culor). Release history is
+API reference on [docs.rs](https://docs.rs/culors). Release history is
 in [CHANGELOG.md](CHANGELOG.md).
 
 ## Contributing

@@ -4,8 +4,8 @@
 //! the case tables at the bottom of each section. Each numeric expected
 //! value was produced by `culori.blend([...], '<mode>')` and pasted in.
 
-use culor::spaces::Rgb;
-use culor::{blend, blend_str, parse, BlendMode, Color};
+use culors::spaces::Rgb;
+use culors::{blend, blend_str, parse, BlendMode, Color};
 
 const EPS: f64 = 1e-12;
 

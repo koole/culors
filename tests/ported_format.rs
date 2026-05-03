@@ -7,13 +7,13 @@
 //! `oklab`, `oklch`, `lrgb`, `xyz65`, `xyz50` map onto the matching
 //! `Color` variants.
 
-use culor::format_css;
-use culor::parse;
-use culor::spaces::{
+use culors::format_css;
+use culors::parse;
+use culors::spaces::{
     Hsl, Hsv, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb, Xyz50, Xyz65, A98,
     P3,
 };
-use culor::Color;
+use culors::Color;
 
 // ---------- sRGB ----------
 

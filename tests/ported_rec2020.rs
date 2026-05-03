@@ -1,7 +1,7 @@
 //! Ported tests for the Rec. 2020 color space.
 
-use culor::spaces::Rec2020;
-use culor::ColorSpace;
+use culors::spaces::Rec2020;
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

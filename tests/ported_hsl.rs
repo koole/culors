@@ -4,8 +4,8 @@
 //! omits the `h` property for achromatic colors; we mirror that with NaN
 //! since our struct stores `h` as `f64`.
 
-use culor::spaces::{Hsl, Rgb, Xyz65};
-use culor::ColorSpace;
+use culors::spaces::{Hsl, Rgb, Xyz65};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

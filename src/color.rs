@@ -75,7 +75,7 @@ pub enum Color {
     /// CIELChuv (polar form of CIELUV).
     Lchuv(Lchuv),
     /// Prismatic (intensity + barycentric chromaticity, Hauke 2009).
-    /// culor extension; not in culori 4.0.2.
+    /// culors extension; not in culori 4.0.2.
     Prismatic(Prismatic),
 }
 

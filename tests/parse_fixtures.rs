@@ -3,21 +3,21 @@
 //! `tests/fixtures/parse_css.json` lists CSS input strings paired with
 //! culori 4.0.2's `parse()` output. Each row reads as either:
 //!
-//! - `output: null` — culori rejects the input. culor must too.
+//! - `output: null` — culori rejects the input. culors must too.
 //! - `output: { mode, ... }` — culori produces a parsed value tagged
-//!   with `mode`. culor must produce a `Color` of the matching variant
+//!   with `mode`. culors must produce a `Color` of the matching variant
 //!   whose channels agree to within `EPS` (and whose alpha presence
 //!   matches culori's).
 //!
 //! culori omits a channel's key when it is `none`; the comparison
-//! treats absent keys as `f64::NAN` and matches them against culor's
+//! treats absent keys as `f64::NAN` and matches them against culors's
 //! NaN sentinel for the same channel. Alpha is the only `Option`-shaped
 //! field: when culori omits `alpha` from its JSON the actual color must
 //! also have `alpha: None`.
 
-use culor::parse;
-use culor::spaces::{Hsl, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
-use culor::Color;
+use culors::parse;
+use culors::spaces::{Hsl, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
+use culors::Color;
 use serde::Deserialize;
 use std::fs;
 

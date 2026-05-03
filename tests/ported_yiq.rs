@@ -1,7 +1,7 @@
 //! Ported tests for NTSC Y'IQ.
 
-use culor::spaces::{Rgb, Yiq};
-use culor::ColorSpace;
+use culors::spaces::{Rgb, Yiq};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

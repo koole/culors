@@ -1,7 +1,7 @@
 //! Ported tests for the Adobe RGB (1998) color space.
 
-use culor::spaces::A98;
-use culor::ColorSpace;
+use culors::spaces::A98;
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

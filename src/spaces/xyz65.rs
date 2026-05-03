@@ -1,4 +1,4 @@
-//! XYZ tristimulus values, D65 illuminant. The conversion hub for `culor`.
+//! XYZ tristimulus values, D65 illuminant. The conversion hub for `culors`.
 
 use crate::traits::ColorSpace;
 

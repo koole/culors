@@ -1,12 +1,12 @@
 [package]
-name = "culor"
+name = "culors"
 version = "1.1.0"
 edition = "2021"
 rust-version = "1.75"
 description = "Rust port of the culori color library — color spaces, parsing, conversion"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/koole/culor"
-documentation = "https://docs.rs/culor"
+repository = "https://github.com/koole/culors"
+documentation = "https://docs.rs/culors"
 readme = "README.md"
 authors = ["Leon Koole <claude@koole.io>"]
 keywords = ["color", "rgb", "lab", "oklab", "css"]

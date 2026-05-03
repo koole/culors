@@ -20,7 +20,7 @@
 /// in culori is `4`; callers pass the value explicitly here.
 ///
 /// ```rust
-/// let r = culor::round(2);
+/// let r = culors::round(2);
 /// assert_eq!(r(0.123), 0.12);
 /// assert_eq!(r(1.235), 1.24);
 /// ```

@@ -2,8 +2,8 @@
 //!
 //! Reference values produced by culori 4.0.2 and pasted verbatim.
 
-use culor::spaces::{Oklab, Oklch, Rgb, Xyz65};
-use culor::ColorSpace;
+use culors::spaces::{Oklab, Oklch, Rgb, Xyz65};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

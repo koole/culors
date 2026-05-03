@@ -40,7 +40,7 @@ toolset. No breaking changes from 1.0.0; everything below is additive.
   `(L, r, g, b)` decomposition where `L = max(r, g, b)` and the
   remaining channels are normalized chromatic components). Multiple
   competing definitions appear in the literature; this implementation
-  follows Hauke's original 2009 paper and is documented as a culor
+  follows Hauke's original 2009 paper and is documented as a culors
   extension. culori 4.0.2 does not ship a `prismatic` definition, so
   the round-trip is verified against an internal reference rather
   than fixture parity.
@@ -57,7 +57,7 @@ toolset. No breaking changes from 1.0.0; everything below is additive.
   `prophoto`, plus `lab65`, `lch65`, and `prismatic`. Mode-specific
   channel layouts (rectangular vs. cylindrical, hue position,
   alpha-as-NaN missing marker) match culori where culori implements
-  them. `hsluv`, `hpluv`, and `prismatic` remain culor extensions
+  them. `hsluv`, `hpluv`, and `prismatic` remain culors extensions
   because culori 4.0.2 omits them from `interpolate`.
 
 ### Changed
@@ -250,7 +250,7 @@ and returns a closure `Fn(&Color) -> Color`.
 
 ### Added
 
-- Eleven color spaces: `Rgb`, `LinearRgb`, `Hsl`, `Hsv`, `Hwb`, `Lab` (D50), `Lch` (D50), `Oklab`, `Oklch`, `Xyz50`, `Xyz65`. Each space is a plain struct re-exported from `culor::spaces`.
+- Eleven color spaces: `Rgb`, `LinearRgb`, `Hsl`, `Hsv`, `Hwb`, `Lab` (D50), `Lch` (D50), `Oklab`, `Oklch`, `Xyz50`, `Xyz65`. Each space is a plain struct re-exported from `culors::spaces`.
 - `ColorSpace` trait with `to_xyz65` / `from_xyz65` plus alpha access. Every space implements it.
 - `Color` enum: a tagged union over every space, with `From<Space>` impls for ergonomic construction.
 - Generic `convert<A, B>(c: A) -> B` function that routes through XYZ D65 for any pair of `ColorSpace` implementors.
@@ -265,6 +265,6 @@ and returns a closure `Fn(&Color) -> Color`.
 - `convert<A, B>` always routes through XYZ D65. For byte-for-byte parity with culori's per-pair routing, use the direct `Type::from(value)` impls listed above for compile-time-known pairs. Pairs without a direct impl drift from culori by approximately 1e-14, acceptable for color use cases but not bit-exact.
 - `color()` function with `display-p3`, `rec2020`, `prophoto-rgb`, or `a98-rgb` profiles returns `None`. Those spaces are deferred to v0.4.
 
-[Unreleased]: https://github.com/koole/culor/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/koole/culor/compare/v0.1.0...v1.0.0
-[0.1.0]: https://github.com/koole/culor/releases/tag/v0.1.0
+[Unreleased]: https://github.com/koole/culors/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/koole/culors/compare/v0.1.0...v1.0.0
+[0.1.0]: https://github.com/koole/culors/releases/tag/v0.1.0

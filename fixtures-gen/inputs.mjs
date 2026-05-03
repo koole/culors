@@ -2,13 +2,13 @@
 //
 // Each space exports an array of culori-shaped color objects (with `mode`)
 // covering boundary values, primary colors, and 50 random samples drawn from
-// a Park-Miller LCG (Lehmer RNG) seeded from the string "culor-v0.1".
+// a Park-Miller LCG (Lehmer RNG) seeded from the string "culors-v0.1".
 //
 // LCG: x_{n+1} = (a * x_n) mod m, with a = 48271, m = 2^31 - 1 (a "minimal
 // standard" Park-Miller). This is reproducible across Node versions and has
 // adequate quality for spreading inputs across each space's domain.
 
-const SEED_STRING = "culor-v0.1";
+const SEED_STRING = "culors-v0.1";
 const LCG_A = 48271;
 const LCG_M = 0x7fffffff; // 2^31 - 1
 

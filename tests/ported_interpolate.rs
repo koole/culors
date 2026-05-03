@@ -4,11 +4,11 @@
 //! { const f = c.interpolate([...], 'mode'); console.log(JSON.stringify(f(t)));
 //! })"` against the version of culori vendored in `node_modules/`.
 
-use culor::spaces::{
+use culors::spaces::{
     Cubehelix, Dlab, Dlch, Hsi, Hsl, Hwb, Itp, Jab, Jch, Lab, Lab65, Lch, Lch65, Lchuv, Luv, Okhsl,
     Okhsv, Oklab, Oklch, Prismatic, ProphotoRgb, Rec2020, Rgb, Xyb, Yiq, A98, P3,
 };
-use culor::{interpolate, interpolate_with, Color, HueFixup, InterpolateOptions};
+use culors::{interpolate, interpolate_with, Color, HueFixup, InterpolateOptions};
 
 const TOL: f64 = 1e-10;
 
@@ -716,7 +716,7 @@ fn prismatic_red_blue_midpoint_handcomputed() {
     // Hand-computed: red→Prismatic = (1, 1, 0, 0); blue→Prismatic =
     // (1, 0, 0, 1); per-channel lerp at t=0.5 gives (1, 0.5, 0, 0.5).
     // culori 4.0.2 has no `prismatic` mode, so the reference is
-    // derived from culor's own conversion (Hauke 2009).
+    // derived from culors's own conversion (Hauke 2009).
     let f = interpolate(&[red(), blue()], "prismatic");
     let Color::Prismatic(Prismatic { l, r, g, b, .. }) = f(0.5) else {
         panic!("expected Prismatic")

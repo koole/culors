@@ -2,7 +2,7 @@
 
 **Date**: 2026-05-03
 **Status**: Validated, ready for implementation planning
-**Crate name**: `culor` (confirmed available on crates.io)
+**Crate name**: `culors` (confirmed available on crates.io)
 **Source library**: [evercoder/culori](https://github.com/evercoder/culori)
 
 ## Goals
@@ -23,10 +23,10 @@ Port the JavaScript color library [culori](https://github.com/evercoder/culori) 
 
 ## Repository Layout
 
-Standalone crate, not part of the spectralite-studio Cargo workspace. Worktree: `.worktrees/culor/`.
+Standalone crate, not part of the spectralite-studio Cargo workspace. Worktree: `.worktrees/culors/`.
 
 ```
-culor/
+culors/
 ├── Cargo.toml
 ├── README.md
 ├── LICENSE-MIT, LICENSE-APACHE         # dual-license, standard for crates.io
@@ -209,7 +209,7 @@ Released when feature parity is verified by full fixture sweep (every culori pub
 
 ## Resolved
 
-- **Crate name**: `culor` confirmed available on crates.io.
+- **Crate name**: `culors` confirmed available on crates.io.
 - **`serde` integration**: shipped in v0.1 behind a `serde` feature flag (off by default). Implements `Serialize`/`Deserialize` on every color struct and the `Color` enum.
 
 ## Open Questions
@@ -218,4 +218,4 @@ Released when feature parity is verified by full fixture sweep (every culori pub
 
 ## Next Step
 
-Create `.worktrees/culor/` worktree and produce v0.1 implementation plan via `superpowers:writing-plans`.
+Create `.worktrees/culors/` worktree and produce v0.1 implementation plan via `superpowers:writing-plans`.

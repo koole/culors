@@ -120,7 +120,7 @@ impl InterpolateOptions {
 /// `hsi`, `hsluv`, `hpluv`, `okhsl`, `okhsv`, `itp`, `xyb`, `luv`,
 /// `lchuv`, `prismatic`. `prismatic` is the only four-channel mode;
 /// every other mode is three channels. `hsluv`, `hpluv`, and `prismatic`
-/// are culor extensions and not present in culori 4.0.2.
+/// are culors extensions and not present in culori 4.0.2.
 ///
 /// Uses [`HueFixup::Shorter`] and no easing. For other strategies, see
 /// [`interpolate_with`].

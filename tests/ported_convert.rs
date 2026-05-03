@@ -4,8 +4,8 @@
 //! generic `convert` always routes through XYZ D65, so chained-transcendental
 //! pairs (e.g. Oklch ↔ Rgb) need a looser epsilon than direct-impl pairs.
 
-use culor::convert;
-use culor::spaces::{Hsl, Lab, Lch, LinearRgb, Oklch, Rgb};
+use culors::convert;
+use culors::spaces::{Hsl, Lab, Lch, LinearRgb, Oklch, Rgb};
 
 #[path = "common/mod.rs"]
 mod common;

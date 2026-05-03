@@ -1,7 +1,7 @@
-//! Ported tests for [`culor::samples`], matching culori 4.0.2's
+//! Ported tests for [`culors::samples`], matching culori 4.0.2's
 //! `samples(n)` with default linear gamma.
 
-use culor::samples;
+use culors::samples;
 
 #[track_caller]
 fn assert_close_slice(label: &str, got: &[f64], expected: &[f64]) {

@@ -1,7 +1,7 @@
 //! Ported tests for OkHSV.
 
-use culor::spaces::{Okhsv, Oklab, Rgb};
-use culor::ColorSpace;
+use culors::spaces::{Okhsv, Oklab, Rgb};
+use culors::ColorSpace;
 
 #[path = "common/mod.rs"]
 mod common;

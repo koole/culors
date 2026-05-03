@@ -1,6 +1,6 @@
 // Parse-fixture generator: emits one JSON file with a list of CSS input
 // strings paired with culori's parsed output for each. The Rust test in
-// `tests/parse_fixtures.rs` asserts that `culor::parse(input)` matches
+// `tests/parse_fixtures.rs` asserts that `culors::parse(input)` matches
 // culori's output channel-by-channel.
 //
 // Idempotent: the input list is deterministic (`./parse-inputs.mjs`) and
@@ -8,9 +8,9 @@
 //
 // Outputs come from culori 4.0.2's public `parse()` function. For
 // unsupported `color()` profiles culori returns a parsed value tagged
-// with a mode culor does not implement (`p3`, `rec2020`, `prophoto`,
+// with a mode culors does not implement (`p3`, `rec2020`, `prophoto`,
 // `a98`); we exclude those inputs from the fixture and exercise them
-// only in the Rust unit tests, where culor returns `None`.
+// only in the Rust unit tests, where culors returns `None`.
 
 import { parse } from "culori";
 import { writeFileSync } from "node:fs";
