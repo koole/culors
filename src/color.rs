@@ -1,6 +1,6 @@
 //! Dynamic color enum.
 
-use crate::spaces::{Hsl, Hsv, Hwb, Lab, Lch, LinearRgb, Oklab, Rgb, Xyz50, Xyz65};
+use crate::spaces::{Hsl, Hsv, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
 
 /// Tagged union over every supported color space. Variants are added as each
 /// space lands.
@@ -22,6 +22,8 @@ pub enum Color {
     Lch(Lch),
     /// Oklab (perceptually uniform).
     Oklab(Oklab),
+    /// Oklch (polar Oklab).
+    Oklch(Oklch),
     /// CIE XYZ D50.
     Xyz50(Xyz50),
     /// CIE XYZ D65.
@@ -73,6 +75,12 @@ impl From<Lch> for Color {
 impl From<Oklab> for Color {
     fn from(c: Oklab) -> Self {
         Color::Oklab(c)
+    }
+}
+
+impl From<Oklch> for Color {
+    fn from(c: Oklch) -> Self {
+        Color::Oklch(c)
     }
 }
 
