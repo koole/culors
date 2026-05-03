@@ -38,6 +38,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `hsla(H, S%, L%, A)` serializer mirroring culori's `formatHsl`. Hue
   passes through unchanged when finite (negatives and values >360 are
   preserved); saturation and lightness are clamped to [0, 100] %.
+- `displayable(color)` and `clamp_rgb(color)` — convenience aliases for
+  `in_gamut(color, "rgb")` and `clamp_gamut(color, "rgb")`, mirroring
+  culori 4.0.2's same-named entry points in `clamp.js`.
+- `random(mode)` and `random_with_constraints(mode, constraints)` —
+  uniform random color generators mirroring culori's `random.js`.
+  Channel ranges follow each space's `definition.js` with culori's
+  `[0, 1]` fallback for unranged channels. Alpha is opt-in via an
+  `alpha` constraint. The PRNG is a thread-local xorshift64 seeded
+  from `SystemTime` and the thread id; reproducibility is intentionally
+  not exposed because culori's `Math.random()` has no public seed
+  either.
+
+### Fixed
+
+- `Lab65` and `Luv` reference white points are now expressed as runtime
+  divisions (`0.3127 / 0.329` and friends) instead of precomputed
+  literals, matching JS bit-for-bit and harmonising with the existing
+  convention in `util.rs`. A regression test in `ported_lab65.rs`
+  feeds the runtime D65 white through `Lab65::from(Xyz65)` and pins
+  the result at `(L=100, a=0, b=0)`.
+- `ported_jch.rs` now covers the PQ_inv negative-value guard on
+  `convertJabToXyz65`. culori clamps `v < 0` to `0` because the inverse
+  PQ formula raises a fractional power of a sign-dependent quantity;
+  without the clamp, a Jch input with negative `j` produces NaN. The
+  regression tests pin the all-zero XYZ65 output that culori produces
+  for negative-`j` inputs both with and without chroma.
+- `ported_xyz65.rs` extended with sRGB primary / white round-trip and
+  identity checks (the file was previously skeletal).
 
 ## [1.2.0] - 2026-05-03
 
