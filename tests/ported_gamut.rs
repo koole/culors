@@ -1,15 +1,19 @@
-//! Tests for gamut mapping (`in_gamut`, `clamp_gamut`), ported from culori
-//! 4.0.2.
+//! Tests for gamut mapping (`in_gamut`, `clamp_gamut`, `clamp_chroma`),
+//! ported from culori 4.0.2.
 //!
 //! Each expected output was produced with `node -e "import('culori').then(c =>
 //! { console.log(JSON.stringify(c.clampGamut('rgb')(c.parse('oklch(70% 1
 //! 30deg)')))); })"` against the version of culori vendored in
 //! `node_modules/`.
 
-use culor::spaces::{Oklab, Oklch, Rgb};
-use culor::{clamp_gamut, in_gamut, parse, Color};
+use culor::spaces::{Lch, Oklab, Oklch, Rgb};
+use culor::{clamp_chroma, clamp_gamut, in_gamut, parse, Color};
 
 const TOL_RGB: f64 = 1e-12;
+// `clamp_chroma` uses a binary search whose final precision is the loop
+// epsilon (`(range_max - range_min) / 2^13`). The reported chroma agrees
+// with culori to 1e-9 because both implementations share the same epsilon.
+const TOL_CHROMA: f64 = 1e-10;
 
 fn rgb(r: f64, g: f64, b: f64) -> Color {
     Color::Rgb(Rgb {
@@ -36,6 +40,12 @@ fn unwrap_oklab(c: Color) -> Oklab {
     match c {
         Color::Oklab(v) => v,
         other => panic!("expected Oklab, got {other:?}"),
+    }
+}
+fn unwrap_lch(c: Color) -> Lch {
+    match c {
+        Color::Lch(v) => v,
+        other => panic!("expected Lch, got {other:?}"),
     }
 }
 
@@ -160,4 +170,60 @@ fn clamp_gamut_returns_in_source_mode_for_oklab() {
     close(out.l, 0.6508732761002483, 1e-12, "l");
     close(out.a, 0.2654229125470914, 1e-12, "a");
     close(out.b, -0.014194695246013245, 1e-12, "b");
+}
+
+// ----- clamp_chroma -----
+
+#[test]
+fn clamp_chroma_oklch_high_chroma() {
+    // culori output:
+    // {"mode":"oklch","l":0.7,"c":0.191497802734375,"h":30}
+    let c = parse("oklch(70% 1 30deg)").unwrap();
+    let out = unwrap_oklch(clamp_chroma(c, "oklch"));
+    close(out.l, 0.7, TOL_RGB, "l");
+    close(out.c, 0.191497802734375, TOL_CHROMA, "c");
+    close(out.h, 30.0, TOL_RGB, "h");
+}
+
+#[test]
+fn clamp_chroma_oklch_blue_high_chroma() {
+    // culori output:
+    // {"mode":"oklch","l":0.5,"c":0.0849609375,"h":200}
+    let c = parse("oklch(50% 0.4 200deg)").unwrap();
+    let out = unwrap_oklch(clamp_chroma(c, "oklch"));
+    close(out.l, 0.5, TOL_RGB, "l");
+    close(out.c, 0.0849609375, TOL_CHROMA, "c");
+    close(out.h, 200.0, TOL_RGB, "h");
+}
+
+#[test]
+fn clamp_chroma_oklch_already_in_gamut_returns_unchanged() {
+    // culori returns the input directly when already displayable.
+    let c = parse("oklch(70% 0.05 30deg)").unwrap();
+    let out = unwrap_oklch(clamp_chroma(c, "oklch"));
+    close(out.l, 0.7, TOL_RGB, "l");
+    close(out.c, 0.05, TOL_RGB, "c");
+    close(out.h, 30.0, TOL_RGB, "h");
+}
+
+#[test]
+fn clamp_chroma_lch_high_chroma() {
+    // culori output:
+    // {"mode":"lch","l":50,"c":87.9150390625,"h":30}
+    let c = parse("lch(50% 100 30deg)").unwrap();
+    let out = unwrap_lch(clamp_chroma(c, "lch"));
+    close(out.l, 50.0, TOL_RGB, "l");
+    close(out.c, 87.9150390625, 1e-9, "c");
+    close(out.h, 30.0, TOL_RGB, "h");
+}
+
+#[test]
+fn clamp_chroma_lch_yellow_high_chroma() {
+    // culori output:
+    // {"mode":"lch","l":80,"c":80.0537109375,"h":90}
+    let c = parse("lch(80% 200 90deg)").unwrap();
+    let out = unwrap_lch(clamp_chroma(c, "lch"));
+    close(out.l, 80.0, TOL_RGB, "l");
+    close(out.c, 80.0537109375, 1e-9, "c");
+    close(out.h, 90.0, TOL_RGB, "h");
 }
