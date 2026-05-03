@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0]
+
+### Added
+
 ## [1.2.0] - 2026-05-03
 
 Adds dynamic-mode conversion that mirrors culori's `converter(mode)`
