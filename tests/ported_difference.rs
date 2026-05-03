@@ -19,8 +19,8 @@
 use culor::{
     difference_ciede2000, difference_ciede76, difference_ciede94, difference_ciede94_with,
     difference_cmc, difference_euclidean, difference_euclidean_with, difference_euclidean_xyz,
-    difference_hue_chroma, difference_hue_saturation, difference_hyab, difference_itp,
-    difference_jz, difference_ok, parse,
+    difference_hue_chroma, difference_hue_naive, difference_hue_saturation, difference_hyab,
+    difference_itp, difference_jz, difference_ok, parse,
 };
 
 const EPS: f64 = 1e-10;
@@ -689,5 +689,60 @@ fn hyab_hex_short() {
         "#abc vs #cba",
         de(&p("#abc"), &p("#cba")),
         23.761286472410188,
+    );
+}
+
+// ----- difference_hue_naive -----
+
+#[test]
+fn hue_naive_lch_simple() {
+    let de = difference_hue_naive("lch");
+    assert_close(
+        "lch 30 vs 60",
+        de(&p("lch(50% 40 30)"), &p("lch(50% 40 60)")),
+        30.0,
+    );
+}
+
+#[test]
+fn hue_naive_lch_long_arc() {
+    // |60 - 30 - 360| > 180 so signed-wrap fires.
+    let de = difference_hue_naive("lch");
+    assert_close(
+        "lch 30 vs 200",
+        de(&p("lch(50% 40 30)"), &p("lch(50% 40 200)")),
+        170.0,
+    );
+}
+
+#[test]
+fn hue_naive_lch_neg_wrap() {
+    // 350 -> 10 wraps the short way through 0; result is signed.
+    let de = difference_hue_naive("lch");
+    assert_close(
+        "lch 350 vs 10",
+        de(&p("lch(50% 40 350)"), &p("lch(50% 40 10)")),
+        -20.0,
+    );
+}
+
+#[test]
+fn hue_naive_hsl_works() {
+    let de = difference_hue_naive("hsl");
+    assert_close(
+        "hsl 30 vs 60",
+        de(&p("hsl(30 50% 50%)"), &p("hsl(60 50% 50%)")),
+        30.0,
+    );
+}
+
+#[test]
+fn hue_naive_nan_hue_returns_zero() {
+    // A parsed `none` channel becomes NaN; either side NaN => 0.
+    let de = difference_hue_naive("lch");
+    assert_close(
+        "lch with none hue",
+        de(&p("lch(50% 40 none)"), &p("lch(50% 40 30)")),
+        0.0,
     );
 }
