@@ -70,10 +70,12 @@ const fn lch_like() -> [ChannelInfo; 3] {
 
 pub(crate) fn mode_shape(mode: &str) -> ModeShape {
     match mode {
-        "rgb" | "lrgb" | "lab" | "lab65" | "oklab" | "xyz50" | "xyz65" => ModeShape {
-            channels: linear(),
-            hue_diff: None,
-        },
+        "rgb" | "lrgb" | "lab" | "lab65" | "oklab" | "xyz50" | "xyz65" | "jab" | "itp" => {
+            ModeShape {
+                channels: linear(),
+                hue_diff: None,
+            }
+        }
         "lch" | "oklch" => ModeShape {
             channels: lch_like(),
             hue_diff: Some(HueDiffKind::Chroma),
@@ -202,6 +204,18 @@ pub(crate) fn extract(c: Color, mode: &str) -> [f64; 3] {
         "xyz65" => {
             let v: Xyz65 = to_xyz65(c);
             [v.x, v.y, v.z]
+        }
+        "jab" => {
+            let v: crate::spaces::Jab = match c {
+                Color::Jab(x) => x,
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, crate::spaces::Jab>(to_xyz65(other)),
+            };
+            [v.j, v.a, v.b]
+        }
+        "itp" => {
+            let v: crate::spaces::Itp = convert::<Xyz65, crate::spaces::Itp>(to_xyz65(c));
+            [v.i, v.t, v.p]
         }
         other => panic!("difference: unknown mode '{other}'"),
     }

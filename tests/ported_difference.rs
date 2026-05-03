@@ -488,18 +488,26 @@ fn hue_saturation_hsl_identity() {
     );
 }
 
-// ----- difference_jz / difference_itp (stubs) -----
+// ----- difference_jz / difference_itp -----
 
 #[test]
-fn jz_returns_nan_until_v04() {
+fn jz_red_to_blue_matches_culori() {
     let de = difference_jz();
-    assert!(de(&p("red"), &p("blue")).is_nan());
+    assert_close(
+        "difference_jz(red, blue)",
+        de(&p("red"), &p("blue")),
+        0.33960388420164006,
+    );
 }
 
 #[test]
-fn itp_returns_nan_until_v04() {
+fn itp_red_to_blue_matches_culori() {
     let de = difference_itp();
-    assert!(de(&p("red"), &p("blue")).is_nan());
+    assert_close(
+        "difference_itp(red, blue)",
+        de(&p("red"), &p("blue")),
+        349.7161209211369,
+    );
 }
 
 // ----- cross-cuts -----
