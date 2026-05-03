@@ -354,6 +354,7 @@ fn color_to_xyz65(c: Color) -> Xyz65 {
         Color::Okhsl(x) => x.to_xyz65(),
         Color::Okhsv(x) => x.to_xyz65(),
         Color::Itp(x) => x.to_xyz65(),
+        Color::Xyb(x) => x.to_xyz65(),
     }
 }
 

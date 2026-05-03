@@ -74,5 +74,6 @@ pub fn format_css(color: &Color) -> String {
         Color::Okhsl(c) => css::format_color_fn("--okhsl", &[c.h, c.s, c.l], c.alpha),
         Color::Okhsv(c) => css::format_color_fn("--okhsv", &[c.h, c.s, c.v], c.alpha),
         Color::Itp(c) => css::format_color_fn("--ictcp", &[c.i, c.t, c.p], c.alpha),
+        Color::Xyb(c) => css::format_color_fn("--xyb", &[c.x, c.y, c.b], c.alpha),
     }
 }
