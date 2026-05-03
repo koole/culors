@@ -90,7 +90,10 @@ fn successive_calls_produce_different_colors() {
         Color::Rgb(c) => (c.r, c.g, c.b),
         _ => unreachable!(),
     };
-    assert!(a != b, "two consecutive random rgb calls produced identical channels: {a:?}");
+    assert!(
+        a != b,
+        "two consecutive random rgb calls produced identical channels: {a:?}"
+    );
 }
 
 /// HSL has `s` and `l` declared in `[0, 1]` (culori's `useMode` fallback)
@@ -234,7 +237,10 @@ fn cubehelix_saturation_can_exceed_unit() {
             }
         }
     }
-    assert!(saw_above_one, "cubehelix s never exceeded 1; range may be wrong");
+    assert!(
+        saw_above_one,
+        "cubehelix s never exceeded 1; range may be wrong"
+    );
 }
 
 #[test]

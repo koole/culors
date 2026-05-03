@@ -121,7 +121,9 @@ fn jch_pq_inv_negative_value_regression() {
     assert!(
         !xyz.x.is_nan() && !xyz.y.is_nan() && !xyz.z.is_nan(),
         "PQ_inv produced NaN for negative input: x={}, y={}, z={}",
-        xyz.x, xyz.y, xyz.z
+        xyz.x,
+        xyz.y,
+        xyz.z
     );
     common::assert_close(xyz.x, 0.0, 1e-15);
     common::assert_close(xyz.y, 0.0, 1e-15);
