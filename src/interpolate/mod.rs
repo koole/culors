@@ -112,6 +112,12 @@ impl InterpolateOptions {
 /// `"xyz65"`. An unrecognized mode panics — call sites should validate
 /// mode strings up front.
 ///
+/// Currently supports the v0.1 modes: rgb, lrgb, hsl, hsv, hwb, lab, lch,
+/// oklab, oklch, xyz50, xyz65. Other modes (cubehelix, dlab/dlch, jab/jch,
+/// luv/lchuv, hsluv/hpluv, okhsl/okhsv, itp, xyb, yiq, hsi, p3, rec2020,
+/// a98, prophoto) are not yet supported by `interpolate` or `average` —
+/// passing them will panic. Wider support is planned for a future release.
+///
 /// Uses [`HueFixup::Shorter`] and no easing. For other strategies, see
 /// [`interpolate_with`].
 ///

@@ -85,6 +85,12 @@ pub fn average_angle(angles: &[f64]) -> f64 {
 /// `"hsv"`, `"hwb"`, `"lab"`, `"lch"`, `"oklab"`, `"oklch"`, `"xyz50"`,
 /// `"xyz65"`.
 ///
+/// Currently supports the v0.1 modes: rgb, lrgb, hsl, hsv, hwb, lab, lch,
+/// oklab, oklch, xyz50, xyz65. Other modes (cubehelix, dlab/dlch, jab/jch,
+/// luv/lchuv, hsluv/hpluv, okhsl/okhsv, itp, xyb, yiq, hsi, p3, rec2020,
+/// a98, prophoto) are not yet supported by `interpolate` or `average` —
+/// passing them will panic. Wider support is planned for a future release.
+///
 /// # Panics
 ///
 /// Panics if `mode` is unknown. Empty `colors` does not panic — it

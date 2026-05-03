@@ -1,8 +1,6 @@
 //! Color-difference (ΔE) factories. Mirrors culori 4.0.2's
-//! `difference.js` family, plus forward-looking placeholders for v0.4
-//! spaces (`difference_jz`, `difference_itp`). Each public function
-//! returns a closure that computes the configured metric on a pair of
-//! colors.
+//! `difference.js` family. Each public function returns a closure that
+//! computes the configured metric on a pair of colors.
 //!
 //! Every factory takes its parameters once and returns a `Fn(&Color,
 //! &Color) -> f64`, matching culori's curried API:
@@ -15,8 +13,8 @@
 //! let _delta = de(&red, &blue);
 //! ```
 //!
-//! Variants whose underlying color space is scheduled for v0.4
-//! ([`difference_jz`], [`difference_itp`]) compile but return `f64::NAN`.
+//! [`difference_jz`] and [`difference_itp`] delegate to
+//! [`difference_euclidean_with`] over the Jab and ITP spaces respectively.
 
 mod ciede2000;
 mod ciede76;
