@@ -71,5 +71,6 @@ pub fn format_css(color: &Color) -> String {
         Color::Hsi(c) => css::format_color_fn("--hsi", &[c.h, c.s, c.i], c.alpha),
         Color::Hsluv(c) => css::format_color_fn("--hsluv", &[c.h, c.s, c.l], c.alpha),
         Color::Hpluv(c) => css::format_color_fn("--hpluv", &[c.h, c.s, c.l], c.alpha),
+        Color::Okhsl(c) => css::format_color_fn("--okhsl", &[c.h, c.s, c.l], c.alpha),
     }
 }
