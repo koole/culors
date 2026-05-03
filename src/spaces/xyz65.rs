@@ -19,7 +19,7 @@ pub struct Xyz65 {
 
 impl ColorSpace for Xyz65 {
     const MODE: &'static str = "xyz65";
-    const CHANNELS: &'static [&'static str] = &["x", "y", "z", "alpha"];
+    const CHANNELS: &'static [&'static str] = &["x", "y", "z"];
 
     fn alpha(&self) -> Option<f64> {
         self.alpha

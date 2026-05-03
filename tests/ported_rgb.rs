@@ -12,6 +12,12 @@ mod common;
 const EPS: f64 = 1e-12;
 
 #[test]
+fn rgb_channels_excludes_alpha() {
+    assert_eq!(Rgb::CHANNELS, &["r", "g", "b"]);
+    assert_eq!(Rgb::CHANNELS.len(), 3);
+}
+
+#[test]
 fn rgb_white_to_xyz65() {
     let white = Rgb {
         r: 1.0,

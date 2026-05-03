@@ -54,7 +54,7 @@ fn linear_to_srgb(c: f64) -> f64 {
 
 impl ColorSpace for Rgb {
     const MODE: &'static str = "rgb";
-    const CHANNELS: &'static [&'static str] = &["r", "g", "b", "alpha"];
+    const CHANNELS: &'static [&'static str] = &["r", "g", "b"];
 
     fn alpha(&self) -> Option<f64> {
         self.alpha

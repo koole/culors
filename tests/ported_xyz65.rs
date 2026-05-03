@@ -21,6 +21,12 @@ fn xyz65_round_trip_through_self() {
 }
 
 #[test]
+fn xyz65_channels_excludes_alpha() {
+    assert_eq!(Xyz65::CHANNELS, &["x", "y", "z"]);
+    assert_eq!(Xyz65::CHANNELS.len(), 3);
+}
+
+#[test]
 fn xyz65_alpha_with_alpha() {
     let c = Xyz65 {
         x: 0.0,

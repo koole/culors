@@ -7,7 +7,9 @@ use crate::spaces::Xyz65;
 pub trait ColorSpace: Sized + Copy + Clone + PartialEq {
     /// Stable identifier for this space (matches culori's `mode` string).
     const MODE: &'static str;
-    /// Channel names in declaration order.
+    /// The space's natural channels in canonical order. Alpha is excluded:
+    /// it is a universal meta-channel accessed via [`alpha`](Self::alpha)
+    /// rather than a channel of any particular space.
     const CHANNELS: &'static [&'static str];
 
     /// Returns the alpha channel, if set.
