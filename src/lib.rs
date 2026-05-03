@@ -116,8 +116,9 @@ pub use difference::{
     difference_hue_chroma, difference_hue_saturation, difference_itp, difference_jz, difference_ok,
 };
 pub use filter::{
-    filter_brightness, filter_contrast, filter_grayscale, filter_hue_rotate, filter_invert,
-    filter_saturate, filter_sepia,
+    filter_brightness, filter_contrast, filter_deficiency_deuter, filter_deficiency_prot,
+    filter_deficiency_trit, filter_grayscale, filter_hue_rotate, filter_invert, filter_saturate,
+    filter_sepia,
 };
 pub use format::format_css;
 pub use gamut::{clamp_chroma, clamp_gamut, in_gamut, to_gamut};

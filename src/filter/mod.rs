@@ -11,8 +11,10 @@
 
 mod adjust;
 mod common;
+mod deficiency;
 
 pub use adjust::{
     filter_brightness, filter_contrast, filter_grayscale, filter_hue_rotate, filter_invert,
     filter_saturate, filter_sepia,
 };
+pub use deficiency::{filter_deficiency_deuter, filter_deficiency_prot, filter_deficiency_trit};

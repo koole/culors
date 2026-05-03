@@ -5,8 +5,9 @@
 //! and pasted in.
 
 use culor::{
-    filter_brightness, filter_contrast, filter_grayscale, filter_hue_rotate, filter_invert,
-    filter_saturate, filter_sepia, parse, Color,
+    filter_brightness, filter_contrast, filter_deficiency_deuter, filter_deficiency_prot,
+    filter_deficiency_trit, filter_grayscale, filter_hue_rotate, filter_invert, filter_saturate,
+    filter_sepia, parse, Color,
 };
 
 const EPS: f64 = 1e-12;
@@ -298,6 +299,123 @@ fn sepia_white() {
 #[test]
 fn sepia_black_is_black() {
     assert_rgb(filter_sepia(1.0)(&black()), 0.0, 0.0, 0.0);
+}
+
+// ----- deficiency: prot -------------------------------------------------
+
+#[test]
+fn prot_zero_is_identity() {
+    assert_rgb(filter_deficiency_prot(0.0)(&red()), 1.0, 0.0, 0.0);
+}
+
+#[test]
+fn prot_full_red() {
+    assert_rgb(
+        filter_deficiency_prot(1.0)(&red()),
+        0.152_286,
+        0.114_503,
+        -0.003_882,
+    );
+}
+
+#[test]
+fn prot_half_red() {
+    assert_rgb(
+        filter_deficiency_prot(0.5)(&red()),
+        0.458_064,
+        0.092_785,
+        -0.007_494,
+    );
+}
+
+#[test]
+fn prot_full_lime() {
+    assert_rgb(
+        filter_deficiency_prot(1.0)(&lime()),
+        1.052_583,
+        0.786_281,
+        -0.048_116,
+    );
+}
+
+#[test]
+fn prot_snaps_to_nearest_tenth() {
+    // culori uses Math.round(severity / 0.1); 0.04 rounds to 0 (identity).
+    assert_rgb(filter_deficiency_prot(0.04)(&red()), 1.0, 0.0, 0.0);
+    // 0.05 rounds up to bucket 1 (severity = 0.1).
+    assert_rgb(
+        filter_deficiency_prot(0.05)(&red()),
+        0.856_167,
+        0.029_342,
+        -0.002_88,
+    );
+    // 0.14 still rounds down to bucket 1, not interpolated.
+    assert_rgb(
+        filter_deficiency_prot(0.14)(&red()),
+        0.856_167,
+        0.029_342,
+        -0.002_88,
+    );
+}
+
+// ----- deficiency: deuter -----------------------------------------------
+
+#[test]
+fn deuter_full_red() {
+    assert_rgb(
+        filter_deficiency_deuter(1.0)(&red()),
+        0.367_322,
+        0.280_085,
+        -0.011_82,
+    );
+}
+
+#[test]
+fn deuter_half_red() {
+    assert_rgb(
+        filter_deficiency_deuter(0.5)(&red()),
+        0.547_494,
+        0.181_692,
+        -0.010_41,
+    );
+}
+
+// ----- deficiency: trit -------------------------------------------------
+
+#[test]
+fn trit_blue_severity_07() {
+    assert_rgb(
+        filter_deficiency_trit(0.7)(&blue()),
+        -0.083_402,
+        0.079_086,
+        0.598_854,
+    );
+}
+
+#[test]
+fn trit_red_full() {
+    assert_rgb(
+        filter_deficiency_trit(1.0)(&red()),
+        1.255_528,
+        -0.078_411,
+        0.004_733,
+    );
+}
+
+#[test]
+fn deficiency_clamps_above_one() {
+    // Severity > 1 clamps to last bucket (severity = 1).
+    assert_rgb(
+        filter_deficiency_prot(2.0)(&red()),
+        0.152_286,
+        0.114_503,
+        -0.003_882,
+    );
+}
+
+#[test]
+fn deficiency_negative_is_identity() {
+    assert_rgb(filter_deficiency_prot(-0.5)(&red()), 1.0, 0.0, 0.0);
 }
 
 // ----- non-RGB inputs ---------------------------------------------------
