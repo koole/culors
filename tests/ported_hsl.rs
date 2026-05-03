@@ -208,6 +208,28 @@ fn hsl_nan_hue_treated_as_zero() {
 }
 
 #[test]
+fn hsl_nan_hue_with_nonzero_s_coerces_to_zero() {
+    // NaN hue coerces to 0 regardless of s, matching culori's `h !== undefined ? h : 0`.
+    let nan_hsl = Hsl {
+        h: f64::NAN,
+        s: 0.5,
+        l: 0.5,
+        alpha: None,
+    };
+    let zero_hsl = Hsl {
+        h: 0.0,
+        s: 0.5,
+        l: 0.5,
+        alpha: None,
+    };
+    let nan_rgb: Rgb = nan_hsl.into();
+    let zero_rgb: Rgb = zero_hsl.into();
+    common::assert_close(nan_rgb.r, zero_rgb.r, EPS);
+    common::assert_close(nan_rgb.g, zero_rgb.g, EPS);
+    common::assert_close(nan_rgb.b, zero_rgb.b, EPS);
+}
+
+#[test]
 fn rgb_round_trip_through_hsl() {
     let rgb = Rgb {
         r: 0.3,

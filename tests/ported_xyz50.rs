@@ -1,8 +1,6 @@
 //! Ported tests for the `Xyz50` color space.
 //!
-//! Reference values produced by culori 4.0.2 and pasted verbatim. The
-//! Bradford-adapted matrices in culori are not exact mathematical inverses,
-//! so chained conversions use a slightly looser eps.
+//! Reference values produced by culori 4.0.2 and pasted verbatim.
 
 use culor::spaces::{Xyz50, Xyz65};
 use culor::ColorSpace;
@@ -11,7 +9,6 @@ use culor::ColorSpace;
 mod common;
 
 const EPS: f64 = 1e-12;
-const CHAIN_EPS: f64 = 1e-10;
 
 #[test]
 fn xyz50_channels_excludes_alpha() {
