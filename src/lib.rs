@@ -7,9 +7,11 @@
 #![warn(missing_docs)]
 
 pub mod color;
+pub mod convert;
 pub mod spaces;
 pub mod traits;
 pub(crate) mod util;
 
 pub use color::Color;
+pub use convert::convert;
 pub use traits::ColorSpace;
