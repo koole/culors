@@ -1,0 +1,30 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [0.1.0] - 2026-05-03
+
+### Added
+
+- Eleven color spaces: `Rgb`, `LinearRgb`, `Hsl`, `Hsv`, `Hwb`, `Lab` (D50), `Lch` (D50), `Oklab`, `Oklch`, `Xyz50`, `Xyz65`. Each space is a plain struct re-exported from `culor::spaces`.
+- `ColorSpace` trait with `to_xyz65` / `from_xyz65` plus alpha access. Every space implements it.
+- `Color` enum: a tagged union over every space, with `From<Space>` impls for ergonomic construction.
+- Generic `convert<A, B>(c: A) -> B` function that routes through XYZ D65 for any pair of `ColorSpace` implementors.
+- Direct `From` impls for the precision-critical pairs: `Rgb` ↔ `LinearRgb`, `Rgb` ↔ `Hsl`, `Rgb` ↔ `Hsv`, `Hsv` ↔ `Hwb`, `LinearRgb` ↔ `Oklab`, `Oklab` ↔ `Oklch`, `Xyz50` ↔ `Lab`, `Lab` ↔ `Lch`, and `Rgb` → `Lab` / `Lch` / `Oklab` / `Oklch` with culori's achromatic snap.
+- CSS Color Module 4 parser (`parse(&str) -> Option<Color>`) covering named colors, `transparent`, hex (`#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`), functional `rgb()`, `rgba()`, `hsl()`, `hsla()`, `hwb()`, `lab()`, `lch()`, `oklab()`, `oklch()`, and `color()` with `srgb`, `srgb-linear`, `xyz`, `xyz-d50`, `xyz-d65` profiles.
+- CSS Color Module 4 formatter (`format_css(&Color) -> String`) emitting modern functional notation with slash-prefixed alpha and `none` for NaN channels.
+- Fixture-based test infrastructure: 110 conversion pairs, 365 parse cases, 303 format round-trips, all generated from culori 4.0.2 and re-verified on every CI run.
+- Optional `serde` feature deriving `Serialize` and `Deserialize` for every space struct and `Color`.
+
+### Known limitations
+
+- `convert<A, B>` always routes through XYZ D65. For byte-for-byte parity with culori's per-pair routing, use the direct `Type::from(value)` impls listed above for compile-time-known pairs. Pairs without a direct impl drift from culori by approximately 1e-14, acceptable for color use cases but not bit-exact.
+- `color()` function with `display-p3`, `rec2020`, `prophoto-rgb`, or `a98-rgb` profiles returns `None`. Those spaces are deferred to v0.4.
+
+[Unreleased]: https://github.com/koole/culor/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/koole/culor/releases/tag/v0.1.0
