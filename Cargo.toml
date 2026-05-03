@@ -11,6 +11,13 @@ readme = "README.md"
 authors = ["Leon Koole <claude@koole.io>"]
 keywords = ["color", "rgb", "lab", "oklab", "css"]
 categories = ["graphics", "multimedia::images"]
+exclude = [
+    "/.github/",
+    "/docs/",
+    "/fixtures-gen/",
+    "/package.json",
+    "/package-lock.json",
+]
 
 [features]
 default = []
