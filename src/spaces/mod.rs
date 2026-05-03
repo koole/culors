@@ -20,6 +20,7 @@ mod rec2020;
 mod rgb;
 mod xyz50;
 mod xyz65;
+mod yiq;
 
 pub use a98::A98;
 pub use cubehelix::Cubehelix;
@@ -41,3 +42,4 @@ pub use rec2020::Rec2020;
 pub use rgb::Rgb;
 pub use xyz50::Xyz50;
 pub use xyz65::Xyz65;
+pub use yiq::Yiq;
