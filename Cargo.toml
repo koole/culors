@@ -1,0 +1,24 @@
+[package]
+name = "culor"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Rust port of the culori color library — color spaces, parsing, conversion"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/koole/culor"
+documentation = "https://docs.rs/culor"
+readme = "README.md"
+authors = ["Leon Koole <claude@koole.io>"]
+keywords = ["color", "rgb", "lab", "oklab", "css"]
+categories = ["graphics", "multimedia::images"]
+
+[features]
+default = []
+serde = ["dep:serde"]
+
+[dependencies]
+serde = { version = "1", optional = true, features = ["derive"] }
+
+[dev-dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
