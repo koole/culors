@@ -21,7 +21,7 @@
 #![allow(dead_code)] // wired up by parse::mod.rs in a later commit
 
 use crate::color::Color;
-use crate::spaces::{Hsl, Hwb, Lab, Lch, Oklab, Oklch, Rgb};
+use crate::spaces::{Hsl, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) enum Tok {
@@ -699,6 +699,63 @@ fn parse_oklch(parsed: &Modern) -> Option<Oklch> {
     })
 }
 
+/// Mirrors culori's `parseColorSyntax`. Accepts `color(<profile> c1 c2 c3
+/// [/ alpha])` for the v0.1 profiles (`srgb`, `srgb-linear`, `xyz`,
+/// `xyz-d50`, `xyz-d65`). Each numeric coord becomes the channel value
+/// directly; percentages divide by 100. Other profiles return `None`
+/// until those spaces land.
+fn parse_color_function(tokens: &[Token]) -> Option<Color> {
+    let mut iter = tokens.iter();
+    let head = iter.next()?;
+    if head.kind != Tok::Function || head.ident != "color" {
+        return None;
+    }
+    let profile = iter.next()?;
+    if profile.kind != Tok::Ident {
+        return None;
+    }
+    let coords = consume_coords(&mut iter, false, false)?;
+    let resolve = |t: &Token| match t.kind {
+        Tok::None => f64::NAN,
+        Tok::Number => t.value,
+        Tok::Percentage => t.value / 100.0,
+        _ => f64::NAN,
+    };
+    let c1 = resolve(&coords[0]);
+    let c2 = resolve(&coords[1]);
+    let c3 = resolve(&coords[2]);
+    let alpha = alpha_value(&coords[3]);
+    match profile.ident.as_str() {
+        "srgb" => Some(Color::Rgb(Rgb {
+            r: c1,
+            g: c2,
+            b: c3,
+            alpha,
+        })),
+        "srgb-linear" => Some(Color::LinearRgb(LinearRgb {
+            r: c1,
+            g: c2,
+            b: c3,
+            alpha,
+        })),
+        "xyz" | "xyz-d65" => Some(Color::Xyz65(Xyz65 {
+            x: c1,
+            y: c2,
+            z: c3,
+            alpha,
+        })),
+        "xyz-d50" => Some(Color::Xyz50(Xyz50 {
+            x: c1,
+            y: c2,
+            z: c3,
+            alpha,
+        })),
+        // TODO(v0.4): display-p3, rec2020, prophoto-rgb, a98-rgb once
+        // those spaces land.
+        _ => None,
+    }
+}
+
 /// Try every functional notation handled by this module. Returns
 /// `Some(Color)` on a recognized + valid call, `None` on either a
 /// non-functional input or a malformed call. Callers above this layer
@@ -728,6 +785,11 @@ pub(crate) fn parse_functional(input: &str) -> Option<Color> {
             if let Some(c) = parse_oklch(&parsed) {
                 return Some(Color::Oklch(c));
             }
+        }
+        // `color(<profile> ...)` uses a different shape (function +
+        // ident + coords); try it after the rgb/hsl/etc. families.
+        if let Some(c) = parse_color_function(&tokens) {
+            return Some(c);
         }
     }
     // Legacy comma-form: convert commas to whitespace, retry, treating
@@ -1089,5 +1151,72 @@ mod tests {
             panic!()
         };
         assert!((c.c - 0.2).abs() < 1e-12);
+    }
+
+    #[test]
+    fn color_srgb() {
+        let Color::Rgb(c) = parse_functional("color(srgb 1 0 0)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.r, 1.0);
+        assert_eq!(c.g, 0.0);
+        assert_eq!(c.b, 0.0);
+        assert_eq!(c.alpha, None);
+    }
+
+    #[test]
+    fn color_srgb_with_alpha() {
+        let Color::Rgb(c) = parse_functional("color(srgb 1 0 0 / 0.5)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.alpha, Some(0.5));
+    }
+
+    #[test]
+    fn color_srgb_linear() {
+        let Color::LinearRgb(c) = parse_functional("color(srgb-linear 1 0 0)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.r, 1.0);
+    }
+
+    #[test]
+    fn color_xyz_aliases() {
+        // `xyz` is the alias for D65, matching culori.
+        let Color::Xyz65(c) = parse_functional("color(xyz 0.5 0.5 0.5)").unwrap() else {
+            panic!("xyz should map to xyz65")
+        };
+        assert_eq!(c.x, 0.5);
+        let Color::Xyz65(_) = parse_functional("color(xyz-d65 0.5 0.5 0.5)").unwrap() else {
+            panic!("xyz-d65 should map to xyz65")
+        };
+    }
+
+    #[test]
+    fn color_xyz_d50() {
+        let Color::Xyz50(c) = parse_functional("color(xyz-d50 0.5 0.5 0.5)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.x, 0.5);
+        assert_eq!(c.y, 0.5);
+        assert_eq!(c.z, 0.5);
+    }
+
+    #[test]
+    fn color_unsupported_profile_returns_none() {
+        assert!(parse_functional("color(display-p3 1 0 0)").is_none());
+        assert!(parse_functional("color(rec2020 1 0 0)").is_none());
+        assert!(parse_functional("color(prophoto-rgb 1 0 0)").is_none());
+        assert!(parse_functional("color(a98-rgb 1 0 0)").is_none());
+    }
+
+    #[test]
+    fn color_percentage_coords() {
+        let Color::Rgb(c) = parse_functional("color(srgb 100% 0% 0%)").unwrap() else {
+            panic!()
+        };
+        assert_eq!(c.r, 1.0);
+        assert_eq!(c.g, 0.0);
+        assert_eq!(c.b, 0.0);
     }
 }
