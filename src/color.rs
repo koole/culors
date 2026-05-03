@@ -1,7 +1,7 @@
 //! Dynamic color enum.
 
 use crate::spaces::{
-    Cubehelix, Dlab, Dlch, Hpluv, Hsi, Hsl, Hsluv, Hsv, Hwb, Itp, Jab, Jch, Lab, Lch, Lchuv,
+    Cubehelix, Dlab, Dlch, Hpluv, Hsi, Hsl, Hsluv, Hsv, Hwb, Itp, Jab, Jch, Lab, Lab65, Lch, Lchuv,
     LinearRgb, Luv, Okhsl, Okhsv, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb, Xyb, Xyz50, Xyz65, Yiq,
     A98, P3,
 };
@@ -22,6 +22,8 @@ pub enum Color {
     Hwb(Hwb),
     /// CIE Lab D50.
     Lab(Lab),
+    /// CIE Lab D65.
+    Lab65(Lab65),
     /// CIE Lch D50 (polar Lab).
     Lch(Lch),
     /// Oklab (perceptually uniform).
@@ -105,6 +107,12 @@ impl From<Hwb> for Color {
 impl From<Lab> for Color {
     fn from(c: Lab) -> Self {
         Color::Lab(c)
+    }
+}
+
+impl From<Lab65> for Color {
+    fn from(c: Lab65) -> Self {
+        Color::Lab65(c)
     }
 }
 

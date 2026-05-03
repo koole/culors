@@ -159,10 +159,15 @@ pub(crate) fn extract(c: Color, mode: &str) -> [f64; 3] {
             [v.l, v.a, v.b]
         }
         "lab65" => {
-            // D65 Lab — culori's `lab65` mode. Implemented via xyz65.
-            let xyz = to_xyz65(c);
-            let (l, a, b) = xyz65_to_lab65(xyz.x, xyz.y, xyz.z);
-            [l, a, b]
+            // D65 Lab — culori's `lab65` mode. Direct path for Lab65 and
+            // Rgb (with the achromatic snap); other modes route through
+            // xyz65 to match the generic hub.
+            let v: crate::spaces::Lab65 = match c {
+                Color::Lab65(x) => x,
+                Color::Rgb(x) => x.into(),
+                other => crate::spaces::Lab65::from(to_xyz65(other)),
+            };
+            [v.l, v.a, v.b]
         }
         "lch" => {
             let v: Lch = match c {
@@ -237,6 +242,7 @@ pub(crate) fn to_xyz65(c: Color) -> Xyz65 {
         Color::Hsv(x) => x.to_xyz65(),
         Color::Hwb(x) => x.to_xyz65(),
         Color::Lab(x) => x.to_xyz65(),
+        Color::Lab65(x) => x.to_xyz65(),
         Color::Lch(x) => x.to_xyz65(),
         Color::Oklab(x) => x.to_xyz65(),
         Color::Oklch(x) => x.to_xyz65(),

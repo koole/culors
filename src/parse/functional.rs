@@ -20,7 +20,8 @@
 
 use crate::color::Color;
 use crate::spaces::{
-    Hsl, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb, Xyz50, Xyz65, A98, P3,
+    Hsl, Hwb, Lab, Lab65, Lch, LinearRgb, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb, Xyz50, Xyz65,
+    A98, P3,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -836,6 +837,12 @@ fn parse_color_function(tokens: &[Token]) -> Option<Color> {
         "prophoto-rgb" => Some(Color::ProphotoRgb(ProphotoRgb {
             r: c1,
             g: c2,
+            b: c3,
+            alpha,
+        })),
+        "--lab-d65" => Some(Color::Lab65(Lab65 {
+            l: c1,
+            a: c2,
             b: c3,
             alpha,
         })),

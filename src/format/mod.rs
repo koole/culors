@@ -55,6 +55,7 @@ pub fn format_css(color: &Color) -> String {
         Color::Hsl(c) => css::format_hsl(c.h, c.s, c.l, c.alpha),
         Color::Hwb(c) => css::format_hwb(c.h, c.w, c.b, c.alpha),
         Color::Lab(c) => css::format_lab_like("lab", c.l, c.a, c.b, c.alpha),
+        Color::Lab65(c) => css::format_color_fn("--lab-d65", &[c.l, c.a, c.b], c.alpha),
         Color::Lch(c) => css::format_lch_like("lch", c.l, c.c, c.h, c.alpha),
         Color::Oklab(c) => css::format_lab_like("oklab", c.l, c.a, c.b, c.alpha),
         Color::Oklch(c) => css::format_lch_like("oklch", c.l, c.c, c.h, c.alpha),
