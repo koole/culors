@@ -386,3 +386,68 @@ fn lab_none_channels_become_nan() {
     assert!(c.b.is_nan());
     assert_eq!(c.alpha, Some(0.5));
 }
+
+// Discovered while building the parse fixture against culori's
+// `parse()` (Phase E.2). The legacy comma-form parser used to stripe
+// out commas without verifying the input had legal legacy structure —
+// it accepted modern-style 4-positional forms (`rgb(255 0 0 0)`),
+// trailing/leading commas, and mixed comma/space separators.
+#[test]
+fn rgb_modern_four_positional_no_slash_rejected() {
+    assert!(parse("rgb(255 0 0 0)").is_none());
+    assert!(parse("rgb(255 0 0 0.5)").is_none());
+    assert!(parse("hsl(180 50% 50% 0.5)").is_none());
+}
+
+#[test]
+fn rgb_legacy_trailing_or_misplaced_commas_rejected() {
+    assert!(parse("rgb(255, 0, 0,)").is_none());
+    assert!(parse("rgb(255 0 0,)").is_none());
+}
+
+#[test]
+fn rgb_legacy_mixed_separators_rejected() {
+    assert!(parse("hsl(180 50%, 50%)").is_none());
+    assert!(parse("hsl(180, 50% 50%)").is_none());
+}
+
+// Culori's `parseRgbLegacy.js` uses two regexes (`rgb_num_old` and
+// `rgb_per_old`) so legacy form requires all three RGB channels to
+// share the same type. Mixed forms like `rgb(50%, 50, 0%)` are
+// rejected.
+#[test]
+fn rgb_legacy_requires_uniform_channel_types() {
+    assert!(parse("rgb(50%, 50, 0%)").is_none());
+    assert!(parse("rgb(50%, 50%, 0)").is_none());
+    assert!(parse("rgb(50, 50%, 0)").is_none());
+    // All-num and all-per stay valid.
+    assert_eq!(rgb(parse("rgb(255, 0, 0)").unwrap()).r, 1.0);
+    assert_eq!(rgb(parse("rgb(100%, 0%, 0%)").unwrap()).r, 1.0);
+}
+
+// Culori's `parseHslLegacy.js` clamps S and L to [0, 1] (legacy form
+// only) and requires both to be percentages. Modern syntax preserves
+// out-of-range values and accepts bare numbers.
+#[test]
+fn hsl_legacy_clamps_saturation_lightness() {
+    let neg = hsl(parse("hsl(180, -50%, 50%)").unwrap());
+    assert_eq!(neg.s, 0.0);
+    let big = hsl(parse("hsl(180, 150%, 50%)").unwrap());
+    assert_eq!(big.s, 1.0);
+    // Modern form does NOT clamp.
+    let neg_modern = hsl(parse("hsl(180 -50% 50%)").unwrap());
+    assert_eq!(neg_modern.s, -0.5);
+    let big_modern = hsl(parse("hsl(180 150% 50%)").unwrap());
+    assert_eq!(big_modern.s, 1.5);
+}
+
+#[test]
+fn hsl_legacy_requires_percentage_sl() {
+    // Bare numbers in legacy form are rejected.
+    assert!(parse("hsl(180, 50, 50)").is_none());
+    assert!(parse("hsl(180, 0.5, 0.5)").is_none());
+    // Modern still accepts bare numbers (treated as percentages).
+    let bare = hsl(parse("hsl(180 50 50)").unwrap());
+    assert_eq!(bare.s, 0.5);
+    assert_eq!(bare.l, 0.5);
+}

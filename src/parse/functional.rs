@@ -372,9 +372,13 @@ pub(crate) fn tokenize(input: &str) -> Option<Vec<Token>> {
 
 /// Modern-syntax parsed payload: `[function_name, c1, c2, c3, alpha]`.
 /// Alpha is always present, possibly as a `Tok::None` placeholder.
+/// `legacy` is set when the payload came from comma-stripped legacy
+/// input; some validators (e.g. legacy `rgb()`'s all-num-or-all-per
+/// rule, legacy `hsl()`'s S/L clamp) only fire in that mode.
 pub(crate) struct Modern {
     pub func: String,
     pub coords: [Token; 4],
+    pub legacy: bool,
 }
 
 pub(crate) fn parse_modern(tokens: &[Token], include_hue: bool) -> Option<Modern> {
@@ -389,7 +393,11 @@ fn parse_form(tokens: &[Token], include_hue: bool, legacy: bool) -> Option<Moder
     }
     let func = first.ident.clone();
     let coords = consume_coords(&mut iter, include_hue, legacy)?;
-    Some(Modern { func, coords })
+    Some(Modern {
+        func,
+        coords,
+        legacy,
+    })
 }
 
 fn consume_coords<'a>(
@@ -447,18 +455,41 @@ fn consume_coords<'a>(
 
 /// Strip commas to translate legacy comma-form into modern-form. Returns
 /// the cleaned string only when the input starts with a known legacy
-/// function (rgb/rgba/hsl/hsla); otherwise returns None to defer to the
-/// modern-form parse. This is a behavioral shortcut: culori's actual
-/// pipeline is two distinct regex parsers, but the legacy regexes only
-/// accept tokens already accepted by the modern parser plus commas, so
-/// removing commas and rerunning the modern parser produces the same
-/// result.
+/// function (rgb/rgba/hsl/hsla) AND the input is structurally a legal
+/// legacy call: 3 or 4 comma-separated non-empty parts inside the parens
+/// and no `/` separator (slash-alpha is modern-only). Without those
+/// guards the stripped tokenization would silently accept inputs culori
+/// rejects, like `rgb(255 0 0 0)` (modern 4-positional without slash) or
+/// `rgb(255, 0, 0,)` (trailing comma).
+///
+/// This is a behavioral shortcut: culori's pipeline is two distinct
+/// regex parsers, but the legacy regexes only accept tokens already
+/// accepted by the modern parser plus commas, so removing commas and
+/// rerunning the modern parser produces the same result once we verify
+/// the comma structure was legal.
 fn strip_legacy_commas(input: &str) -> Option<String> {
-    let trimmed = input.trim_start();
-    let prefix = ["rgba(", "rgb(", "hsla(", "hsl("]
+    let trimmed = input.trim();
+    if !["rgba(", "rgb(", "hsla(", "hsl("]
         .iter()
-        .find(|p| trimmed.starts_with(*p))?;
-    let _ = prefix;
+        .any(|p| trimmed.starts_with(p))
+    {
+        return None;
+    }
+    if !trimmed.ends_with(')') {
+        return None;
+    }
+    if trimmed.contains('/') {
+        return None;
+    }
+    let open = trimmed.find('(')?;
+    let inner = &trimmed[open + 1..trimmed.len() - 1];
+    let parts: Vec<&str> = inner.split(',').map(str::trim).collect();
+    if parts.len() < 3 || parts.len() > 4 {
+        return None;
+    }
+    if parts.iter().any(|p| p.is_empty()) {
+        return None;
+    }
     Some(input.replace(',', " "))
 }
 
@@ -472,7 +503,11 @@ fn alpha_value(t: &Token) -> Option<f64> {
 }
 
 /// Parse `rgb()` / `rgba()` modern or legacy form. Returns `None` if
-/// `parsed` doesn't belong to this function family.
+/// `parsed` doesn't belong to this function family. Legacy form requires
+/// all three RGB channels to share the same type (all `<number>` or all
+/// `<percentage>`); culori enforces this through two separate regexes
+/// (`rgb_num_old` / `rgb_per_old` in `parseRgbLegacy.js`) and rejects
+/// mixed inputs like `rgb(50%, 50, 0%)`.
 fn parse_rgb(parsed: &Modern) -> Option<Rgb> {
     if parsed.func != "rgb" && parsed.func != "rgba" {
         return None;
@@ -480,6 +515,14 @@ fn parse_rgb(parsed: &Modern) -> Option<Rgb> {
     let [r, g, b, a] = &parsed.coords;
     if matches!(r.kind, Tok::Hue) || matches!(g.kind, Tok::Hue) || matches!(b.kind, Tok::Hue) {
         return None;
+    }
+    if parsed.legacy {
+        let kinds = [r.kind, g.kind, b.kind];
+        let all_num = kinds.iter().all(|k| matches!(k, Tok::Number));
+        let all_per = kinds.iter().all(|k| matches!(k, Tok::Percentage));
+        if !all_num && !all_per {
+            return None;
+        }
     }
     let resolve = |t: &Token| match t.kind {
         Tok::None => f64::NAN,
@@ -507,18 +550,32 @@ fn parse_hsl(parsed: &Modern) -> Option<Hsl> {
         Tok::Percentage => return None,
         _ => return None,
     };
-    // S / L: percentage in spec; culori also accepts number-as-percentage.
-    let s_val = match s.kind {
+    // S / L: percentage in spec. Modern syntax also accepts bare numbers
+    // (culori's `parseHsl` divides by 100 either way). Legacy syntax
+    // requires percentages — culori's `parseHslLegacy` regex is
+    // `hue${c}per${c}per` — and clamps the result to 0..1.
+    if parsed.legacy
+        && (!matches!(s.kind, Tok::Percentage | Tok::None)
+            || !matches!(l.kind, Tok::Percentage | Tok::None))
+    {
+        return None;
+    }
+    let s_raw = match s.kind {
         Tok::None => f64::NAN,
         Tok::Hue => return None,
         Tok::Number | Tok::Percentage => s.value / 100.0,
         _ => return None,
     };
-    let l_val = match l.kind {
+    let l_raw = match l.kind {
         Tok::None => f64::NAN,
         Tok::Hue => return None,
         Tok::Number | Tok::Percentage => l.value / 100.0,
         _ => return None,
+    };
+    let (s_val, l_val) = if parsed.legacy {
+        (clamp_unit(s_raw), clamp_unit(l_raw))
+    } else {
+        (s_raw, l_raw)
     };
     Some(Hsl {
         h: h_val,
@@ -526,6 +583,14 @@ fn parse_hsl(parsed: &Modern) -> Option<Hsl> {
         l: l_val,
         alpha: alpha_value(a),
     })
+}
+
+fn clamp_unit(v: f64) -> f64 {
+    if v.is_nan() {
+        v
+    } else {
+        v.clamp(0.0, 1.0)
+    }
 }
 
 fn parse_hwb(parsed: &Modern) -> Option<Hwb> {
