@@ -68,7 +68,9 @@
 //!   through XYZ D65, so any pair of [`ColorSpace`] implementors
 //!   works without enumerating conversion paths. For bit-exact culori
 //!   parity on precision-critical pairs, use the direct `From` impls
-//!   listed in [`mod@convert`].
+//!   listed in [`mod@convert`], or the dynamic-dispatch
+//!   [`Color::convert_to`] / typed [`convert::convert_culori`] APIs
+//!   added in v1.2 — both follow culori's per-pair routing.
 //! - [`parse()`] consumes CSS Color Module 4 syntax (named colors,
 //!   hex, functional notation, `color()` profiles including the four
 //!   wide-gamut spaces, and `color-mix()`). Malformed or unsupported
@@ -170,7 +172,7 @@ pub use average::{average, average_angle, average_number};
 pub use blend::{blend, blend_str, BlendMode};
 pub use color::{Color, ColorVariantMismatch};
 pub use contrast::{wcag_contrast, wcag_luminance};
-pub use convert::convert;
+pub use convert::{convert, convert_culori};
 pub use difference::{
     difference_ciede2000, difference_ciede76, difference_ciede94, difference_ciede94_with,
     difference_cmc, difference_euclidean, difference_euclidean_with, difference_euclidean_xyz,
