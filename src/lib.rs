@@ -90,6 +90,7 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+pub mod average;
 pub mod blend;
 pub mod color;
 pub mod convert;
@@ -102,6 +103,7 @@ pub mod spaces;
 pub mod traits;
 pub(crate) mod util;
 
+pub use average::{average_angle, average_number};
 pub use blend::{blend, blend_str, BlendMode};
 pub use color::Color;
 pub use convert::convert;
