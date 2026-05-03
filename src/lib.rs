@@ -103,7 +103,7 @@ pub mod spaces;
 pub mod traits;
 pub(crate) mod util;
 
-pub use average::{average_angle, average_number};
+pub use average::{average, average_angle, average_number};
 pub use blend::{blend, blend_str, BlendMode};
 pub use color::Color;
 pub use convert::convert;
