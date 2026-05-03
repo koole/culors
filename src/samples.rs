@@ -55,7 +55,11 @@ pub fn samples(n: usize) -> Vec<f64> {
 /// ```
 pub fn samples_with_easing<F: Fn(f64) -> f64>(n: usize, easing: F) -> Vec<f64> {
     if n < 2 {
-        return if n == 0 { Vec::new() } else { vec![easing(0.5)] };
+        return if n == 0 {
+            Vec::new()
+        } else {
+            vec![easing(0.5)]
+        };
     }
     let denom = (n - 1) as f64;
     (0..n).map(|i| easing(i as f64 / denom)).collect()

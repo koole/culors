@@ -40,25 +40,32 @@ fn unlerp_inverts_lerp() {
     close("unlerp(0,1,0.7)", unlerp(0.0, 1.0, 0.7), 0.7);
     // Round-trip property.
     for t in [0.1, 0.3, 0.5, 0.9] {
-        close(
-            "round-trip",
-            unlerp(-3.0, 7.0, lerp(-3.0, 7.0, t)),
-            t,
-        );
+        close("round-trip", unlerp(-3.0, 7.0, lerp(-3.0, 7.0, t)), t);
     }
 }
 
 #[test]
 fn unlerp_collapsed_range_is_nan() {
     let v = unlerp(5.0, 5.0, 5.0);
-    assert!(v.is_nan(), "unlerp on a collapsed range must be NaN, got {v}");
+    assert!(
+        v.is_nan(),
+        "unlerp on a collapsed range must be NaN, got {v}"
+    );
 }
 
 #[test]
 fn blerp_corners() {
     // a00=a01=0 → tx-row → 0; a10=a11=1 → tx-row → 1; ty interpolates.
-    close("blerp corners ty=0", blerp(0.0, 0.0, 1.0, 1.0, 0.5, 0.0), 0.0);
-    close("blerp corners ty=1", blerp(0.0, 0.0, 1.0, 1.0, 0.5, 1.0), 1.0);
+    close(
+        "blerp corners ty=0",
+        blerp(0.0, 0.0, 1.0, 1.0, 0.5, 0.0),
+        0.0,
+    );
+    close(
+        "blerp corners ty=1",
+        blerp(0.0, 0.0, 1.0, 1.0, 0.5, 1.0),
+        1.0,
+    );
 }
 
 #[test]
@@ -76,9 +83,7 @@ fn trilerp_center() {
     // 8 unit-cube corners 0..7 averaged at the center is 3.5.
     close(
         "trilerp center",
-        trilerp(
-            0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 0.5, 0.5, 0.5,
-        ),
+        trilerp(0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 0.5, 0.5, 0.5),
         3.5,
     );
 }
@@ -87,9 +92,7 @@ fn trilerp_center() {
 fn trilerp_spot_check() {
     close(
         "trilerp(0..7, 0.25, 0.5, 0.75)",
-        trilerp(
-            0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 0.25, 0.5, 0.75,
-        ),
+        trilerp(0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 0.25, 0.5, 0.75),
         4.25,
     );
 }

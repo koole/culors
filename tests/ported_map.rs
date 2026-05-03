@@ -28,12 +28,7 @@ fn close(label: &str, got: f64, expected: f64) {
 }
 
 fn rgb(r: f64, g: f64, b: f64, a: Option<f64>) -> Color {
-    Color::Rgb(Rgb {
-        r,
-        g,
-        b,
-        alpha: a,
-    })
+    Color::Rgb(Rgb { r, g, b, alpha: a })
 }
 
 #[test]

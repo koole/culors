@@ -118,11 +118,7 @@ pub fn map_transfer_linear(slope: f64, intercept: f64) -> impl Fn(f64, &str, &Co
 }
 
 /// Gamma transfer `amp * v^exp + offset` on every non-alpha channel.
-pub fn map_transfer_gamma(
-    amp: f64,
-    exp: f64,
-    offset: f64,
-) -> impl Fn(f64, &str, &Color) -> f64 {
+pub fn map_transfer_gamma(amp: f64, exp: f64, offset: f64) -> impl Fn(f64, &str, &Color) -> f64 {
     move |v: f64, ch: &str, _c: &Color| {
         if ch == "alpha" {
             v
