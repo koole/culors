@@ -14,6 +14,7 @@ pub fn assert_close(actual: f64, expected: f64, eps: f64) {
 }
 
 #[track_caller]
+#[allow(dead_code)]
 pub fn assert_alpha_close(actual: Option<f64>, expected: Option<f64>, eps: f64) {
     match (actual, expected) {
         (None, None) => {}

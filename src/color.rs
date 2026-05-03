@@ -1,6 +1,6 @@
 //! Dynamic color enum.
 
-use crate::spaces::{Rgb, Xyz65};
+use crate::spaces::{LinearRgb, Rgb, Xyz65};
 
 /// Tagged union over every supported color space. Variants are added as each
 /// space lands.
@@ -8,6 +8,8 @@ use crate::spaces::{Rgb, Xyz65};
 pub enum Color {
     /// sRGB.
     Rgb(Rgb),
+    /// Linear-sRGB.
+    LinearRgb(LinearRgb),
     /// CIE XYZ D65.
     Xyz65(Xyz65),
 }
@@ -15,6 +17,12 @@ pub enum Color {
 impl From<Rgb> for Color {
     fn from(c: Rgb) -> Self {
         Color::Rgb(c)
+    }
+}
+
+impl From<LinearRgb> for Color {
+    fn from(c: LinearRgb) -> Self {
+        Color::LinearRgb(c)
     }
 }
 
