@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install npm deps
+        run: npm ci
+      - name: Build (default features)
+        run: cargo build --verbose
+      - name: Build (all features)
+        run: cargo build --all-features --verbose
+      - name: Test (default features)
+        run: cargo test --verbose
+      - name: Test (all features)
+        run: cargo test --all-features --verbose
+      - name: Test (no default features)
+        run: cargo test --no-default-features --verbose
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: rustfmt
+        run: cargo fmt -- --check
+      - name: clippy
+        run: cargo clippy --all-features --all-targets -- -D warnings
+
+  fixtures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - name: Generate conversion fixtures
+        run: npm run gen-fixtures
+      - name: Generate parse fixtures
+        run: npm run gen-parse-fixtures
+      - name: Generate format fixtures
+        run: npm run gen-format-fixtures
+      - name: Verify no drift
+        run: |
+          if [ -n "$(git status --porcelain tests/fixtures/)" ]; then
+            echo "Fixture regeneration produced drift:"
+            git diff tests/fixtures/
+            exit 1
+          fi
