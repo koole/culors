@@ -156,12 +156,16 @@ pub mod color;
 pub mod contrast;
 pub mod convert;
 pub mod difference;
+pub mod easing;
 pub mod filter;
 pub mod format;
 pub mod gamut;
 pub mod interpolate;
+pub mod lerp;
+pub mod map;
 pub mod nearest;
 pub mod parse;
+pub mod random;
 pub mod round;
 pub mod samples;
 pub mod spaces;
@@ -179,16 +183,25 @@ pub use difference::{
     difference_hue_chroma, difference_hue_naive, difference_hue_saturation, difference_hyab,
     difference_itp, difference_jz, difference_kotsarenko_ramos, difference_ok,
 };
+pub use easing::{
+    easing_gamma, easing_in_out_sine, easing_midpoint, easing_smootherstep, easing_smoothstep,
+    easing_smoothstep_inverse,
+};
 pub use filter::{
     filter_brightness, filter_contrast, filter_deficiency_deuter, filter_deficiency_prot,
     filter_deficiency_trit, filter_grayscale, filter_hue_rotate, filter_invert, filter_saturate,
     filter_sepia,
 };
-pub use format::format_css;
-pub use gamut::{clamp_chroma, clamp_gamut, in_gamut, to_gamut};
+pub use format::{format_css, format_hex, format_hex8};
+pub use gamut::{clamp_chroma, clamp_gamut, clamp_rgb, displayable, in_gamut, to_gamut};
 pub use interpolate::{interpolate, interpolate_with, HueFixup, InterpolateOptions};
+pub use lerp::{blerp, lerp, trilerp, unlerp};
+pub use map::{
+    map_alpha_divide, map_alpha_multiply, map_transfer_gamma, map_transfer_linear, mapper,
+};
 pub use nearest::nearest;
 pub use parse::parse;
+pub use random::{random, random_with_constraints};
 pub use round::round;
-pub use samples::samples;
+pub use samples::{samples, samples_with_easing};
 pub use traits::ColorSpace;

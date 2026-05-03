@@ -36,6 +36,9 @@
 //! magnitudes.
 
 mod css;
+pub(crate) mod hex;
+
+pub use hex::{format_hex, format_hex8};
 
 use crate::color::Color;
 

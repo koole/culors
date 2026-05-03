@@ -24,3 +24,23 @@ mod to_gamut;
 pub use clamp::{clamp_chroma, clamp_gamut};
 pub use in_gamut::in_gamut;
 pub use to_gamut::to_gamut;
+
+use crate::Color;
+
+/// Returns `true` if `color` is in the sRGB gamut.
+///
+/// Mirrors culori 4.0.2's `displayable(color)` (`node_modules/culori/src/clamp.js`):
+/// equivalent to `in_gamut(color, "rgb")`. Convenience alias for callers
+/// that don't want to spell out the mode string.
+pub fn displayable(color: &Color) -> bool {
+    in_gamut(color, "rgb")
+}
+
+/// Clamps `color` into the sRGB gamut by per-channel clipping.
+///
+/// Mirrors culori 4.0.2's `clampRgb(color)`: equivalent to
+/// `clamp_gamut(color, "rgb")`. The result is returned in `color`'s
+/// original mode.
+pub fn clamp_rgb(color: Color) -> Color {
+    clamp_gamut(color, "rgb")
+}

@@ -8,12 +8,12 @@ A Rust port of [culori](https://github.com/evercoder/culori), the JavaScript col
 
 Used in production by [Spectralite](https://spectralite.studio), a lighting-control application whose UI relies on culori. We needed the Rust render core to produce the same colors as the JS layer, end to end — culors is the result.
 
-## Features (v1.1)
+## Features (v1.2)
 
 | Feature | Coverage |
 |---|---|
 | Color spaces (33) | rgb, lrgb, hsl, hsv, hwb, lab (D50), lch (D50), lab65, lch65, oklab, oklch, xyz50, xyz65, p3, rec2020, a98, prophoto-rgb, cubehelix, dlab, dlch, jab, jch, yiq, hsi, hsluv, hpluv, okhsl, okhsv, itp, xyb, luv, lchuv, prismatic |
-| Conversion | generic `convert<A, B>` plus direct `From` impls between adjacent spaces |
+| Conversion | three flavors: direct `From` (typed, zero-overhead, bit-exact culori parity), generic `convert<A, B>` (typed, always XYZ-D65 hub, ~1e-14 drift), and dynamic `Color::convert_to(mode)` / typed `convert_culori<A, B>` (culori's per-pair routing — closes the 1e-14 gap with byte-for-byte parity) |
 | CSS parser | named colors, hex, functional `rgb`/`hsl`/`hwb`/`lab`/`lch`/`oklab`/`oklch`, `color()` with `srgb`/`srgb-linear`/`xyz`/`xyz-d50`/`xyz-d65`/`display-p3`/`rec2020`/`a98-rgb`/`prophoto-rgb`/`--lab-d65`/`--lch-d65`, plus `color-mix()` |
 | CSS formatter | round-trip stable for canonical CSS Color Module 4 forms, including wide-gamut `color()` profiles and the `--lab-d65` / `--lch-d65` custom profiles |
 | Interpolation | `interpolate` / `interpolate_with` over rgb, lrgb, hsl, hsv, hwb, lab, lab65, lch, lch65, oklab, oklch, xyz50, xyz65, p3, rec2020, a98, prophoto, cubehelix, dlab, dlch, jab, jch, yiq, hsi, hsluv, hpluv, okhsl, okhsv, itp, xyb, luv, lchuv, prismatic. Hue-fixup (shorter / longer / increasing / decreasing / raw), per-channel easing |
