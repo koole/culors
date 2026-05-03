@@ -8,6 +8,7 @@
 
 pub mod color;
 pub mod convert;
+pub mod parse;
 pub mod spaces;
 pub mod traits;
 pub(crate) mod util;
