@@ -93,6 +93,7 @@
 pub mod color;
 pub mod convert;
 pub mod format;
+pub mod interpolate;
 pub mod parse;
 pub mod spaces;
 pub mod traits;
@@ -101,5 +102,6 @@ pub(crate) mod util;
 pub use color::Color;
 pub use convert::convert;
 pub use format::format_css;
+pub use interpolate::{interpolate, interpolate_with, HueFixup, InterpolateOptions};
 pub use parse::parse;
 pub use traits::ColorSpace;
