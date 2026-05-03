@@ -96,6 +96,7 @@ pub mod color;
 pub mod contrast;
 pub mod convert;
 pub mod difference;
+pub mod filter;
 pub mod format;
 pub mod gamut;
 pub mod interpolate;
@@ -113,6 +114,10 @@ pub use difference::{
     difference_ciede2000, difference_ciede76, difference_ciede94, difference_ciede94_with,
     difference_cmc, difference_euclidean, difference_euclidean_with, difference_euclidean_xyz,
     difference_hue_chroma, difference_hue_saturation, difference_itp, difference_jz, difference_ok,
+};
+pub use filter::{
+    filter_brightness, filter_contrast, filter_grayscale, filter_hue_rotate, filter_invert,
+    filter_saturate, filter_sepia,
 };
 pub use format::format_css;
 pub use gamut::{clamp_chroma, clamp_gamut, in_gamut, to_gamut};
