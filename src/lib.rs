@@ -103,7 +103,7 @@ pub(crate) mod util;
 pub use color::Color;
 pub use convert::convert;
 pub use format::format_css;
-pub use gamut::{clamp_chroma, clamp_gamut, in_gamut};
+pub use gamut::{clamp_chroma, clamp_gamut, in_gamut, to_gamut};
 pub use interpolate::{interpolate, interpolate_with, HueFixup, InterpolateOptions};
 pub use parse::parse;
 pub use traits::ColorSpace;
