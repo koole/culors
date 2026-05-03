@@ -6,6 +6,7 @@
 //! candidate is judged in gamut either by the literal sRGB box test or by
 //! a small ΔE comparison against its naïvely-clipped projection.
 
+use crate::difference::difference_euclidean;
 use crate::gamut::clamp::clamp_gamut;
 use crate::gamut::in_gamut::{color_to_rgb, in_gamut};
 use crate::spaces::{Oklab, Oklch, Rgb};
@@ -70,12 +71,13 @@ pub fn to_gamut(color: Color, mode: &str) -> Color {
     let mut start = 0.0;
     let mut end = candidate.c;
     let mut last_clipped: Oklch = unwrap_oklch(clamp_gamut(Color::Oklch(candidate), mode));
+    let de = difference_euclidean("oklch");
     while end - start > EPSILON {
         candidate.c = (start + end) * 0.5;
         let working = Color::Oklch(candidate);
         let clipped = unwrap_oklch(clamp_gamut(working, mode));
         let in_g = in_gamut(&working, mode);
-        let delta = delta_e_oklch(&candidate, &clipped);
+        let delta = de(&working, &Color::Oklch(clipped));
         if in_g || delta <= JND {
             start = candidate.c;
         } else {
@@ -155,48 +157,5 @@ fn convert_to_mode(color: Color, mode: &str) -> Color {
         "xyz50" => Color::Xyz50(crate::convert::<Rgb, Xyz50>(rgb)),
         "xyz65" => Color::Xyz65(crate::convert::<Rgb, Xyz65>(rgb)),
         other => panic!("to_gamut: unknown mode '{other}'"),
-    }
-}
-
-/// `differenceEuclidean('oklch')` — the deltaE used by `toGamut` to detect
-/// "roughly in gamut" candidates.
-///
-/// Mirrors culori's `differenceEuclidean(mode='oklch', weights=[1,1,1,0])`
-/// composed with the OkLCh definition's per-channel hue difference
-/// (`differenceHueChroma`, see `node_modules/culori/src/difference.js` and
-/// `node_modules/culori/src/lch/definition.js`):
-///
-/// ```text
-/// dL = std.l - smp.l
-/// dC = std.c - smp.c
-/// dH = 2 * sqrt(std.c * smp.c) * sin((((smp.h - std.h + 360) / 2) * π) / 180)
-/// deltaE = sqrt(dL^2 + dC^2 + dH^2)
-/// ```
-///
-/// `dH` collapses to zero when either chroma is zero, when either hue is
-/// missing, or when the two hues coincide modulo 360°.
-fn delta_e_oklch(std: &Oklch, smp: &Oklch) -> f64 {
-    let d_l = std.l - smp.l;
-    let d_c = std.c - smp.c;
-
-    let d_h = if std.h.is_nan() || smp.h.is_nan() || std.c == 0.0 || smp.c == 0.0 {
-        0.0
-    } else {
-        let std_h = normalize_hue(std.h);
-        let smp_h = normalize_hue(smp.h);
-        let theta_deg = (smp_h - std_h + 360.0) / 2.0;
-        2.0 * (std.c * smp.c).sqrt() * theta_deg.to_radians().sin()
-    };
-
-    (d_l * d_l + d_c * d_c + d_h * d_h).sqrt()
-}
-
-fn normalize_hue(h: f64) -> f64 {
-    // culori's `util/normalizeHue.js`.
-    let h = h % 360.0;
-    if h < 0.0 {
-        h + 360.0
-    } else {
-        h
     }
 }
