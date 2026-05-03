@@ -11,7 +11,7 @@
 //! NaN hue is treated as 0 (matching culori's `h === undefined` fallback
 //! inside `convertLchToLab`).
 
-use crate::spaces::{Lab, Xyz65};
+use crate::spaces::{Lab, Rgb, Xyz65};
 use crate::traits::ColorSpace;
 
 /// CIE Lch (D50). `l` is in 0..100, `c` (chroma) is non-negative, `h`
@@ -80,6 +80,15 @@ impl From<Lab> for Lch {
             h,
             alpha: c.alpha,
         }
+    }
+}
+
+/// Direct `Rgb` -> `Lch` conversion that picks up the achromatic snap from
+/// `Lab::from(Rgb)` so `r == g == b` produces `c = 0` and `h = NaN`,
+/// matching culori's public `lch({mode:'rgb', ...})` output.
+impl From<Rgb> for Lch {
+    fn from(c: Rgb) -> Self {
+        Lch::from(Lab::from(c))
     }
 }
 

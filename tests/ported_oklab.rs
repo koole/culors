@@ -3,7 +3,7 @@
 //! Reference values produced by culori 4.0.2 and pasted verbatim. Oklab is
 //! defined relative to linear sRGB, not gamma-encoded sRGB.
 
-use culor::spaces::{LinearRgb, Oklab, Rgb, Xyz65};
+use culor::spaces::{LinearRgb, Oklab, Oklch, Rgb, Xyz65};
 use culor::ColorSpace;
 
 #[path = "common/mod.rs"]
@@ -219,6 +219,86 @@ fn oklab_hdr_lrgb_matches_culori() {
     common::assert_close(oklab.l, 0.6718402835881381, 1e-12);
     common::assert_close(oklab.a, 0.31753813322383284, 1e-12);
     common::assert_close(oklab.b, 0.1337485625307116, 1e-12);
+}
+
+// ---- Achromatic fixup: Rgb -> Oklab/Oklch -------------------------------
+//
+// culori's `convertRgbToOklab.js` snaps `a` and `b` to exactly zero when
+// the input is achromatic (r === g === b). The cube-root LMS chain leaves
+// a residual on the order of 1e-16 in both opponent channels without the
+// snap. Reference values come from culori 4.0.2's public `oklab()` and
+// `oklch()` converters invoked on `{mode:'rgb', ...}` inputs.
+
+#[test]
+fn rgb_white_to_oklab_snaps_a_b_to_zero() {
+    // c.oklab({mode:'rgb', r:1, g:1, b:1})
+    // -> {"l":1.0000000000000002,"a":0,"b":0}
+    let oklab: Oklab = Oklab::from(Rgb {
+        r: 1.0,
+        g: 1.0,
+        b: 1.0,
+        alpha: None,
+    });
+    assert_eq!(oklab.a, 0.0);
+    assert_eq!(oklab.b, 0.0);
+    common::assert_close(oklab.l, 1.0000000000000002, EPS);
+}
+
+#[test]
+fn rgb_grey_to_oklab_snaps_a_b_to_zero() {
+    // c.oklab({mode:'rgb', r:0.5, g:0.5, b:0.5})
+    // -> {"l":0.5981807305268477,"a":0,"b":0}
+    let oklab: Oklab = Oklab::from(Rgb {
+        r: 0.5,
+        g: 0.5,
+        b: 0.5,
+        alpha: None,
+    });
+    assert_eq!(oklab.a, 0.0);
+    assert_eq!(oklab.b, 0.0);
+    common::assert_close(oklab.l, 0.5981807305268477, EPS);
+}
+
+#[test]
+fn rgb_black_to_oklab_snaps_a_b_to_zero() {
+    let oklab: Oklab = Oklab::from(Rgb {
+        r: 0.0,
+        g: 0.0,
+        b: 0.0,
+        alpha: None,
+    });
+    assert_eq!(oklab.a, 0.0);
+    assert_eq!(oklab.b, 0.0);
+    common::assert_close(oklab.l, 0.0, EPS);
+}
+
+#[test]
+fn rgb_white_to_oklch_has_nan_hue() {
+    let oklch: Oklch = Oklch::from(Rgb {
+        r: 1.0,
+        g: 1.0,
+        b: 1.0,
+        alpha: None,
+    });
+    assert_eq!(oklch.c, 0.0);
+    assert!(oklch.h.is_nan());
+    common::assert_close(oklch.l, 1.0000000000000002, EPS);
+}
+
+#[test]
+fn rgb_chromatic_oklab_matches_culori() {
+    // c.oklab({mode:'rgb', r:1, g:0, b:0})
+    // -> {"l":0.6279553639214311,"a":0.22486306842627443,"b":0.12584627733058495}
+    // Achromatic fixup must NOT trigger here (r != g).
+    let oklab: Oklab = Oklab::from(Rgb {
+        r: 1.0,
+        g: 0.0,
+        b: 0.0,
+        alpha: None,
+    });
+    common::assert_close(oklab.l, 0.6279553639214311, EPS);
+    common::assert_close(oklab.a, 0.22486306842627443, EPS);
+    common::assert_close(oklab.b, 0.12584627733058495, EPS);
 }
 
 #[test]

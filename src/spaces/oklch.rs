@@ -10,7 +10,7 @@
 //! NaN-hue handling matches Lch: chroma exactly zero produces a NaN hue
 //! sentinel; on the reverse path NaN coerces to 0.
 
-use crate::spaces::{Oklab, Xyz65};
+use crate::spaces::{Oklab, Rgb, Xyz65};
 use crate::traits::ColorSpace;
 
 /// Oklch — polar Oklab. `l` is in 0..1, `c` (chroma) is non-negative,
@@ -78,6 +78,15 @@ impl From<Oklab> for Oklch {
             h,
             alpha: c.alpha,
         }
+    }
+}
+
+/// Direct `Rgb` -> `Oklch` conversion that picks up the achromatic snap
+/// from `Oklab::from(Rgb)` so `r == g == b` produces `c = 0` and `h = NaN`,
+/// matching culori's public `oklch({mode:'rgb', ...})` output.
+impl From<Rgb> for Oklch {
+    fn from(c: Rgb) -> Self {
+        Oklch::from(Oklab::from(c))
     }
 }
 

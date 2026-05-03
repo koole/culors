@@ -7,7 +7,7 @@
 
 #![allow(clippy::excessive_precision)]
 
-use crate::spaces::{Xyz50, Xyz65};
+use crate::spaces::{Rgb, Xyz50, Xyz65};
 use crate::traits::ColorSpace;
 
 /// Reference white point (D50, CIE 1931 2°) — culori's `D50.X`, `D50.Y`,
@@ -87,6 +87,28 @@ impl From<Xyz50> for Lab {
             b: 200.0 * (f1 - f2),
             alpha: xyz.alpha,
         }
+    }
+}
+
+/// Direct `Rgb` -> `Lab` conversion mirroring culori's
+/// `convertRgbToLab.js`: route through XYZ50 (via XYZ65 + Bradford) and
+/// then snap `a` and `b` to exactly zero when the input is achromatic
+/// (`r == g == b`). Without the snap the chained matrix multiply leaves a
+/// residual on the order of 1e-6 in both opponent channels, which feeds a
+/// phantom hue into [`Lch`](crate::spaces::Lch).
+///
+/// The generic [`crate::convert`] still routes through XYZ65 with no fixup,
+/// so callers who want culori's public-API output should call
+/// `Lab::from(rgb)` directly. `Lch::from(rgb)` likewise picks up the snap.
+impl From<Rgb> for Lab {
+    fn from(c: Rgb) -> Self {
+        let xyz50 = Xyz50::from_xyz65(c.to_xyz65());
+        let mut lab = Lab::from(xyz50);
+        if c.r == c.g && c.g == c.b {
+            lab.a = 0.0;
+            lab.b = 0.0;
+        }
+        lab
     }
 }
 

@@ -8,7 +8,7 @@
 
 #![allow(clippy::excessive_precision)]
 
-use crate::spaces::{LinearRgb, Xyz65};
+use crate::spaces::{LinearRgb, Rgb, Xyz65};
 use crate::traits::ColorSpace;
 
 /// Oklab — perceptually uniform color space. `l` is in 0..1 for in-gamut
@@ -58,6 +58,28 @@ impl From<LinearRgb> for Oklab {
             b: 0.0259040424655478 * l_ + 0.7827717124575296 * m_ - 0.8086757549230774 * s_,
             alpha,
         }
+    }
+}
+
+/// Direct `Rgb` -> `Oklab` conversion mirroring culori's
+/// `convertRgbToOklab.js`: route through linear sRGB and then snap `a` and
+/// `b` to exactly zero when the input is achromatic (`r == g == b`).
+/// Without the snap the cube-root LMS chain leaves a residual on the order
+/// of 1e-16 in both opponent channels, which feeds a phantom hue into
+/// [`Oklch`](crate::spaces::Oklch).
+///
+/// The generic [`crate::convert`] still routes through XYZ65 with no fixup,
+/// so callers who want culori's public-API output should call
+/// `Oklab::from(rgb)` directly. `Oklch::from(rgb)` likewise picks up the
+/// snap.
+impl From<Rgb> for Oklab {
+    fn from(c: Rgb) -> Self {
+        let mut oklab = Oklab::from(LinearRgb::from(c));
+        if c.r == c.g && c.g == c.b {
+            oklab.a = 0.0;
+            oklab.b = 0.0;
+        }
+        oklab
     }
 }
 

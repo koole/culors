@@ -2,7 +2,7 @@
 //!
 //! Reference values produced by culori 4.0.2 and pasted verbatim.
 
-use culor::spaces::{Lab, Rgb, Xyz50, Xyz65};
+use culor::spaces::{Lab, Lch, Rgb, Xyz50, Xyz65};
 use culor::ColorSpace;
 
 #[path = "common/mod.rs"]
@@ -174,6 +174,87 @@ fn xyz65_round_trip_through_lab() {
     common::assert_close(back.x, 0.4999999902965942, CHAIN_EPS);
     common::assert_close(back.y, 0.4000000345910334, CHAIN_EPS);
     common::assert_close(back.z, 0.29999994290464727, CHAIN_EPS);
+}
+
+// ---- Achromatic fixup: Rgb -> Lab/Lch ----------------------------------
+//
+// culori's `convertRgbToLab.js` snaps `a` and `b` to exactly zero whenever
+// the input is achromatic (r === g === b). Without it, the chained Bradford
+// matrix multiply leaves a residual on the order of 1e-6 in both opponent
+// channels and `Lch::from(Lab)` synthesizes a meaningless hue. Reference
+// values come from culori 4.0.2's public `lab()` / `lch()` converters
+// invoked on `{mode:'rgb', ...}` inputs.
+
+#[test]
+fn rgb_white_to_lab_snaps_a_b_to_zero() {
+    // c.lab({mode:'rgb', r:1, g:1, b:1})
+    // -> {"l":100.00000139649632,"a":0,"b":0}
+    let lab: Lab = Lab::from(Rgb {
+        r: 1.0,
+        g: 1.0,
+        b: 1.0,
+        alpha: None,
+    });
+    assert_eq!(lab.a, 0.0);
+    assert_eq!(lab.b, 0.0);
+    common::assert_close(lab.l, 100.00000139649632, EPS);
+}
+
+#[test]
+fn rgb_grey_to_lab_snaps_a_b_to_zero() {
+    // c.lab({mode:'rgb', r:0.5, g:0.5, b:0.5})
+    // -> {"l":53.388965576471506,"a":0,"b":0}
+    let lab: Lab = Lab::from(Rgb {
+        r: 0.5,
+        g: 0.5,
+        b: 0.5,
+        alpha: None,
+    });
+    assert_eq!(lab.a, 0.0);
+    assert_eq!(lab.b, 0.0);
+    common::assert_close(lab.l, 53.388965576471506, EPS);
+}
+
+#[test]
+fn rgb_black_to_lab_snaps_a_b_to_zero() {
+    let lab: Lab = Lab::from(Rgb {
+        r: 0.0,
+        g: 0.0,
+        b: 0.0,
+        alpha: None,
+    });
+    assert_eq!(lab.a, 0.0);
+    assert_eq!(lab.b, 0.0);
+    common::assert_close(lab.l, 0.0, EPS);
+}
+
+#[test]
+fn rgb_white_to_lch_has_nan_hue() {
+    let lch: Lch = Lch::from(Rgb {
+        r: 1.0,
+        g: 1.0,
+        b: 1.0,
+        alpha: None,
+    });
+    assert_eq!(lch.c, 0.0);
+    assert!(lch.h.is_nan());
+    common::assert_close(lch.l, 100.00000139649632, EPS);
+}
+
+#[test]
+fn rgb_chromatic_lab_matches_culori() {
+    // c.lab({mode:'rgb', r:1, g:0, b:0})
+    // -> {"l":54.29054294696968,"a":80.80492033462417,"b":69.89098825896278}
+    // Achromatic fixup must NOT trigger here (r != g).
+    let lab: Lab = Lab::from(Rgb {
+        r: 1.0,
+        g: 0.0,
+        b: 0.0,
+        alpha: None,
+    });
+    common::assert_close(lab.l, 54.29054294696968, CHAIN_EPS);
+    common::assert_close(lab.a, 80.80492033462417, CHAIN_EPS);
+    common::assert_close(lab.b, 69.89098825896278, CHAIN_EPS);
 }
 
 #[test]
