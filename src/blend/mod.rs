@@ -1,16 +1,15 @@
-//! CSS Compositing & Blending — separable blend modes.
+//! CSS Compositing & Blending.
 //!
-//! Mirrors culori 4.0.2's `src/blend.js`. The public entry point [`blend`]
-//! takes a slice of [`Color`]s and a [`BlendMode`], converts each to sRGB,
-//! and folds them left-to-right with Porter-Duff source-over compositing
-//! using a per-channel separable blend function. The output is a
-//! [`Color::Rgb`]. Result channels are clipped to `[0, 1]`, matching
-//! culori's `Math.max(0, Math.min(1, ...))` step.
+//! The public entry point [`blend`] takes a slice of [`Color`]s and a
+//! [`BlendMode`], converts each to sRGB, and folds them left-to-right with
+//! Porter-Duff source-over compositing. Separable modes apply a per-channel
+//! function from CSS Compositing 1 § 5.7; non-separable modes (`Hue`,
+//! `Saturation`, `Color`, `Luminosity`) operate on whole RGB triples per
+//! § 5.8. The output is a [`Color::Rgb`] with channels clipped to `[0, 1]`.
 //!
-//! Only the separable modes from CSS Compositing 1 § 5.7 are supported,
-//! because culori 4.0.2 implements only those. The non-separable modes
-//! (`hue`, `saturation`, `color`, `luminosity`) require luminance-preserving
-//! HSL math that culori does not provide; they are not implemented here.
+//! The separable modes mirror culori 4.0.2's `src/blend.js`. The four
+//! non-separable modes are spec-direct ports — culori 4.0.2 does not
+//! implement them, so output for those modes is not culori-compatible.
 //!
 //! # Example
 //!
@@ -31,15 +30,20 @@
 //! ```
 
 mod modes;
+mod non_separable;
 
 use crate::convert::convert;
 use crate::spaces::{Hsv, Rgb, Xyz65};
 use crate::traits::ColorSpace;
 use crate::Color;
+use non_separable::Triple;
 
-/// CSS Compositing 1 separable blend modes. The four non-separable
-/// modes (`hue`, `saturation`, `color`, `luminosity`) are intentionally
-/// omitted because culori 4.0.2 does not implement them.
+/// CSS Compositing 1 blend modes — twelve separable from § 5.7 plus the
+/// four non-separable ones from § 5.8.
+///
+/// The non-separable modes (`Hue`, `Saturation`, `Color`, `Luminosity`)
+/// are spec-direct, not culori-compatible, because culori 4.0.2 does not
+/// implement them.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum BlendMode {
     /// `B(b, s) = s` — source replaces backdrop.
@@ -77,9 +81,32 @@ pub enum BlendMode {
     Difference,
     /// `B(b, s) = b + s - 2*b*s`.
     Exclusion,
+    /// Non-separable. `B(b, s) = SetLum(SetSat(s, Sat(b)), Lum(b))` — the
+    /// source's hue with the backdrop's saturation and luminance.
+    /// CSS Compositing 1 § 5.8.1.
+    Hue,
+    /// Non-separable. `B(b, s) = SetLum(SetSat(b, Sat(s)), Lum(b))` — the
+    /// backdrop's hue and luminance with the source's saturation.
+    /// CSS Compositing 1 § 5.8.2.
+    Saturation,
+    /// Non-separable. `B(b, s) = SetLum(s, Lum(b))` — the source's hue and
+    /// saturation with the backdrop's luminance. Useful for tinting.
+    /// CSS Compositing 1 § 5.8.3.
+    Color,
+    /// Non-separable. `B(b, s) = SetLum(b, Lum(s))` — the backdrop's hue
+    /// and saturation with the source's luminance.
+    /// CSS Compositing 1 § 5.8.4.
+    Luminosity,
 }
 
 impl BlendMode {
+    fn is_non_separable(self) -> bool {
+        matches!(
+            self,
+            BlendMode::Hue | BlendMode::Saturation | BlendMode::Color | BlendMode::Luminosity
+        )
+    }
+
     fn apply(self, b: f64, s: f64) -> f64 {
         match self {
             BlendMode::Normal => modes::normal(b, s),
@@ -94,6 +121,21 @@ impl BlendMode {
             BlendMode::SoftLight => modes::soft_light(b, s),
             BlendMode::Difference => modes::difference(b, s),
             BlendMode::Exclusion => modes::exclusion(b, s),
+            // Non-separable modes use `apply_triple` instead. Reaching here
+            // is a programming error.
+            BlendMode::Hue | BlendMode::Saturation | BlendMode::Color | BlendMode::Luminosity => {
+                unreachable!("non-separable mode dispatched to scalar apply")
+            }
+        }
+    }
+
+    fn apply_triple(self, b: Triple, s: Triple) -> Triple {
+        match self {
+            BlendMode::Hue => non_separable::hue(b, s),
+            BlendMode::Saturation => non_separable::saturation(b, s),
+            BlendMode::Color => non_separable::color(b, s),
+            BlendMode::Luminosity => non_separable::luminosity(b, s),
+            _ => unreachable!("separable mode dispatched to triple apply"),
         }
     }
 
@@ -113,6 +155,10 @@ impl BlendMode {
             "soft-light" => BlendMode::SoftLight,
             "difference" => BlendMode::Difference,
             "exclusion" => BlendMode::Exclusion,
+            "hue" => BlendMode::Hue,
+            "saturation" => BlendMode::Saturation,
+            "color" => BlendMode::Color,
+            "luminosity" => BlendMode::Luminosity,
             _ => return None,
         })
     }
@@ -222,19 +268,46 @@ fn color_to_xyz65(c: Color) -> Xyz65 {
 
 fn porter_duff(b: Rgba, s: Rgba, mode: BlendMode) -> Rgba {
     let alpha = s.a + b.a * (1.0 - s.a);
-    let blend_channel = |bc: f64, sc: f64| -> f64 {
-        if alpha == 0.0 {
-            0.0
-        } else {
-            let f = mode.apply(bc, sc);
-            let v = s.a * (1.0 - b.a) * sc + s.a * b.a * f + (1.0 - s.a) * b.a * bc;
-            (v / alpha).clamp(0.0, 1.0)
-        }
+    if alpha == 0.0 {
+        return Rgba {
+            r: 0.0,
+            g: 0.0,
+            b: 0.0,
+            a: 0.0,
+        };
+    }
+    // Compute the per-channel blend output `f`. Separable modes apply the
+    // mode function to each channel independently; non-separable modes
+    // operate on the whole triple at once.
+    let (fr, fg, fb) = if mode.is_non_separable() {
+        let triple = mode.apply_triple(
+            Triple {
+                r: b.r,
+                g: b.g,
+                b: b.b,
+            },
+            Triple {
+                r: s.r,
+                g: s.g,
+                b: s.b,
+            },
+        );
+        (triple.r, triple.g, triple.b)
+    } else {
+        (
+            mode.apply(b.r, s.r),
+            mode.apply(b.g, s.g),
+            mode.apply(b.b, s.b),
+        )
+    };
+    let combine = |bc: f64, sc: f64, f: f64| -> f64 {
+        let v = s.a * (1.0 - b.a) * sc + s.a * b.a * f + (1.0 - s.a) * b.a * bc;
+        (v / alpha).clamp(0.0, 1.0)
     };
     Rgba {
-        r: blend_channel(b.r, s.r),
-        g: blend_channel(b.g, s.g),
-        b: blend_channel(b.b, s.b),
+        r: combine(b.r, s.r, fr),
+        g: combine(b.g, s.g, fg),
+        b: combine(b.b, s.b, fb),
         a: alpha,
     }
 }

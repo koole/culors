@@ -351,3 +351,117 @@ fn blend_str_handles_hyphenated_keywords() {
     let out = blend_str(&[bg, fg], "color-dodge").unwrap();
     assert_rgb(out, 1.0, 1.0, 1.0, 1.0);
 }
+
+// ----- non-separable: hue ----------------------------------------------
+//
+// Expected values are computed from the CSS Compositing 1 § 5.8 spec
+// directly (Lum, Sat, ClipColor, SetLum, SetSat) since culori 4.0.2 has no
+// reference. All test backdrops/sources are fully opaque, so Porter-Duff
+// reduces to the pure blend output.
+
+#[test]
+fn hue_red_over_blue_takes_blue_hue_keeps_red_chroma_and_lum() {
+    // Backdrop = red, source = blue → result has blue's hue with red's
+    // saturation (1.0) and luminance (0.3).
+    let out = blend(
+        &[parse("red").unwrap(), parse("blue").unwrap()],
+        BlendMode::Hue,
+    );
+    assert_rgb(out, 0.2134831460674157, 0.2134831460674157, 1.0, 1.0);
+}
+
+#[test]
+fn hue_blue_over_red_takes_red_hue_keeps_blue_lum() {
+    // Backdrop = blue, source = red → spec gives (0.3667, 0, 0).
+    let out = blend(
+        &[parse("blue").unwrap(), parse("red").unwrap()],
+        BlendMode::Hue,
+    );
+    assert_rgb(out, 0.3666666666666667, 0.0, 0.0, 1.0);
+}
+
+// ----- non-separable: saturation ---------------------------------------
+
+#[test]
+fn saturation_grey_under_red_yields_grey_back() {
+    // Achromatic backdrop has sat=0; SetSat preserves achromacity, so
+    // result equals backdrop's lum across all channels.
+    let bg = rgb(0.5, 0.5, 0.5, None);
+    let fg = parse("red").unwrap();
+    let out = blend(&[bg, fg], BlendMode::Saturation);
+    assert_rgb(out, 0.5, 0.5, 0.5, 1.0);
+}
+
+#[test]
+fn saturation_red_under_green_full_sat_keeps_red() {
+    // Both stops have sat=1; SetSat(red, 1) = red, SetLum(red, lum(red))
+    // = red.
+    let out = blend(
+        &[parse("red").unwrap(), parse("#00ff00").unwrap()],
+        BlendMode::Saturation,
+    );
+    assert_rgb(out, 1.0, 0.0, 0.0, 1.0);
+}
+
+// ----- non-separable: color --------------------------------------------
+
+#[test]
+fn color_red_under_blue_takes_blue_color_keeps_red_lum() {
+    // SetLum(blue, lum(red)=0.3): equals the hue-blend result for these
+    // operands since `Sat(blue) = 1 = Sat(red)`.
+    let out = blend(
+        &[parse("red").unwrap(), parse("blue").unwrap()],
+        BlendMode::Color,
+    );
+    assert_rgb(out, 0.2134831460674157, 0.2134831460674157, 1.0, 1.0);
+}
+
+#[test]
+fn color_white_under_red_clips_to_white() {
+    // SetLum(red, lum(white)=1) clips: x = 1.7 > 1 → all channels → 1.
+    let out = blend(
+        &[parse("white").unwrap(), parse("red").unwrap()],
+        BlendMode::Color,
+    );
+    assert_rgb(out, 1.0, 1.0, 1.0, 1.0);
+}
+
+// ----- non-separable: luminosity ---------------------------------------
+
+#[test]
+fn luminosity_red_under_green_takes_green_lum() {
+    // SetLum(red, lum(green)=0.59) shifts red by +0.29; clip handles the
+    // r > 1 case by pulling channels back. Spec output: (1, 0.4143, 0.4143).
+    let out = blend(
+        &[parse("red").unwrap(), parse("#00ff00").unwrap()],
+        BlendMode::Luminosity,
+    );
+    assert_rgb(out, 1.0, 0.41428571428571437, 0.41428571428571437, 1.0);
+}
+
+#[test]
+fn luminosity_blue_under_white_clips_to_white() {
+    // lum(white)=1; SetLum(blue, 1) lifts to (0.89, 0.89, 1.89), clip x>1
+    // pulls everything to white.
+    let out = blend(
+        &[parse("blue").unwrap(), parse("white").unwrap()],
+        BlendMode::Luminosity,
+    );
+    assert_rgb(out, 0.9999999999999998, 0.9999999999999998, 1.0, 1.0);
+}
+
+// ----- string parsing for non-separable keywords -----------------------
+
+#[test]
+fn from_css_name_recognizes_non_separable_keywords() {
+    assert_eq!(BlendMode::from_css_name("hue"), Some(BlendMode::Hue));
+    assert_eq!(
+        BlendMode::from_css_name("saturation"),
+        Some(BlendMode::Saturation)
+    );
+    assert_eq!(BlendMode::from_css_name("color"), Some(BlendMode::Color));
+    assert_eq!(
+        BlendMode::from_css_name("luminosity"),
+        Some(BlendMode::Luminosity)
+    );
+}
