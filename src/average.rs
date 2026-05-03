@@ -25,9 +25,9 @@
 
 use crate::convert::convert;
 use crate::spaces::{
-    Cubehelix, Dlab, Dlch, Hpluv, Hsi, Hsl, Hsluv, Hsv, Hwb, Itp, Jab, Jch, Lab, Lch, Lchuv,
-    LinearRgb, Luv, Okhsl, Okhsv, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb, Xyb, Xyz50, Xyz65, Yiq,
-    A98, P3,
+    Cubehelix, Dlab, Dlch, Hpluv, Hsi, Hsl, Hsluv, Hsv, Hwb, Itp, Jab, Jch, Lab, Lab65, Lch, Lch65,
+    Lchuv, LinearRgb, Luv, Okhsl, Okhsv, Oklab, Oklch, Prismatic, ProphotoRgb, Rec2020, Rgb, Xyb,
+    Xyz50, Xyz65, Yiq, A98, P3,
 };
 use crate::traits::ColorSpace;
 use crate::Color;
@@ -85,11 +85,13 @@ pub fn average_angle(angles: &[f64]) -> f64 {
 /// or, for alpha, all missing), the result keeps that channel as `NaN`
 /// or `None`.
 ///
-/// Supported modes: `rgb`, `lrgb`, `hsl`, `hsv`, `hwb`, `lab`, `lch`,
-/// `oklab`, `oklch`, `xyz50`, `xyz65`, `p3`, `rec2020`, `a98`, `prophoto`,
-/// `cubehelix`, `dlab`, `dlch`, `jab`, `jch`, `yiq`, `hsi`, `hsluv`,
-/// `hpluv`, `okhsl`, `okhsv`, `itp`, `xyb`, `luv`, `lchuv`. (`hsluv` and
-/// `hpluv` are culor extensions and not present in culori 4.0.2.)
+/// Supported modes: `rgb`, `lrgb`, `hsl`, `hsv`, `hwb`, `lab`, `lab65`,
+/// `lch`, `lch65`, `oklab`, `oklch`, `xyz50`, `xyz65`, `p3`, `rec2020`,
+/// `a98`, `prophoto`, `cubehelix`, `dlab`, `dlch`, `jab`, `jch`, `yiq`,
+/// `hsi`, `hsluv`, `hpluv`, `okhsl`, `okhsv`, `itp`, `xyb`, `luv`,
+/// `lchuv`, `prismatic`. `prismatic` is the only four-channel mode.
+/// `hsluv`, `hpluv`, and `prismatic` are culor extensions and not
+/// present in culori 4.0.2.
 ///
 /// # Panics
 ///
@@ -98,12 +100,13 @@ pub fn average_angle(angles: &[f64]) -> f64 {
 pub fn average(colors: &[Color], mode: &str) -> Color {
     let info = mode_info(mode);
 
-    let mut channels: Vec<Vec<f64>> = vec![Vec::with_capacity(colors.len()); info.channels.len()];
+    let n_channels = info.channels.len();
+    let mut channels: Vec<Vec<f64>> = vec![Vec::with_capacity(colors.len()); n_channels];
     let mut alphas: Vec<f64> = Vec::with_capacity(colors.len());
     for color in colors {
         let (chs, a) = decompose(*color, mode);
-        for (i, v) in chs.iter().enumerate() {
-            channels[i].push(*v);
+        for (i, ch) in channels.iter_mut().enumerate().take(n_channels) {
+            ch.push(chs[i]);
         }
         alphas.push(a);
     }
@@ -167,6 +170,13 @@ const LCH_CHANNELS: &[ChannelInfo] = &[
 ];
 
 const XYZ_CHANNELS: &[ChannelInfo] = RGB_CHANNELS;
+
+const PRISMATIC_CHANNELS: &[ChannelInfo] = &[
+    ChannelInfo { is_hue: false },
+    ChannelInfo { is_hue: false },
+    ChannelInfo { is_hue: false },
+    ChannelInfo { is_hue: false },
+];
 
 fn mode_info(mode: &str) -> ModeInfo {
     match mode {
@@ -290,6 +300,18 @@ fn mode_info(mode: &str) -> ModeInfo {
             mode_str: "lchuv",
             channels: LCH_CHANNELS,
         },
+        "lab65" => ModeInfo {
+            mode_str: "lab65",
+            channels: LAB_CHANNELS,
+        },
+        "lch65" => ModeInfo {
+            mode_str: "lch65",
+            channels: LCH_CHANNELS,
+        },
+        "prismatic" => ModeInfo {
+            mode_str: "prismatic",
+            channels: PRISMATIC_CHANNELS,
+        },
         other => panic!("average: unknown mode '{other}'"),
     }
 }
@@ -298,7 +320,7 @@ fn alpha_to_f64(a: Option<f64>) -> f64 {
     a.unwrap_or(f64::NAN)
 }
 
-fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
+fn decompose(c: Color, mode: &str) -> ([f64; 4], f64) {
     match mode {
         "rgb" => {
             let v: Rgb = match c {
@@ -309,7 +331,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Hwb(x) => Hsv::from(x).into(),
                 other => convert::<Xyz65, Rgb>(color_to_xyz65(other)),
             };
-            ([v.r, v.g, v.b], alpha_to_f64(v.alpha))
+            ([v.r, v.g, v.b, 0.0], alpha_to_f64(v.alpha))
         }
         "lrgb" => {
             let v: LinearRgb = match c {
@@ -317,7 +339,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::LinearRgb(x) => x,
                 other => convert::<Xyz65, LinearRgb>(color_to_xyz65(other)),
             };
-            ([v.r, v.g, v.b], alpha_to_f64(v.alpha))
+            ([v.r, v.g, v.b, 0.0], alpha_to_f64(v.alpha))
         }
         "hsl" => {
             let v: Hsl = match c {
@@ -328,7 +350,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Hwb(x) => Rgb::from(Hsv::from(x)).into(),
                 other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
             };
-            ([v.h, v.s, v.l], alpha_to_f64(v.alpha))
+            ([v.h, v.s, v.l, 0.0], alpha_to_f64(v.alpha))
         }
         "hsv" => {
             let v: Hsv = match c {
@@ -339,7 +361,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Hsl(x) => Rgb::from(x).into(),
                 other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
             };
-            ([v.h, v.s, v.v], alpha_to_f64(v.alpha))
+            ([v.h, v.s, v.v, 0.0], alpha_to_f64(v.alpha))
         }
         "hwb" => {
             let v: Hwb = match c {
@@ -350,7 +372,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Hsl(x) => Hsv::from(Rgb::from(x)).into(),
                 other => Hsv::from(convert::<Xyz65, Rgb>(color_to_xyz65(other))).into(),
             };
-            ([v.h, v.w, v.b], alpha_to_f64(v.alpha))
+            ([v.h, v.w, v.b, 0.0], alpha_to_f64(v.alpha))
         }
         "lab" => {
             let v: Lab = match c {
@@ -360,7 +382,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Rgb(x) => x.into(),
                 other => convert::<Xyz65, Lab>(color_to_xyz65(other)),
             };
-            ([v.l, v.a, v.b], alpha_to_f64(v.alpha))
+            ([v.l, v.a, v.b, 0.0], alpha_to_f64(v.alpha))
         }
         "lch" => {
             let v: Lch = match c {
@@ -369,7 +391,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Rgb(x) => x.into(),
                 other => convert::<Xyz65, Lab>(color_to_xyz65(other)).into(),
             };
-            ([v.l, v.c, v.h], alpha_to_f64(v.alpha))
+            ([v.l, v.c, v.h, 0.0], alpha_to_f64(v.alpha))
         }
         "oklab" => {
             let v: Oklab = match c {
@@ -379,7 +401,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::LinearRgb(x) => x.into(),
                 other => convert::<Xyz65, Oklab>(color_to_xyz65(other)),
             };
-            ([v.l, v.a, v.b], alpha_to_f64(v.alpha))
+            ([v.l, v.a, v.b, 0.0], alpha_to_f64(v.alpha))
         }
         "oklch" => {
             let v: Oklch = match c {
@@ -389,7 +411,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::LinearRgb(x) => Oklab::from(x).into(),
                 other => convert::<Xyz65, Oklab>(color_to_xyz65(other)).into(),
             };
-            ([v.l, v.c, v.h], alpha_to_f64(v.alpha))
+            ([v.l, v.c, v.h, 0.0], alpha_to_f64(v.alpha))
         }
         "xyz50" => {
             let v: Xyz50 = match c {
@@ -397,39 +419,39 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Lab(x) => x.into(),
                 other => convert::<Xyz65, Xyz50>(color_to_xyz65(other)),
             };
-            ([v.x, v.y, v.z], alpha_to_f64(v.alpha))
+            ([v.x, v.y, v.z, 0.0], alpha_to_f64(v.alpha))
         }
         "xyz65" => {
             let v: Xyz65 = color_to_xyz65(c);
-            ([v.x, v.y, v.z], alpha_to_f64(v.alpha))
+            ([v.x, v.y, v.z, 0.0], alpha_to_f64(v.alpha))
         }
         "p3" => {
             let v: P3 = match c {
                 Color::P3(x) => x,
                 other => convert::<Xyz65, P3>(color_to_xyz65(other)),
             };
-            ([v.r, v.g, v.b], alpha_to_f64(v.alpha))
+            ([v.r, v.g, v.b, 0.0], alpha_to_f64(v.alpha))
         }
         "rec2020" => {
             let v: Rec2020 = match c {
                 Color::Rec2020(x) => x,
                 other => convert::<Xyz65, Rec2020>(color_to_xyz65(other)),
             };
-            ([v.r, v.g, v.b], alpha_to_f64(v.alpha))
+            ([v.r, v.g, v.b, 0.0], alpha_to_f64(v.alpha))
         }
         "a98" => {
             let v: A98 = match c {
                 Color::A98(x) => x,
                 other => convert::<Xyz65, A98>(color_to_xyz65(other)),
             };
-            ([v.r, v.g, v.b], alpha_to_f64(v.alpha))
+            ([v.r, v.g, v.b, 0.0], alpha_to_f64(v.alpha))
         }
         "prophoto" => {
             let v: ProphotoRgb = match c {
                 Color::ProphotoRgb(x) => x,
                 other => convert::<Xyz65, ProphotoRgb>(color_to_xyz65(other)),
             };
-            ([v.r, v.g, v.b], alpha_to_f64(v.alpha))
+            ([v.r, v.g, v.b, 0.0], alpha_to_f64(v.alpha))
         }
         "cubehelix" => {
             let v: Cubehelix = match c {
@@ -437,7 +459,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Rgb(x) => x.into(),
                 other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
             };
-            ([v.h, v.s, v.l], alpha_to_f64(v.alpha))
+            ([v.h, v.s, v.l, 0.0], alpha_to_f64(v.alpha))
         }
         "dlab" => {
             let v: Dlab = match c {
@@ -445,7 +467,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Rgb(x) => x.into(),
                 other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
             };
-            ([v.l, v.a, v.b], alpha_to_f64(v.alpha))
+            ([v.l, v.a, v.b, 0.0], alpha_to_f64(v.alpha))
         }
         "dlch" => {
             let v: Dlch = match c {
@@ -453,7 +475,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Rgb(x) => x.into(),
                 other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
             };
-            ([v.l, v.c, v.h], alpha_to_f64(v.alpha))
+            ([v.l, v.c, v.h, 0.0], alpha_to_f64(v.alpha))
         }
         "jab" => {
             let v: Jab = match c {
@@ -462,7 +484,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Rgb(x) => x.into(),
                 other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
             };
-            ([v.j, v.a, v.b], alpha_to_f64(v.alpha))
+            ([v.j, v.a, v.b, 0.0], alpha_to_f64(v.alpha))
         }
         "jch" => {
             let v: Jch = match c {
@@ -471,7 +493,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Rgb(x) => x.into(),
                 other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
             };
-            ([v.j, v.c, v.h], alpha_to_f64(v.alpha))
+            ([v.j, v.c, v.h, 0.0], alpha_to_f64(v.alpha))
         }
         "yiq" => {
             let v: Yiq = match c {
@@ -479,7 +501,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Rgb(x) => x.into(),
                 other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
             };
-            ([v.y, v.i, v.q], alpha_to_f64(v.alpha))
+            ([v.y, v.i, v.q, 0.0], alpha_to_f64(v.alpha))
         }
         "hsi" => {
             let v: Hsi = match c {
@@ -487,7 +509,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Rgb(x) => x.into(),
                 other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
             };
-            ([v.h, v.s, v.i], alpha_to_f64(v.alpha))
+            ([v.h, v.s, v.i, 0.0], alpha_to_f64(v.alpha))
         }
         "hsluv" => {
             let v: Hsluv = match c {
@@ -495,7 +517,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Rgb(x) => x.into(),
                 other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
             };
-            ([v.h, v.s, v.l], alpha_to_f64(v.alpha))
+            ([v.h, v.s, v.l, 0.0], alpha_to_f64(v.alpha))
         }
         "hpluv" => {
             let v: Hpluv = match c {
@@ -503,7 +525,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Rgb(x) => x.into(),
                 other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
             };
-            ([v.h, v.s, v.l], alpha_to_f64(v.alpha))
+            ([v.h, v.s, v.l, 0.0], alpha_to_f64(v.alpha))
         }
         "okhsl" => {
             let v: Okhsl = match c {
@@ -512,7 +534,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Oklab(x) => x.into(),
                 other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
             };
-            ([v.h, v.s, v.l], alpha_to_f64(v.alpha))
+            ([v.h, v.s, v.l, 0.0], alpha_to_f64(v.alpha))
         }
         "okhsv" => {
             let v: Okhsv = match c {
@@ -521,14 +543,14 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Oklab(x) => x.into(),
                 other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
             };
-            ([v.h, v.s, v.v], alpha_to_f64(v.alpha))
+            ([v.h, v.s, v.v, 0.0], alpha_to_f64(v.alpha))
         }
         "itp" => {
             let v: Itp = match c {
                 Color::Itp(x) => x,
                 other => convert::<Xyz65, Itp>(color_to_xyz65(other)),
             };
-            ([v.i, v.t, v.p], alpha_to_f64(v.alpha))
+            ([v.i, v.t, v.p, 0.0], alpha_to_f64(v.alpha))
         }
         "xyb" => {
             let v: Xyb = match c {
@@ -536,7 +558,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Rgb(x) => x.into(),
                 other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
             };
-            ([v.x, v.y, v.b], alpha_to_f64(v.alpha))
+            ([v.x, v.y, v.b, 0.0], alpha_to_f64(v.alpha))
         }
         "luv" => {
             let v: Luv = match c {
@@ -545,7 +567,7 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Rgb(x) => x.into(),
                 other => convert::<Xyz65, Luv>(color_to_xyz65(other)),
             };
-            ([v.l, v.u, v.v], alpha_to_f64(v.alpha))
+            ([v.l, v.u, v.v, 0.0], alpha_to_f64(v.alpha))
         }
         "lchuv" => {
             let v: Lchuv = match c {
@@ -554,7 +576,33 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
                 Color::Rgb(x) => x.into(),
                 other => convert::<Xyz65, Luv>(color_to_xyz65(other)).into(),
             };
-            ([v.l, v.c, v.h], alpha_to_f64(v.alpha))
+            ([v.l, v.c, v.h, 0.0], alpha_to_f64(v.alpha))
+        }
+        "lab65" => {
+            let v: Lab65 = match c {
+                Color::Lab65(x) => x,
+                Color::Lch65(x) => x.into(),
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, Lab65>(color_to_xyz65(other)),
+            };
+            ([v.l, v.a, v.b, 0.0], alpha_to_f64(v.alpha))
+        }
+        "lch65" => {
+            let v: Lch65 = match c {
+                Color::Lch65(x) => x,
+                Color::Lab65(x) => x.into(),
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, Lab65>(color_to_xyz65(other)).into(),
+            };
+            ([v.l, v.c, v.h, 0.0], alpha_to_f64(v.alpha))
+        }
+        "prismatic" => {
+            let v: Prismatic = match c {
+                Color::Prismatic(x) => x,
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
+            };
+            ([v.l, v.r, v.g, v.b], alpha_to_f64(v.alpha))
         }
         _ => unreachable!("mode_info already validated"),
     }
@@ -778,6 +826,25 @@ fn compose(mode: &str, channels: &[f64], alpha: Option<f64>) -> Color {
             l: channels[0],
             c: channels[1],
             h: channels[2],
+            alpha,
+        }),
+        "lab65" => Color::Lab65(Lab65 {
+            l: channels[0],
+            a: channels[1],
+            b: channels[2],
+            alpha,
+        }),
+        "lch65" => Color::Lch65(Lch65 {
+            l: channels[0],
+            c: channels[1],
+            h: channels[2],
+            alpha,
+        }),
+        "prismatic" => Color::Prismatic(Prismatic {
+            l: channels[0],
+            r: channels[1],
+            g: channels[2],
+            b: channels[3],
             alpha,
         }),
         _ => unreachable!("mode_info already validated"),
