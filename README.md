@@ -52,26 +52,43 @@ let css = format_css(&mixed);
 assert!(css.starts_with("color(srgb"));
 ```
 
-Convert through the generic `convert` function, or use a direct `From`
-impl when bit-for-bit culori parity matters:
+Convert in three flavors, each with different precision/ergonomic
+trade-offs:
 
 ```rust
+use culors::convert::convert_culori;
 use culors::{convert, Color};
 use culors::spaces::{Lab, Oklch, Rgb};
 
 let red = Rgb { r: 1.0, g: 0.0, b: 0.0, alpha: None };
 
-// Generic — routes through XYZ D65, ~1e-14 drift from culori.
+// 1. Direct `From` — typed, zero overhead, bit-for-bit culori parity on
+//    pairs where the impl exists. Best when both spaces are known at
+//    compile time.
+let lab_direct: Lab = Lab::from(red);
+
+// 2. Generic `convert<A, B>` — typed, simple semantics, always routes
+//    through XYZ D65. ~1e-14 drift versus culori on pairs where culori
+//    takes a shorter path; back-compatible with v1.0 / v1.1 callers.
 let lab_via_hub: Lab = convert(red);
 
-// Direct — matches culori's per-pair routing exactly, including
-// the achromatic snap on grayscale inputs.
-let lab_direct: Lab = Lab::from(red);
+// 3. `Color::convert_to` (dynamic) and `convert_culori<A, B>` (typed
+//    wrapper) — match culori's `converter(mode)` dispatch exactly. Per-pair
+//    routing closes the 1e-14 gap.
+let lab_culori: Lab = convert_culori(red);
+let lab_dyn = Color::Rgb(red).convert_to("lab").unwrap();
 
 // Cylindrical: oklch with hue fixup for grayscale.
 let oklch: Oklch = Oklch::from(red);
 assert!(!oklch.l.is_nan());
 ```
+
+`Color::convert_to` returns `None` when the target string is not a known
+mode; otherwise it produces the same routing culori would. Use it for
+CSS tooling, design-tool UIs, and any caller that carries the target
+space as a `&str`. Use `convert_culori<A, B>` when the source and target
+types are known at compile time but you still want culori's per-pair
+routing.
 
 Interpolate between two colors in Oklab and sample at `t = 0.5`:
 
@@ -99,7 +116,7 @@ closures with the same shape.
 |---|---|
 | `parse(str)` | `parse(&str)` |
 | `formatCss(c)` | `format_css(&c)` |
-| `converter(mode)` | `convert::<_, T>()` or `T::from(c)` |
+| `converter(mode)` | `Color::convert_to(mode)`, `convert_culori::<_, T>()`, `convert::<_, T>()`, or `T::from(c)` |
 | `interpolate(colors, mode)` | `interpolate(&colors, mode)` |
 | `inGamut(mode)` / `clampRgb` / `clampChroma` / `toGamut` | `in_gamut`, `clamp_gamut`, `clamp_chroma`, `to_gamut` |
 | `differenceCiede76` … `differenceItp` | `difference_ciede76` … `difference_itp` |
@@ -115,17 +132,15 @@ closures with the same shape.
   without a direct `From` impl, even when culori's public
   `converter(mode)` API takes a shorter path. Output drifts from
   culori by ~1e-14, well below any practical color tolerance, but
-  not bit-for-bit. For bit-exact parity, use the direct `From` impls
-  (`Rgb` ↔ `LinearRgb`, `Rgb` ↔ `Hsl`, `Rgb` ↔ `Hsv`, `Hsv` ↔ `Hwb`,
-  `LinearRgb` ↔ `Oklab`, `Oklab` ↔ `Oklch`, `Xyz50` ↔ `Lab`,
-  `Lab` ↔ `Lch`, plus the four achromatic-snap paths
-  `Rgb` → `Lab` / `Lch` / `Oklab` / `Oklch`, and the D65 analogues
-  `Xyz65` ↔ `Lab65`, `Lab65` ↔ `Lch65`).
+  not bit-for-bit. For bit-exact parity, use either the direct `From`
+  impls or the v1.2 dynamic-mode APIs `Color::convert_to(mode)` /
+  `convert_culori<A, B>` — both follow culori's per-pair routing.
 - culori's `convertRgbToLab` and `convertRgbToOklab` snap `a` and `b`
   to exactly zero when `r == g == b`. The XYZ-hub path in
   `convert::<>()` leaves a residual on the order of 1e-6 (Lab) or
   1e-16 (Oklab) and feeds a phantom hue into `Lch` / `Oklch`. The
-  direct `From` impls perform the snap; the generic does not.
+  direct `From` impls and the new `convert_to` / `convert_culori` paths
+  perform the snap; only the generic `convert<>` does not.
 - `Prismatic` follows the Hauke 2009 definition because culori 4.0.2
   ships no `prismatic` mode against which to fixture-test. The
   literature contains other definitions under the same name; this

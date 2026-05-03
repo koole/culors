@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-05-03
+
+Adds dynamic-mode conversion that mirrors culori's `converter(mode)`
+dispatch exactly, closing the precision gap between the existing
+`convert<A, B>()` (always routes through XYZ D65) and culori's per-pair
+shortest-path routing.
+
+### Added
+
+- `Color::convert_to(target_mode: &str) -> Option<Color>` — runtime
+  dispatch keyed on a culori mode string. Returns `None` for unrecognized
+  modes; otherwise picks the same conversion path culori does (a direct
+  edge if culori's `converters` table has one, else `source → rgb →
+  target`). Handy for CSS tooling, design-tool UIs, and any caller that
+  carries the target space as a `&str`.
+- `convert_culori<A, B>(c: A) -> B` — typed wrapper around
+  `Color::convert_to` for callers who prefer compile-time typing while
+  still wanting culori's per-pair routing. Mirrors
+  `culori.converter(B::MODE)(c)`.
+- `Color::mode() -> &'static str` — returns the culori mode string for
+  the current variant, matching the corresponding `ColorSpace::MODE`.
+- `TryFrom<Color>` for every space struct (`Rgb`, `Lab`, `Oklch`, …),
+  unwrapping the matching variant or returning `ColorVariantMismatch`.
+
+### Removed limitations
+
+- `convert<A, B>()` continues to route through XYZ D65 unchanged. The
+  previously documented ~1e-14 drift on pairs where culori takes a
+  shorter path is now closeable: callers who need byte-for-byte culori
+  parity should use `Color::convert_to` or `convert_culori`. The two
+  APIs coexist; existing `convert<>` callers are unaffected.
+
+### Internal
+
+- New fixture suite `tests/fixtures/convert_to/` (870 ordered pairs ×
+  6 inputs) pins `Color::convert_to` against culori's `converter(mode)`
+  output across every culori-known space pair.
+
 ## [1.1.0] - 2026-05-03
 
 Closes the public-API gap with culori 4.0.2 by adding the D65 Lab/Lch
