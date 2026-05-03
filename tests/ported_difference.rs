@@ -20,7 +20,7 @@ use culor::{
     difference_ciede2000, difference_ciede76, difference_ciede94, difference_ciede94_with,
     difference_cmc, difference_euclidean, difference_euclidean_with, difference_euclidean_xyz,
     difference_hue_chroma, difference_hue_naive, difference_hue_saturation, difference_hyab,
-    difference_itp, difference_jz, difference_ok, parse,
+    difference_itp, difference_jz, difference_kotsarenko_ramos, difference_ok, parse,
 };
 
 const EPS: f64 = 1e-10;
@@ -744,5 +744,35 @@ fn hue_naive_nan_hue_returns_zero() {
         "lch with none hue",
         de(&p("lch(50% 40 none)"), &p("lch(50% 40 30)")),
         0.0,
+    );
+}
+
+// ----- difference_kotsarenko_ramos -----
+
+#[test]
+fn kr_red_blue() {
+    let de = difference_kotsarenko_ramos();
+    assert_close("red,blue", de(&p("red"), &p("blue")), 0.5205596576463887);
+}
+
+#[test]
+fn kr_red_green() {
+    let de = difference_kotsarenko_ramos();
+    assert_close("red,green", de(&p("red"), &p("green")), 0.452610968031737);
+}
+
+#[test]
+fn kr_identity() {
+    let de = difference_kotsarenko_ramos();
+    assert_close("red,red", de(&p("red"), &p("red")), 0.0);
+}
+
+#[test]
+fn kr_hex_short() {
+    let de = difference_kotsarenko_ramos();
+    assert_close(
+        "#abc vs #cba",
+        de(&p("#abc"), &p("#cba")),
+        0.06940795435285183,
     );
 }

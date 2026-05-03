@@ -1,4 +1,7 @@
-//! HyAB color difference, defined over Lab65.
+//! HyAB and Kotsarenko-Ramos color differences.
+//!
+//! Both factories live here because they are short formulae that don't
+//! warrant their own modules.
 //!
 //! Ports culori 4.0.2's `differenceHyab` from `difference.js`:
 //!
@@ -19,6 +22,7 @@
 //! Source: Abasi, Amani Tehran, Fairchild (2019), "Distance metrics for
 //! very large color differences."
 
+use crate::difference::euclidean::difference_euclidean_with;
 use crate::difference::extract::extract;
 use crate::Color;
 
@@ -36,4 +40,16 @@ pub fn difference_hyab() -> impl Fn(&Color, &Color) -> f64 {
         let db = s[2] - t[2];
         dl.abs() + (da * da + db * db).sqrt()
     }
+}
+
+/// Kotsarenko-Ramos color difference, defined over Y'IQ.
+///
+/// Mirrors culori's `differenceKotsarenkoRamos`, which is a thin wrapper
+/// around `differenceEuclidean('yiq', [0.5053, 0.299, 0.1957])`.
+///
+/// Source: Kotsarenko & Ramos (2010), "Measuring perceived color
+/// difference using YIQ NTSC transmission color space in mobile
+/// applications," Programación Matemática y Software.
+pub fn difference_kotsarenko_ramos() -> impl Fn(&Color, &Color) -> f64 {
+    difference_euclidean_with("yiq", [0.5053, 0.299, 0.1957, 0.0])
 }

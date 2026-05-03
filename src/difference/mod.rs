@@ -34,5 +34,5 @@ pub use euclidean::{
     difference_euclidean, difference_euclidean_with, difference_euclidean_xyz, difference_ok,
 };
 pub use hue::{difference_hue_chroma, difference_hue_naive, difference_hue_saturation};
-pub use hyab::difference_hyab;
+pub use hyab::{difference_hyab, difference_kotsarenko_ramos};
 pub use stub::{difference_itp, difference_jz};

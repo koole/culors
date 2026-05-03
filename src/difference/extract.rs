@@ -5,7 +5,7 @@
 
 use crate::convert::convert;
 use crate::spaces::{
-    Hsl, Hsv, Hwb, Lab, Lab65, Lch, Lch65, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65,
+    Hsl, Hsv, Hwb, Lab, Lab65, Lch, Lch65, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65, Yiq,
 };
 use crate::traits::ColorSpace;
 use crate::Color;
@@ -72,7 +72,7 @@ const fn lch_like() -> [ChannelInfo; 3] {
 
 pub(crate) fn mode_shape(mode: &str) -> ModeShape {
     match mode {
-        "rgb" | "lrgb" | "lab" | "lab65" | "oklab" | "xyz50" | "xyz65" | "jab" | "itp" => {
+        "rgb" | "lrgb" | "lab" | "lab65" | "oklab" | "xyz50" | "xyz65" | "jab" | "itp" | "yiq" => {
             ModeShape {
                 channels: linear(),
                 hue_diff: None,
@@ -233,6 +233,15 @@ pub(crate) fn extract(c: Color, mode: &str) -> [f64; 3] {
         "itp" => {
             let v: crate::spaces::Itp = convert::<Xyz65, crate::spaces::Itp>(to_xyz65(c));
             [v.i, v.t, v.p]
+        }
+        "yiq" => {
+            let v: Yiq = match c {
+                Color::Yiq(x) => x,
+                Color::Rgb(x) => x.into(),
+                Color::LinearRgb(x) => Rgb::from(x).into(),
+                other => convert::<Xyz65, Rgb>(to_xyz65(other)).into(),
+            };
+            [v.y, v.i, v.q]
         }
         other => panic!("difference: unknown mode '{other}'"),
     }
