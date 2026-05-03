@@ -11,6 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Six easing factories matching culori's `easing/` family: `easing_midpoint`,
+  `easing_smoothstep`, `easing_smoothstep_inverse`, `easing_smootherstep`,
+  `easing_in_out_sine`, `easing_gamma`. Each returns a closure
+  `Fn(f64) -> f64`, so they compose with [`samples_with_easing`] and the
+  per-channel `easing` field of `InterpolateOptions`.
+- `samples_with_easing(n, easing)` — culori's `samples(n, γ)` generalised
+  to any easing curve. The existing `samples(n)` keeps its linear shape.
+- Scalar interpolation utilities `lerp`, `unlerp`, `blerp`, `trilerp`,
+  matching culori's `interpolate/lerp.js` argument order so per-bit results
+  agree across platforms.
+- `mapper`, `map_alpha_multiply`, `map_alpha_divide`, `map_transfer_linear`,
+  `map_transfer_gamma` — the per-channel transfer pipeline from culori's
+  `map.js`. `mapper` accepts a `preserve_mode` flag that round-trips the
+  result back to the source color's mode, matching culori's third
+  positional argument.
+
 ## [1.2.0] - 2026-05-03
 
 Adds dynamic-mode conversion that mirrors culori's `converter(mode)`
