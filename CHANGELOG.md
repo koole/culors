@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- ΔE color-difference factories. Each returns a closure `Fn(&Color, &Color) -> f64`, mirroring culori's curried API:
+  - `difference_ciede76()` — Euclidean distance in D65 Lab.
+  - `difference_ciede94(textiles)` and `difference_ciede94_with(kL, K1, K2)` — graphic-arts (default) and textile parametric variants.
+  - `difference_ciede2000(kL, kC, kH)` — the modern CIEDE2000 formula, with rotation term and hue-region adjustments verbatim from Sharma/Wu/Dalal 2005.
+  - `difference_cmc(l, c)` — CMC l:c with the `T` hue-region branch.
+  - `difference_euclidean(mode)` and `difference_euclidean_with(mode, weights)` — generic Euclidean distance with per-channel weights and the right polar-distance operator on cylindrical modes (`differenceHueChroma` for LCh-likes, `differenceHueSaturation` for HSx, `differenceHueNaive` for HWB).
+  - `difference_ok()` — Oklab Euclidean. `difference_euclidean_xyz()` — XYZ D65 Euclidean.
+  - `difference_hue_chroma(mode)` and `difference_hue_saturation(mode)` — signed polar-hue distance on LCh-like / HSx-like modes.
+  - `difference_jz()` and `difference_itp()` — placeholders that return `f64::NAN` until JzAzBz and ICtCp land in v0.4.
 - Color interpolation: `interpolate(colors, mode)` returns a closure `Fn(f64) -> Color` that, given `t` in `[0, 1]`, produces an interpolated color in the requested space. `interpolate_with(colors, mode, options)` exposes per-channel easing and hue-fixup configuration.
 - Hue-fixup strategies for cylindrical spaces: `Shorter` (default, CSS Color Module 4), `Longer`, `Increasing`, `Decreasing`, and `Raw`. The fixup is applied incrementally across stops, matching culori 4.0.2.
 - Multi-stop interpolation with even spacing of intermediate colors, plus per-channel easing functions and a global easing override.
