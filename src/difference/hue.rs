@@ -64,6 +64,51 @@ pub fn difference_hue_saturation(mode: &str) -> impl Fn(&Color, &Color) -> f64 {
     }
 }
 
+/// Naive signed hue distance — culori's `differenceHueNaive`.
+///
+/// ```text
+/// let dh = smp.h - std.h, both normalized to 0..360.
+/// if |dh| > 180:  std.h - (smp.h - 360 * sign(dh))
+/// else:           dh
+/// ```
+///
+/// Returns the signed shortest angular distance (range `-180..180`).
+/// Returns 0 if either hue is NaN. The caller specifies which mode
+/// supplies the hue (any cylindrical mode: `lch`, `lch65`, `oklch`,
+/// `hsl`, `hsv`, `hwb`).
+///
+/// # Panics
+///
+/// Panics if `mode` is not a known cylindrical mode.
+pub fn difference_hue_naive(mode: &str) -> impl Fn(&Color, &Color) -> f64 {
+    assert!(
+        matches!(mode, "lch" | "lch65" | "oklch" | "hsl" | "hsv" | "hwb"),
+        "difference_hue_naive: mode must be cylindrical (lch/lch65/oklch/hsl/hsv/hwb), got '{mode}'"
+    );
+    let mode_str = mode.to_string();
+    let hue_idx: usize = if matches!(mode, "lch" | "lch65" | "oklch") {
+        2
+    } else {
+        0
+    };
+    move |std, smp| {
+        let s = extract(*std, &mode_str);
+        let t = extract(*smp, &mode_str);
+        let h_std = s[hue_idx];
+        let h_smp = t[hue_idx];
+        if h_std.is_nan() || h_smp.is_nan() {
+            return 0.0;
+        }
+        let std_h = normalize_hue(h_std);
+        let smp_h = normalize_hue(h_smp);
+        if (smp_h - std_h).abs() > 180.0 {
+            std_h - (smp_h - 360.0 * (smp_h - std_h).signum())
+        } else {
+            smp_h - std_h
+        }
+    }
+}
+
 fn polar_hue_distance(h_std: f64, h_smp: f64, mag_std: f64, mag_smp: f64) -> f64 {
     if h_std.is_nan() || h_smp.is_nan() || mag_std == 0.0 || mag_smp == 0.0 {
         return 0.0;

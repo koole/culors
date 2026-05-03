@@ -19,8 +19,8 @@
 use culor::{
     difference_ciede2000, difference_ciede76, difference_ciede94, difference_ciede94_with,
     difference_cmc, difference_euclidean, difference_euclidean_with, difference_euclidean_xyz,
-    difference_hue_chroma, difference_hue_saturation, difference_itp, difference_jz, difference_ok,
-    parse,
+    difference_hue_chroma, difference_hue_saturation, difference_hyab, difference_itp,
+    difference_jz, difference_ok, parse,
 };
 
 const EPS: f64 = 1e-10;
@@ -649,5 +649,45 @@ fn ciede94_hex_short() {
         "#abc vs #cba",
         de(&p("#abc"), &p("#cba")),
         19.032710628226997,
+    );
+}
+
+// ----- difference_hyab -----
+
+#[test]
+fn hyab_red_blue() {
+    let de = difference_hyab();
+    assert_close("red vs blue", de(&p("red"), &p("blue")), 195.9972588015325);
+}
+
+#[test]
+fn hyab_red_green() {
+    let de = difference_hyab();
+    assert_close(
+        "red vs green",
+        de(&p("red"), &p("green")),
+        139.92805737622862,
+    );
+}
+
+#[test]
+fn hyab_white_black() {
+    let de = difference_hyab();
+    assert_close("white vs black", de(&p("white"), &p("black")), 100.0);
+}
+
+#[test]
+fn hyab_identity_red() {
+    let de = difference_hyab();
+    assert_close("red vs red", de(&p("red"), &p("red")), 0.0);
+}
+
+#[test]
+fn hyab_hex_short() {
+    let de = difference_hyab();
+    assert_close(
+        "#abc vs #cba",
+        de(&p("#abc"), &p("#cba")),
+        23.761286472410188,
     );
 }

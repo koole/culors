@@ -168,7 +168,8 @@ pub use convert::convert;
 pub use difference::{
     difference_ciede2000, difference_ciede76, difference_ciede94, difference_ciede94_with,
     difference_cmc, difference_euclidean, difference_euclidean_with, difference_euclidean_xyz,
-    difference_hue_chroma, difference_hue_saturation, difference_itp, difference_jz, difference_ok,
+    difference_hue_chroma, difference_hue_naive, difference_hue_saturation, difference_hyab,
+    difference_itp, difference_jz, difference_ok,
 };
 pub use filter::{
     filter_brightness, filter_contrast, filter_deficiency_deuter, filter_deficiency_prot,

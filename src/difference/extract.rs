@@ -4,7 +4,9 @@
 //! of, via `lab65`).
 
 use crate::convert::convert;
-use crate::spaces::{Hsl, Hsv, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
+use crate::spaces::{
+    Hsl, Hsv, Hwb, Lab, Lab65, Lch, Lch65, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65,
+};
 use crate::traits::ColorSpace;
 use crate::Color;
 
@@ -76,7 +78,7 @@ pub(crate) fn mode_shape(mode: &str) -> ModeShape {
                 hue_diff: None,
             }
         }
-        "lch" | "oklch" => ModeShape {
+        "lch" | "lch65" | "oklch" => ModeShape {
             channels: lch_like(),
             hue_diff: Some(HueDiffKind::Chroma),
         },
@@ -162,10 +164,11 @@ pub(crate) fn extract(c: Color, mode: &str) -> [f64; 3] {
             // D65 Lab — culori's `lab65` mode. Direct path for Lab65 and
             // Rgb (with the achromatic snap); other modes route through
             // xyz65 to match the generic hub.
-            let v: crate::spaces::Lab65 = match c {
+            let v: Lab65 = match c {
                 Color::Lab65(x) => x,
+                Color::Lch65(x) => x.into(),
                 Color::Rgb(x) => x.into(),
-                other => crate::spaces::Lab65::from(to_xyz65(other)),
+                other => Lab65::from(to_xyz65(other)),
             };
             [v.l, v.a, v.b]
         }
@@ -175,6 +178,15 @@ pub(crate) fn extract(c: Color, mode: &str) -> [f64; 3] {
                 Color::Lab(x) => x.into(),
                 Color::Rgb(x) => x.into(),
                 other => convert::<Xyz65, Lab>(to_xyz65(other)).into(),
+            };
+            [v.l, v.c, v.h]
+        }
+        "lch65" => {
+            let v: Lch65 = match c {
+                Color::Lch65(x) => x,
+                Color::Lab65(x) => x.into(),
+                Color::Rgb(x) => x.into(),
+                other => Lab65::from(to_xyz65(other)).into(),
             };
             [v.l, v.c, v.h]
         }
