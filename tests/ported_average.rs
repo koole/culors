@@ -6,7 +6,8 @@
 //! was produced by `culori.average([...], '<mode>')` and pasted in.
 
 use culor::spaces::{
-    Cubehelix, Hsi, Hsl, Itp, Jab, Jch, Lab, Lch, Lchuv, Oklab, Oklch, Rgb, Xyb, Yiq, P3,
+    Cubehelix, Hsi, Hsl, Itp, Jab, Jch, Lab, Lab65, Lch, Lch65, Lchuv, Oklab, Oklch, Prismatic,
+    Rgb, Xyb, Yiq, P3,
 };
 use culor::{average, average_angle, average_number, parse, Color};
 
@@ -567,4 +568,89 @@ fn average_yiq_red_blue_matches_culori() {
     approx_tol("y", y, 0.20668877000000002);
     approx_tol("i", i, 0.13708805);
     approx_tol("q", q, 0.261308555);
+}
+
+#[test]
+fn average_lab65_red_blue_matches_culori() {
+    // c.average(['red','blue'],'lab65')
+    let out = average(&[red(), blue()], "lab65");
+    let Color::Lab65(Lab65 { l, a, b, .. }) = out else {
+        panic!("expected Lab65")
+    };
+    approx_tol("l", l, 42.76899424970476);
+    approx_tol("a", a, 79.64269191525403);
+    approx_tol("b", b, -20.326101014010256);
+}
+
+#[test]
+fn average_lab65_singleton_red_round_trips() {
+    // c.lab65('red') — averaging a single color is the conversion.
+    let out = average(&[red()], "lab65");
+    let Color::Lab65(Lab65 { l, a, b, .. }) = out else {
+        panic!("expected Lab65")
+    };
+    approx_tol("l", l, 53.237115595429344);
+    approx_tol("a", a, 80.09011352310385);
+    approx_tol("b", b, 67.20326351172214);
+}
+
+#[test]
+fn average_lch65_red_blue_matches_culori_circular() {
+    // c.average(['red','blue'],'lch65') — hue uses the circular mean,
+    // which lands at 353.144… rather than the lerp-style midpoint
+    // produced by `interpolate(...,'lch65')`.
+    let out = average(&[red(), blue()], "lch65");
+    let Color::Lch65(Lch65 { l, c, h, .. }) = out else {
+        panic!("expected Lch65")
+    };
+    approx_tol("l", l, 42.76899424970476);
+    approx_tol("c", c, 119.17921393918918);
+    approx_tol("h", h, 353.14433420584567);
+}
+
+#[test]
+fn average_lch65_singleton_red_round_trips() {
+    // c.lch65('red')
+    let out = average(&[red()], "lch65");
+    let Color::Lch65(Lch65 { l, c, h, .. }) = out else {
+        panic!("expected Lch65")
+    };
+    approx_tol("l", l, 53.237115595429344);
+    approx_tol("c", c, 104.55001152926587);
+    approx_tol("h", h, 39.99986515439813);
+}
+
+#[test]
+fn average_prismatic_red_blue_midpoint() {
+    // Hand-computed: red→Prismatic = (1, 1, 0, 0); blue→Prismatic =
+    // (1, 0, 0, 1). Per-channel arithmetic mean = (1, 0.5, 0, 0.5).
+    let out = average(&[red(), blue()], "prismatic");
+    let Color::Prismatic(Prismatic { l, r, g, b, .. }) = out else {
+        panic!("expected Prismatic")
+    };
+    approx_tol("l", l, 1.0);
+    approx_tol("r", r, 0.5);
+    approx_tol("g", g, 0.0);
+    approx_tol("b", b, 0.5);
+}
+
+#[test]
+fn average_prismatic_three_primaries_uniform_chromaticity() {
+    // Pure red, pure green (1.0, not CSS "green" = 128/255), pure blue:
+    // each maps to Prismatic (1, e_i) with a unit chromaticity vector.
+    // The arithmetic mean is (1, 1/3, 1/3, 1/3).
+    let pure_green = Color::Rgb(Rgb {
+        r: 0.0,
+        g: 1.0,
+        b: 0.0,
+        alpha: None,
+    });
+    let out = average(&[red(), pure_green, blue()], "prismatic");
+    let Color::Prismatic(Prismatic { l, r, g, b, .. }) = out else {
+        panic!("expected Prismatic")
+    };
+    approx_tol("l", l, 1.0);
+    approx_tol("r", r, 1.0 / 3.0);
+    approx_tol("g", g, 1.0 / 3.0);
+    approx_tol("b", b, 1.0 / 3.0);
 }

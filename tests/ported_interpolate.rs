@@ -5,8 +5,8 @@
 //! })"` against the version of culori vendored in `node_modules/`.
 
 use culor::spaces::{
-    Cubehelix, Dlab, Dlch, Hsi, Hsl, Hwb, Itp, Jab, Jch, Lab, Lch, Lchuv, Luv, Okhsl, Okhsv, Oklab,
-    Oklch, ProphotoRgb, Rec2020, Rgb, Xyb, Yiq, A98, P3,
+    Cubehelix, Dlab, Dlch, Hsi, Hsl, Hwb, Itp, Jab, Jch, Lab, Lab65, Lch, Lch65, Lchuv, Luv, Okhsl,
+    Okhsv, Oklab, Oklch, Prismatic, ProphotoRgb, Rec2020, Rgb, Xyb, Yiq, A98, P3,
 };
 use culor::{interpolate, interpolate_with, Color, HueFixup, InterpolateOptions};
 
@@ -659,4 +659,83 @@ fn lchuv_red_green_midpoint() {
     assert_close(l, 71.05453963906085, "l");
     assert_close(c, 149.3488227277694, "c");
     assert_close(h, 71.33273562157414, "h");
+}
+
+#[test]
+fn lab65_red_blue_midpoint_matches_culori() {
+    // c.interpolate(['red','blue'],'lab65')(0.5)
+    let f = interpolate(&[red(), blue()], "lab65");
+    let Color::Lab65(Lab65 { l, a, b, .. }) = f(0.5) else {
+        panic!("expected Lab65")
+    };
+    assert_close(l, 42.76899424970476, "l");
+    assert_close(a, 79.64269191525403, "a");
+    assert_close(b, -20.326101014010263, "b");
+}
+
+#[test]
+fn lab65_red_blue_t_zero_matches_culori() {
+    // c.interpolate(['red','blue'],'lab65')(0) == c.lab65('red')
+    let f = interpolate(&[red(), blue()], "lab65");
+    let Color::Lab65(Lab65 { l, a, b, .. }) = f(0.0) else {
+        panic!("expected Lab65")
+    };
+    assert_close(l, 53.237115595429344, "l");
+    assert_close(a, 80.09011352310385, "a");
+    assert_close(b, 67.20326351172214, "b");
+}
+
+#[test]
+fn lch65_red_blue_midpoint_matches_culori() {
+    // c.interpolate(['red','blue'],'lch65')(0.5) — shorter-fixup wraps
+    // blue's hue (306.288…) into negative territory so the lerp lands
+    // at -6.855…, matching culori's output exactly.
+    let f = interpolate(&[red(), blue()], "lch65");
+    let Color::Lch65(Lch65 { l, c, h, .. }) = f(0.5) else {
+        panic!("expected Lch65")
+    };
+    assert_close(l, 42.76899424970476, "l");
+    assert_close(c, 119.17921393918918, "c");
+    assert_close(h, -6.855665794154326, "h");
+}
+
+#[test]
+fn lch65_red_blue_t_zero_matches_culori() {
+    // c.interpolate(['red','blue'],'lch65')(0) == c.lch65('red')
+    let f = interpolate(&[red(), blue()], "lch65");
+    let Color::Lch65(Lch65 { l, c, h, .. }) = f(0.0) else {
+        panic!("expected Lch65")
+    };
+    assert_close(l, 53.237115595429344, "l");
+    assert_close(c, 104.55001152926587, "c");
+    assert_close(h, 39.99986515439813, "h");
+}
+
+#[test]
+fn prismatic_red_blue_midpoint_handcomputed() {
+    // Hand-computed: red→Prismatic = (1, 1, 0, 0); blue→Prismatic =
+    // (1, 0, 0, 1); per-channel lerp at t=0.5 gives (1, 0.5, 0, 0.5).
+    // culori 4.0.2 has no `prismatic` mode, so the reference is
+    // derived from culor's own conversion (Hauke 2009).
+    let f = interpolate(&[red(), blue()], "prismatic");
+    let Color::Prismatic(Prismatic { l, r, g, b, .. }) = f(0.5) else {
+        panic!("expected Prismatic")
+    };
+    assert_close(l, 1.0, "l");
+    assert_close(r, 0.5, "r");
+    assert_close(g, 0.0, "g");
+    assert_close(b, 0.5, "b");
+}
+
+#[test]
+fn prismatic_red_blue_t_zero_returns_red() {
+    // At t=0 the closure returns the first stop (Color::Prismatic of red).
+    let f = interpolate(&[red(), blue()], "prismatic");
+    let Color::Prismatic(Prismatic { l, r, g, b, .. }) = f(0.0) else {
+        panic!("expected Prismatic")
+    };
+    assert_close(l, 1.0, "l");
+    assert_close(r, 1.0, "r");
+    assert_close(g, 0.0, "g");
+    assert_close(b, 0.0, "b");
 }
