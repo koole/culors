@@ -1,15 +1,29 @@
 //! A Rust port of [culori](https://github.com/evercoder/culori), the
 //! JavaScript color library by Dan Burzo.
 //!
-//! culor implements a fixed set of color spaces, conversion between any pair
-//! of them, a CSS Color Module 4 string parser, and a matching formatter.
-//! Output values agree with culori 4.0.2 within 1e-10 across an exhaustive
-//! fixture set (110 conversion pairs, 365 parse cases, 303 format
+//! culor implements 30 color spaces, conversion between any pair of
+//! them, a CSS Color Module 4 string parser and matching formatter,
+//! interpolation, gamut mapping, ΔE, separable blend modes, mode-aware
+//! averaging, WCAG contrast, and the CSS filter set. Output values
+//! agree with culori 4.0.2 within 1e-10 across an exhaustive fixture
+//! set (110 conversion pairs, 365 parse cases, 303 format
 //! round-trips).
 //!
 //! # Quick start
 //!
-//! Parse a CSS string, convert it to another space, and format it back:
+//! Parse two CSS strings, blend them, and format the result back:
+//!
+//! ```rust
+//! use culor::{blend, format_css, parse, BlendMode};
+//!
+//! let red = parse("#ff0000").unwrap();
+//! let blue = parse("rgb(0 0 255 / 0.5)").unwrap();
+//! let mixed = blend(&[red, blue], BlendMode::Multiply);
+//! let css = format_css(&mixed);
+//! assert!(css.starts_with("color(srgb"));
+//! ```
+//!
+//! Parse, convert, and format:
 //!
 //! ```rust
 //! use culor::{convert, format_css, parse, Color};
@@ -24,64 +38,105 @@
 //! assert!(css.starts_with("lab("));
 //! ```
 //!
-//! Round-trip a hex string through the formatter:
-//!
-//! ```rust
-//! use culor::{format_css, parse, Color};
-//!
-//! let red = parse("#ff0000").unwrap();
-//! assert!(matches!(red, Color::Rgb(_)));
-//! assert_eq!(format_css(&red), "color(srgb 1 0 0)");
-//! ```
-//!
 //! # Supported color spaces
 //!
-//! | Space       | Variant                             | CSS notation                    |
-//! |-------------|-------------------------------------|---------------------------------|
-//! | sRGB        | [`Color::Rgb`]                      | `rgb(...)`, `#rrggbb`, named    |
-//! | Linear sRGB | [`Color::LinearRgb`]                | `color(srgb-linear ...)`        |
-//! | HSL         | [`Color::Hsl`]                      | `hsl(...)`                      |
-//! | HSV         | [`Color::Hsv`]                      | `color(--hsv ...)` (formatter)  |
-//! | HWB         | [`Color::Hwb`]                      | `hwb(...)`                      |
-//! | CIE Lab D50 | [`Color::Lab`]                      | `lab(...)`                      |
-//! | CIE LCh D50 | [`Color::Lch`]                      | `lch(...)`                      |
-//! | Oklab       | [`Color::Oklab`]                    | `oklab(...)`                    |
-//! | Oklch       | [`Color::Oklch`]                    | `oklch(...)`                    |
-//! | XYZ D50     | [`Color::Xyz50`]                    | `color(xyz-d50 ...)`            |
-//! | XYZ D65     | [`Color::Xyz65`]                    | `color(xyz ...)` / `xyz-d65`    |
+//! Thirty spaces are exposed as plain structs in [`spaces`] and as
+//! variants of [`Color`].
+//!
+//! | Family | Spaces |
+//! |---|---|
+//! | sRGB and linear | [`Color::Rgb`], [`Color::LinearRgb`] |
+//! | Cylindrical sRGB | [`Color::Hsl`], [`Color::Hsv`], [`Color::Hwb`] |
+//! | CIE | [`Color::Lab`], [`Color::Lch`], [`Color::Luv`], [`Color::Lchuv`], [`Color::Xyz50`], [`Color::Xyz65`] |
+//! | Oklab | [`Color::Oklab`], [`Color::Oklch`], [`Color::Okhsl`], [`Color::Okhsv`] |
+//! | Wide-gamut RGB | [`Color::P3`], [`Color::Rec2020`], [`Color::A98`], [`Color::ProphotoRgb`] |
+//! | DIN99o | [`Color::Dlab`], [`Color::Dlch`] |
+//! | JzAzBz / ICtCp | [`Color::Jab`], [`Color::Jch`], [`Color::Itp`] |
+//! | HSLuv | [`Color::Hsluv`], [`Color::Hpluv`] |
+//! | Other | [`Color::Cubehelix`], [`Color::Hsi`], [`Color::Yiq`], [`Color::Xyb`] |
 //!
 //! # Public API tour
 //!
-//! - [`Color`] is the tagged union over every supported space. Each variant
-//!   wraps the matching struct from [`spaces`].
-//! - The [`ColorSpace`] trait defines `to_xyz65` / `from_xyz65` for every
-//!   space, plus alpha access. It is the extension point for adding spaces.
-//! - [`convert()`] is the generic conversion function. It routes through XYZ
-//!   D65, so any pair of [`ColorSpace`] implementors works without enumerating
-//!   conversion paths.
-//! - [`parse()`] consumes a CSS Color Module 4 string and returns
-//!   `Option<Color>`. Malformed input yields `None`; unsupported `color()`
-//!   profiles also yield `None` (see the [`mod@parse`] module docs for the
-//!   profile list).
-//! - [`format_css`] serializes a [`Color`] to the CSS Color Module 4
-//!   functional notation that [`parse()`] accepts.
+//! - [`Color`] is the tagged union over every supported space. Each
+//!   variant wraps the matching struct from [`spaces`].
+//! - The [`ColorSpace`] trait defines `to_xyz65` / `from_xyz65` for
+//!   every space, plus alpha access.
+//! - [`convert()`] is the generic conversion function. It routes
+//!   through XYZ D65, so any pair of [`ColorSpace`] implementors
+//!   works without enumerating conversion paths. For bit-exact culori
+//!   parity on precision-critical pairs, use the direct `From` impls
+//!   listed in [`mod@convert`].
+//! - [`parse()`] consumes CSS Color Module 4 syntax (named colors,
+//!   hex, functional notation, `color()` profiles including the four
+//!   wide-gamut spaces, and `color-mix()`). Malformed or unsupported
+//!   input yields `None`.
+//! - [`format_css`] serializes a [`Color`] to canonical CSS.
+//! - [`interpolate`] / [`interpolate_with`] return a closure
+//!   `Fn(f64) -> Color` that samples a multi-stop ramp at `t ∈ [0, 1]`
+//!   in the requested space. [`HueFixup`] selects the cylindrical
+//!   fixup strategy.
+//! - [`blend`] / [`blend_str`] fold a stack of colors with one of the
+//!   12 separable [`BlendMode`] modes, using Porter-Duff source-over
+//!   with premultiplied alpha. Output is always `Color::Rgb`.
+//! - [`average`], [`average_number`], [`average_angle`] reduce a slice
+//!   of colors / numbers / hue angles in a chosen mode.
+//! - [`in_gamut`], [`clamp_gamut`], [`clamp_chroma`], [`to_gamut`]
+//!   provide the gamut-mapping ladder, with [`to_gamut`] implementing
+//!   the CSS Color Module 4 algorithm using ΔE OK.
+//! - The `difference_*` family (Ciede76, Ciede94, Ciede2000, CMC, OK,
+//!   JzAzBz, ICtCp, Euclidean, hue-chroma, hue-saturation) returns
+//!   curried closures `Fn(&Color, &Color) -> f64`.
+//! - [`wcag_luminance`] and [`wcag_contrast`] implement the WCAG 2.x
+//!   contrast formula on sRGB.
+//! - The `filter_*` family (`brightness`, `contrast`, `grayscale`,
+//!   `hue_rotate`, `invert`, `saturate`, `sepia`, plus CVD `prot` /
+//!   `deuter` / `trit`) returns a closure `Fn(&Color) -> Color`.
 //!
-//! For pairs where culori takes a shorter routing than XYZ D65 (notably
-//! anything `Rgb`-derived going to `Lab` / `Lch` / `Oklab` / `Oklch`), call
-//! the matching `From` impl directly to get bit-for-bit culori parity. See
-//! [`convert()`] for the full list.
+//! # Interpolation
+//!
+//! ```rust
+//! use culor::{interpolate, parse};
+//!
+//! let a = parse("oklch(70% 0.15 30deg)").unwrap();
+//! let b = parse("oklch(70% 0.15 200deg)").unwrap();
+//! let ramp = interpolate(&[a, b], "oklab");
+//! let mid = ramp(0.5);
+//! let _ = mid;
+//! ```
+//!
+//! # WCAG contrast
+//!
+//! ```rust
+//! use culor::{parse, wcag_contrast};
+//!
+//! let bg = parse("white").unwrap();
+//! let fg = parse("black").unwrap();
+//! let ratio = wcag_contrast(&bg, &fg);
+//! assert!(ratio > 20.0);
+//! ```
+//!
+//! # ΔE
+//!
+//! ```rust
+//! use culor::{difference_ciede2000, parse};
+//!
+//! let de = difference_ciede2000(1.0, 1.0, 1.0);
+//! let red = parse("red").unwrap();
+//! let crimson = parse("crimson").unwrap();
+//! assert!(de(&red, &crimson) > 0.0);
+//! ```
 //!
 //! # Feature flags
 //!
-//! - `serde` (off by default): derives `Serialize` and `Deserialize` for
-//!   every space struct and for [`Color`].
+//! - `serde` (off by default): derives `Serialize` and `Deserialize`
+//!   for every space struct and for [`Color`].
 //!
 //! # Further reading
 //!
-//! See the project [README](https://github.com/koole/culor#readme) for a
-//! features matrix and the list of v0.1 known divergences from culori, and
-//! [CHANGELOG.md](https://github.com/koole/culor/blob/main/CHANGELOG.md) for
-//! release history.
+//! See the project [README](https://github.com/koole/culor#readme) for
+//! the features matrix, comparison to culori, and v1.0 known
+//! divergences. Release history is in
+//! [CHANGELOG.md](https://github.com/koole/culor/blob/main/CHANGELOG.md).
 //!
 //! # License
 //!
