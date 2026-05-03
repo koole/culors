@@ -93,6 +93,7 @@
 pub mod average;
 pub mod blend;
 pub mod color;
+pub mod contrast;
 pub mod convert;
 pub mod difference;
 pub mod format;
@@ -106,6 +107,7 @@ pub(crate) mod util;
 pub use average::{average, average_angle, average_number};
 pub use blend::{blend, blend_str, BlendMode};
 pub use color::Color;
+pub use contrast::{wcag_contrast, wcag_luminance};
 pub use convert::convert;
 pub use difference::{
     difference_ciede2000, difference_ciede76, difference_ciede94, difference_ciede94_with,
