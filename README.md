@@ -6,19 +6,20 @@
 
 A Rust port of [culori](https://github.com/evercoder/culori), the JavaScript color library by Dan Burzo. Color spaces, conversion, CSS Color Module 4 parsing and formatting, interpolation, gamut mapping, ΔE, blending, averaging, WCAG contrast, and CSS filters. Output values match culori 4.0.2 within 1e-10 across an exhaustive fixture set.
 
-## Features (v1.0)
+## Features (v1.1)
 
 | Feature | Coverage |
 |---|---|
-| Color spaces (30) | rgb, lrgb, hsl, hsv, hwb, lab (D50), lch, oklab, oklch, xyz50, xyz65, p3, rec2020, a98, prophoto-rgb, cubehelix, dlab, dlch, jab, jch, yiq, hsi, hsluv, hpluv, okhsl, okhsv, itp, xyb, luv, lchuv |
+| Color spaces (33) | rgb, lrgb, hsl, hsv, hwb, lab (D50), lch (D50), lab65, lch65, oklab, oklch, xyz50, xyz65, p3, rec2020, a98, prophoto-rgb, cubehelix, dlab, dlch, jab, jch, yiq, hsi, hsluv, hpluv, okhsl, okhsv, itp, xyb, luv, lchuv, prismatic |
 | Conversion | generic `convert<A, B>` plus direct `From` impls between adjacent spaces |
-| CSS parser | named colors, hex, functional `rgb`/`hsl`/`hwb`/`lab`/`lch`/`oklab`/`oklch`, `color()` with `srgb`/`srgb-linear`/`xyz`/`xyz-d50`/`xyz-d65`/`display-p3`/`rec2020`/`a98-rgb`/`prophoto-rgb`, plus `color-mix()` |
-| CSS formatter | round-trip stable for canonical CSS Color Module 4 forms, including wide-gamut `color()` profiles |
-| Interpolation | `interpolate` / `interpolate_with`, hue-fixup (shorter / longer / increasing / decreasing / raw), per-channel easing |
+| CSS parser | named colors, hex, functional `rgb`/`hsl`/`hwb`/`lab`/`lch`/`oklab`/`oklch`, `color()` with `srgb`/`srgb-linear`/`xyz`/`xyz-d50`/`xyz-d65`/`display-p3`/`rec2020`/`a98-rgb`/`prophoto-rgb`/`--lab-d65`/`--lch-d65`, plus `color-mix()` |
+| CSS formatter | round-trip stable for canonical CSS Color Module 4 forms, including wide-gamut `color()` profiles and the `--lab-d65` / `--lch-d65` custom profiles |
+| Interpolation | `interpolate` / `interpolate_with` over rgb, lrgb, hsl, hsv, hwb, lab, lch, oklab, oklch, xyz50, xyz65, p3, rec2020, a98, prophoto, cubehelix, dlab, dlch, jab, jch, yiq, hsi, hsluv, hpluv, okhsl, okhsv, itp, xyb, luv, lchuv. Hue-fixup (shorter / longer / increasing / decreasing / raw), per-channel easing |
 | Gamut mapping | `in_gamut`, `clamp_gamut`, `clamp_chroma`, `to_gamut` (CSS Color Module 4 with ΔE OK) |
-| ΔE | `ciede76`, `ciede94`, `ciede2000`, `cmc`, `euclidean`, `hue_chroma`, `hue_saturation`, `ok`, `jz`, `itp`, `euclidean_xyz` |
-| Blending | 12 separable modes (normal, multiply, screen, hard-light, overlay, darken, lighten, color-dodge, color-burn, soft-light, difference, exclusion) |
-| Averaging | `average`, `average_number`, `average_angle` (mode-aware, hue-circular) |
+| ΔE | `ciede76`, `ciede94`, `ciede2000`, `cmc`, `euclidean`, `hyab`, `hue_chroma`, `hue_saturation`, `hue_naive`, `ok`, `jz`, `itp`, `euclidean_xyz`, `kotsarenko_ramos` |
+| Blending | 16 modes — 12 separable (normal, multiply, screen, hard-light, overlay, darken, lighten, color-dodge, color-burn, soft-light, difference, exclusion) plus 4 non-separable from CSS Compositing 1 § 5.8 (hue, saturation, color, luminosity) |
+| Averaging | `average`, `average_number`, `average_angle` (mode-aware, hue-circular). Same mode list as `interpolate` |
+| Palette utilities | `samples(n)`, `nearest(palette, metric)`, `round(places)` |
 | WCAG | `wcag_luminance`, `wcag_contrast` |
 | CSS filters | `brightness`, `contrast`, `grayscale`, `hue-rotate`, `invert`, `saturate`, `sepia`, plus CVD `prot` / `deuter` / `trit` |
 | Fixture coverage | 110 conversion pairs, 365 parse cases, 303 format round-trips, all verified against culori 4.0.2 |
@@ -85,7 +86,7 @@ let _ = mid;
 ## Comparison to culori
 
 Every public function in culori 4.0.2 has a culor equivalent, with the
-exceptions listed under "v1.0 known divergences" below. The mapping is
+exceptions listed under "Known divergences" below. The mapping is
 direct enough that culori code translates almost mechanically: `culori
 .parse(s)` becomes `culor::parse(s)`, `culori.convert(c, mode)` becomes
 either the generic `convert::<_, T>()` or a direct `T::from(c)`, and
@@ -106,31 +107,32 @@ closures with the same shape.
 | `filterBrightness` … `filterDeficiencyTrit` | `filter_brightness` … `filter_deficiency_trit` |
 | `colorsNamed` table | `parse(name)` (built-in) |
 
-## v1.0 known divergences from culori
+## Known divergences from culori
 
-- The generic `convert::<A, B>()` always routes through XYZ D65, even
-  when culori's public `converter(mode)` API takes a shorter path.
-  Output drifts from culori by ~1e-14, well below any practical color
-  tolerance, but not bit-for-bit. For bit-exact parity, use the direct
-  `From` impls (`Rgb` ↔ `LinearRgb`, `Rgb` ↔ `Hsl`, `Rgb` ↔ `Hsv`,
-  `Hsv` ↔ `Hwb`, `LinearRgb` ↔ `Oklab`, `Oklab` ↔ `Oklch`,
-  `Xyz50` ↔ `Lab`, `Lab` ↔ `Lch`, plus the four achromatic-snap paths
-  `Rgb` → `Lab` / `Lch` / `Oklab` / `Oklch`).
+- The generic `convert::<A, B>()` routes through XYZ D65 for any pair
+  without a direct `From` impl, even when culori's public
+  `converter(mode)` API takes a shorter path. Output drifts from
+  culori by ~1e-14, well below any practical color tolerance, but
+  not bit-for-bit. For bit-exact parity, use the direct `From` impls
+  (`Rgb` ↔ `LinearRgb`, `Rgb` ↔ `Hsl`, `Rgb` ↔ `Hsv`, `Hsv` ↔ `Hwb`,
+  `LinearRgb` ↔ `Oklab`, `Oklab` ↔ `Oklch`, `Xyz50` ↔ `Lab`,
+  `Lab` ↔ `Lch`, plus the four achromatic-snap paths
+  `Rgb` → `Lab` / `Lch` / `Oklab` / `Oklch`, and the D65 analogues
+  `Xyz65` ↔ `Lab65`, `Lab65` ↔ `Lch65`).
 - culori's `convertRgbToLab` and `convertRgbToOklab` snap `a` and `b`
   to exactly zero when `r == g == b`. The XYZ-hub path in
   `convert::<>()` leaves a residual on the order of 1e-6 (Lab) or
   1e-16 (Oklab) and feeds a phantom hue into `Lch` / `Oklch`. The
   direct `From` impls perform the snap; the generic does not.
-- `Prismatic` color space is not implemented. culori has it but no
-  canonical numerical reference exists outside culori itself; it can
-  be added in a 1.x point release without breaking changes.
-- Non-separable blend modes (`hue`, `saturation`, `color`,
-  `luminosity`) are absent. culori 4.0.2 does not implement them.
-- `interpolate` and `average` accept the eleven 0.1 spaces only
-  (`Rgb`, `LinearRgb`, `Hsl`, `Hsv`, `Hwb`, `Lab`, `Lch`, `Oklab`,
-  `Oklch`, `Xyz50`, `Xyz65`). Calls in the long-tail spaces panic
-  with an unsupported-mode message. culori 4.0.2 has the same gap
-  for several of these spaces.
+- `interpolate` and `average` operate on 3-channel arrays, which
+  excludes `Prismatic` (4 channels) and the D65 Lab/Lch pair
+  (`lab65`, `lch65`). Convert into `Lab` or `Lch` to interpolate; the
+  spaces themselves remain reachable through `convert()` and the CSS
+  round-trip.
+- `Prismatic` follows the Hauke 2009 definition because culori 4.0.2
+  ships no `prismatic` mode against which to fixture-test. The
+  literature contains other definitions under the same name; this
+  one is documented as a culor extension rather than a culori port.
 
 ## Documentation
 

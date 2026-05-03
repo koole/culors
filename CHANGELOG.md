@@ -36,6 +36,53 @@ toolset. No breaking changes from 1.0.0; everything below is additive.
 - `nearest(palette, metric)` — palette-search factory returning
   `Fn(&Color, usize) -> Vec<Color>`, the closest `n` colors under the
   chosen metric (Euclidean by default).
+- `Prismatic` color space (Hauke 2009 definition: a four-channel
+  `(L, r, g, b)` decomposition where `L = max(r, g, b)` and the
+  remaining channels are normalized chromatic components). Multiple
+  competing definitions appear in the literature; this implementation
+  follows Hauke's original 2009 paper and is documented as a culor
+  extension. culori 4.0.2 does not ship a `prismatic` definition, so
+  the round-trip is verified against an internal reference rather
+  than fixture parity.
+- Non-separable blend modes `BlendMode::Hue`, `BlendMode::Saturation`,
+  `BlendMode::Color`, `BlendMode::Luminosity`, implementing the
+  luminance-preserving formulas in CSS Compositing Level 1 § 5.8.
+  `blend_str` accepts the `"hue"`, `"saturation"`, `"color"`, and
+  `"luminosity"` keys. Not in culori 4.0.2; cross-checked against the
+  CSS spec and `colorjs.io`.
+- `interpolate`, `interpolate_with`, and `average` extended to cover
+  every long-tail color space added in v0.4: `cubehelix`, `dlab`,
+  `dlch`, `jab`, `jch`, `yiq`, `hsi`, `hsluv`, `hpluv`, `okhsl`,
+  `okhsv`, `itp`, `xyb`, `luv`, `lchuv`, `p3`, `rec2020`, `a98`,
+  `prophoto`. Mode-specific channel layouts (rectangular vs.
+  cylindrical, hue position, alpha-as-NaN missing marker) match
+  culori where culori implements them. `hsluv` and `hpluv` remain
+  culor extensions because culori 4.0.2 omits them from
+  `interpolate`.
+
+### Removed limitations
+
+The following items were called out as deferred in the 1.0.0
+"Limitations" section and are now closed:
+
+- `Prismatic` color space is implemented (see Added).
+- Non-separable blend modes are implemented (see Added).
+- `interpolate` and `average` no longer panic on the v0.4 long-tail
+  modes. The remaining unsupported modes for `interpolate`/`average`
+  are `lab65`, `lch65`, and `prismatic`: these spaces exist as
+  `ColorSpace` implementors and are reachable through `convert()`,
+  but the current `interpolate`/`average` machinery operates on
+  3-channel arrays, and Prismatic is 4-channel while Lab65/Lch65
+  share their interpolation semantics with their D50 counterparts
+  (callers can convert into `Lab` or `Lch` to interpolate).
+
+The remaining 1.0.0 limitation still stands:
+
+- `convert::<A, B>()` routes through XYZ D65 for any pair without a
+  direct `From` impl, which differs from culori's per-pair routing
+  by approximately 1e-14. The direct `From` impls listed in the
+  `convert` module docs provide bit-for-bit parity for the
+  precision-critical pairs.
 
 ## [1.0.0] - 2026-05-03
 
