@@ -28,7 +28,9 @@ fn close(a: f64, b: f64, label: &str) {
     assert!(diff <= E, "{label}: diff {diff:.3e}");
 }
 
-const NAMED: &[&str] = &["red", "green", "blue", "white", "black", "magenta", "tomato"];
+const NAMED: &[&str] = &[
+    "red", "green", "blue", "white", "black", "magenta", "tomato",
+];
 
 #[test]
 fn rgb_to_xyz50_matches_via_xyz65() {
