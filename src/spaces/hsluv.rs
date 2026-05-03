@@ -1,7 +1,7 @@
 //! HSLuv — perceptually uniform HSL.
 //!
 //! Constants and algorithm verbatim from the official HSLuv reference
-//! implementation (https://github.com/hsluv/hsluv-javascript v1.0.1,
+//! implementation (<https://github.com/hsluv/hsluv-javascript> v1.0.1,
 //! `hsluv.cjs`). HSLuv is a hue-preserving cylinder over CIELuv,
 //! parameterized so that the saturation reaches `100` at the sRGB gamut
 //! boundary for any (`h`, `l`).

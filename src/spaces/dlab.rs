@@ -89,7 +89,7 @@ impl ColorSpace for Dlab {
 /// the achromatic-RGB snap from `convertRgbToLab65.js`. Without the snap a
 /// gray sRGB input picks up a residual a/b on the order of 1e-15 from
 /// `convertRgbToXyz65` ∘ `convertXyz65ToLab65`, which then feeds a phantom
-/// hue into [`Dlch`].
+/// hue into [`crate::spaces::Dlch`].
 impl From<Rgb> for Dlab {
     fn from(c: Rgb) -> Self {
         use crate::traits::ColorSpace;

@@ -71,14 +71,14 @@
 //!   wide-gamut spaces, and `color-mix()`). Malformed or unsupported
 //!   input yields `None`.
 //! - [`format_css`] serializes a [`Color`] to canonical CSS.
-//! - [`interpolate`] / [`interpolate_with`] return a closure
+//! - [`interpolate()`] / [`interpolate_with()`] return a closure
 //!   `Fn(f64) -> Color` that samples a multi-stop ramp at `t ∈ [0, 1]`
 //!   in the requested space. [`HueFixup`] selects the cylindrical
 //!   fixup strategy.
-//! - [`blend`] / [`blend_str`] fold a stack of colors with one of the
+//! - [`blend()`] / [`blend_str()`] fold a stack of colors with one of the
 //!   12 separable [`BlendMode`] modes, using Porter-Duff source-over
 //!   with premultiplied alpha. Output is always `Color::Rgb`.
-//! - [`average`], [`average_number`], [`average_angle`] reduce a slice
+//! - [`average()`], [`average_number()`], [`average_angle()`] reduce a slice
 //!   of colors / numbers / hue angles in a chosen mode.
 //! - [`in_gamut`], [`clamp_gamut`], [`clamp_chroma`], [`to_gamut`]
 //!   provide the gamut-mapping ladder, with [`to_gamut`] implementing
