@@ -188,6 +188,40 @@ fn oklab_to_xyz65_matches_lrgb_path() {
 }
 
 #[test]
+fn oklab_lrgb_out_of_gamut_round_trip() {
+    // HDR-style input with negative channel; verify round-trip preserves
+    // it. Oklab's cube-root nonlinearity is sign-preserving via f64::cbrt,
+    // so negative LMS values survive the forward/inverse pair.
+    let lrgb = LinearRgb {
+        r: 1.5,
+        g: -0.1,
+        b: 0.0,
+        alpha: None,
+    };
+    let oklab: Oklab = lrgb.into();
+    let back: LinearRgb = oklab.into();
+    common::assert_close(back.r, 1.5, 1e-12);
+    common::assert_close(back.g, -0.1, 1e-12);
+    common::assert_close(back.b, 0.0, 1e-12);
+}
+
+#[test]
+fn oklab_hdr_lrgb_matches_culori() {
+    // c.oklab({mode:'lrgb', r:1.5, g:-0.1, b:0.0})
+    // -> {"l":0.6718402835881381,"a":0.31753813322383284,"b":0.1337485625307116}
+    let lrgb = LinearRgb {
+        r: 1.5,
+        g: -0.1,
+        b: 0.0,
+        alpha: None,
+    };
+    let oklab: Oklab = lrgb.into();
+    common::assert_close(oklab.l, 0.6718402835881381, 1e-12);
+    common::assert_close(oklab.a, 0.31753813322383284, 1e-12);
+    common::assert_close(oklab.b, 0.1337485625307116, 1e-12);
+}
+
+#[test]
 fn xyz65_round_trip_through_oklab() {
     let xyz = Xyz65 {
         x: 0.4,
