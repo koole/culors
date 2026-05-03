@@ -7,14 +7,22 @@
 //!
 //! Two output families:
 //!
-//! 1. Functional-notation spaces — `hsl()`, `hwb()`, `lab()`, `lch()`,
+//! 1. Functional-notation spaces, `hsl()`, `hwb()`, `lab()`, `lch()`,
 //!    `oklab()`, `oklch()`. Their `definition.js` uses an inline `c => …`
-//!    serializer. Hue and chroma channels with NaN sentinels render as
-//!    `none`.
-//! 2. `color()`-syntax spaces — `rgb` (id `srgb`), `lrgb` (`srgb-linear`),
+//!    serializer.
+//! 2. `color()`-syntax spaces, `rgb` (id `srgb`), `lrgb` (`srgb-linear`),
 //!    `hsv` (`--hsv`), `xyz65` (`xyz-d65`), `xyz50` (`xyz-d50`). Their
 //!    `definition.js` uses a string `serialize` field which culori's
 //!    dispatcher feeds into the `color()` template.
+//!
+//! NaN channels render as the CSS keyword `none` for both families. CSS
+//! Color Module 4 specifies `none` as the missing-component keyword for
+//! `color()` as well as for the functional spaces, so culor uses it
+//! uniformly. culori, by contrast, emits the literal string `"NaN"` for a
+//! `color()` channel that is `Number.NaN`; that path is unreachable from
+//! culori's own pipeline (its converters never emit NaN into a `color()`
+//! space) and only surfaces if a caller hand-builds such a value, so the
+//! divergence is artificial and the Rust output is the spec-compliant one.
 //!
 //! Alpha mirrors culori's `c.alpha < 1` test: the alpha component only
 //! appears when alpha is present and strictly less than 1. Alpha equal to

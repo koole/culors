@@ -162,6 +162,16 @@ fn rgb_modern() {
 }
 
 #[test]
+fn rgb_modern_with_surrounding_whitespace() {
+    // Outer whitespace is trimmed before dispatch, matching culori.
+    let c = rgb(parse(" rgb(255 0 0) ").unwrap());
+    common::assert_close(c.r, 1.0, EPS);
+    common::assert_close(c.g, 0.0, EPS);
+    common::assert_close(c.b, 0.0, EPS);
+    assert_eq!(c.alpha, None);
+}
+
+#[test]
 fn rgb_modern_with_alpha() {
     let c = rgb(parse("rgb(255 0 0 / 0.5)").unwrap());
     assert_eq!(c.alpha, Some(0.5));

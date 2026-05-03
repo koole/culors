@@ -1,8 +1,10 @@
 // Fixture generator: emits one JSON file per ordered (from, to) pair across
 // the 11 culor color spaces. Outputs land in tests/fixtures/.
 //
-// Idempotent: the input matrix is deterministic (see inputs.mjs) and we
-// stringify with stable key ordering. Running twice produces zero diff.
+// Idempotent: the input matrix is deterministic (see inputs.mjs) and key
+// order in each row comes from `projectRow`'s own iteration over a fixed
+// channel list, so `JSON.stringify` produces a byte-stable output. Running
+// twice produces zero diff.
 //
 // Outputs come from culori's public `converter(mode)` API. This is the
 // surface real-world callers compare against, so the fixtures reflect
@@ -35,10 +37,6 @@ function projectRow(obj, channels) {
 		out.alpha = obj.alpha;
 	}
 	return out;
-}
-
-function stableStringify(value, indent) {
-	return JSON.stringify(value, null, indent);
 }
 
 function fixturePath(from, to) {
@@ -77,30 +75,27 @@ function generatePair(from, to) {
 	});
 
 	const fixture = { from, to, rows };
-	const json = stableStringify(fixture, "\t");
+	const json = JSON.stringify(fixture, null, "\t");
 	writeFileSync(fixturePath(from, to), json + "\n");
 }
 
 function main() {
 	clearOldFixtures();
-	let count = 0;
+	let fileCount = 0;
+	let rowCount = 0;
 	for (const from of SPACES) {
 		for (const to of SPACES) {
 			if (from === to) continue;
 			generatePair(from, to);
-			count++;
+			fileCount++;
+			rowCount += ALL_INPUTS[from].length;
 		}
 	}
-	const totalRows = SPACES.reduce(
-		(acc, s) => acc + ALL_INPUTS[s].length,
-		0,
-	);
 	process.stdout.write(
-		`generated ${count} fixture files in ${OUT_DIR}\n` +
+		`generated ${fileCount} fixture files (${rowCount} rows total) in ${OUT_DIR}\n` +
 			`rows per source space: ${SPACES.map(
 				(s) => `${s}=${ALL_INPUTS[s].length}`,
-			).join(", ")}\n` +
-			`total rows: ${totalRows} per source x 10 targets = ${totalRows * 10}\n`,
+			).join(", ")}\n`,
 	);
 }
 
