@@ -20,7 +20,11 @@
 use std::collections::HashMap;
 
 use crate::convert::convert;
-use crate::spaces::{Hsl, Hsv, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
+use crate::spaces::{
+    Cubehelix, Dlab, Dlch, Hpluv, Hsi, Hsl, Hsluv, Hsv, Hwb, Itp, Jab, Jch, Lab, Lch, Lchuv,
+    LinearRgb, Luv, Okhsl, Okhsv, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb, Xyb, Xyz50, Xyz65, Yiq,
+    A98, P3,
+};
 use crate::traits::ColorSpace;
 use crate::Color;
 
@@ -107,16 +111,14 @@ impl InterpolateOptions {
 /// Build an interpolator for `colors` in `mode`. Returns a closure that
 /// maps `t` (clamped to `[0, 1]`) to a [`Color`] of the requested mode.
 ///
-/// `mode` is one of culori's mode strings: `"rgb"`, `"hsl"`, `"hsv"`,
-/// `"hwb"`, `"lab"`, `"lch"`, `"oklab"`, `"oklch"`, `"lrgb"`, `"xyz50"`,
-/// `"xyz65"`. An unrecognized mode panics — call sites should validate
-/// mode strings up front.
+/// An unrecognized mode panics — call sites should validate mode strings
+/// up front.
 ///
-/// Currently supports the v0.1 modes: rgb, lrgb, hsl, hsv, hwb, lab, lch,
-/// oklab, oklch, xyz50, xyz65. Other modes (cubehelix, dlab/dlch, jab/jch,
-/// luv/lchuv, hsluv/hpluv, okhsl/okhsv, itp, xyb, yiq, hsi, p3, rec2020,
-/// a98, prophoto) are not yet supported by `interpolate` or `average` —
-/// passing them will panic. Wider support is planned for a future release.
+/// Supported modes: `rgb`, `lrgb`, `hsl`, `hsv`, `hwb`, `lab`, `lch`,
+/// `oklab`, `oklch`, `xyz50`, `xyz65`, `p3`, `rec2020`, `a98`, `prophoto`,
+/// `cubehelix`, `dlab`, `dlch`, `jab`, `jch`, `yiq`, `hsi`, `hsluv`,
+/// `hpluv`, `okhsl`, `okhsv`, `itp`, `xyb`, `luv`, `lchuv`. (`hsluv` and
+/// `hpluv` are culor extensions and not present in culori 4.0.2.)
 ///
 /// Uses [`HueFixup::Shorter`] and no easing. For other strategies, see
 /// [`interpolate_with`].
@@ -351,6 +353,111 @@ const XYZ_CHANNELS: &[ChannelInfo] = &[
     },
 ];
 
+const HSI_CHANNELS: &[ChannelInfo] = &[
+    ChannelInfo {
+        name: "h",
+        is_hue: true,
+    },
+    ChannelInfo {
+        name: "s",
+        is_hue: false,
+    },
+    ChannelInfo {
+        name: "i",
+        is_hue: false,
+    },
+];
+
+const JAB_CHANNELS: &[ChannelInfo] = &[
+    ChannelInfo {
+        name: "j",
+        is_hue: false,
+    },
+    ChannelInfo {
+        name: "a",
+        is_hue: false,
+    },
+    ChannelInfo {
+        name: "b",
+        is_hue: false,
+    },
+];
+
+const JCH_CHANNELS: &[ChannelInfo] = &[
+    ChannelInfo {
+        name: "j",
+        is_hue: false,
+    },
+    ChannelInfo {
+        name: "c",
+        is_hue: false,
+    },
+    ChannelInfo {
+        name: "h",
+        is_hue: true,
+    },
+];
+
+const YIQ_CHANNELS: &[ChannelInfo] = &[
+    ChannelInfo {
+        name: "y",
+        is_hue: false,
+    },
+    ChannelInfo {
+        name: "i",
+        is_hue: false,
+    },
+    ChannelInfo {
+        name: "q",
+        is_hue: false,
+    },
+];
+
+const ITP_CHANNELS: &[ChannelInfo] = &[
+    ChannelInfo {
+        name: "i",
+        is_hue: false,
+    },
+    ChannelInfo {
+        name: "t",
+        is_hue: false,
+    },
+    ChannelInfo {
+        name: "p",
+        is_hue: false,
+    },
+];
+
+const XYB_CHANNELS: &[ChannelInfo] = &[
+    ChannelInfo {
+        name: "x",
+        is_hue: false,
+    },
+    ChannelInfo {
+        name: "y",
+        is_hue: false,
+    },
+    ChannelInfo {
+        name: "b",
+        is_hue: false,
+    },
+];
+
+const LUV_CHANNELS: &[ChannelInfo] = &[
+    ChannelInfo {
+        name: "l",
+        is_hue: false,
+    },
+    ChannelInfo {
+        name: "u",
+        is_hue: false,
+    },
+    ChannelInfo {
+        name: "v",
+        is_hue: false,
+    },
+];
+
 fn mode_info(mode: &str) -> ModeInfo {
     match mode {
         "rgb" => ModeInfo {
@@ -396,6 +503,82 @@ fn mode_info(mode: &str) -> ModeInfo {
         "xyz65" => ModeInfo {
             mode_str: "xyz65",
             channels: XYZ_CHANNELS,
+        },
+        "p3" => ModeInfo {
+            mode_str: "p3",
+            channels: RGB_CHANNELS,
+        },
+        "rec2020" => ModeInfo {
+            mode_str: "rec2020",
+            channels: RGB_CHANNELS,
+        },
+        "a98" => ModeInfo {
+            mode_str: "a98",
+            channels: RGB_CHANNELS,
+        },
+        "prophoto" => ModeInfo {
+            mode_str: "prophoto",
+            channels: RGB_CHANNELS,
+        },
+        "cubehelix" => ModeInfo {
+            mode_str: "cubehelix",
+            channels: HSL_CHANNELS,
+        },
+        "dlab" => ModeInfo {
+            mode_str: "dlab",
+            channels: LAB_CHANNELS,
+        },
+        "dlch" => ModeInfo {
+            mode_str: "dlch",
+            channels: LCH_CHANNELS,
+        },
+        "jab" => ModeInfo {
+            mode_str: "jab",
+            channels: JAB_CHANNELS,
+        },
+        "jch" => ModeInfo {
+            mode_str: "jch",
+            channels: JCH_CHANNELS,
+        },
+        "yiq" => ModeInfo {
+            mode_str: "yiq",
+            channels: YIQ_CHANNELS,
+        },
+        "hsi" => ModeInfo {
+            mode_str: "hsi",
+            channels: HSI_CHANNELS,
+        },
+        "hsluv" => ModeInfo {
+            mode_str: "hsluv",
+            channels: HSL_CHANNELS,
+        },
+        "hpluv" => ModeInfo {
+            mode_str: "hpluv",
+            channels: HSL_CHANNELS,
+        },
+        "okhsl" => ModeInfo {
+            mode_str: "okhsl",
+            channels: HSL_CHANNELS,
+        },
+        "okhsv" => ModeInfo {
+            mode_str: "okhsv",
+            channels: HSV_CHANNELS,
+        },
+        "itp" => ModeInfo {
+            mode_str: "itp",
+            channels: ITP_CHANNELS,
+        },
+        "xyb" => ModeInfo {
+            mode_str: "xyb",
+            channels: XYB_CHANNELS,
+        },
+        "luv" => ModeInfo {
+            mode_str: "luv",
+            channels: LUV_CHANNELS,
+        },
+        "lchuv" => ModeInfo {
+            mode_str: "lchuv",
+            channels: LCH_CHANNELS,
         },
         other => panic!("interpolate: unknown mode '{other}'"),
     }
@@ -518,6 +701,159 @@ fn decompose(c: Color, mode: &str) -> ([f64; 3], f64) {
             let v: Xyz65 = color_to_xyz65(c);
             ([v.x, v.y, v.z], alpha_to_f64(v.alpha))
         }
+        "p3" => {
+            let v: P3 = match c {
+                Color::P3(x) => x,
+                other => convert::<Xyz65, P3>(color_to_xyz65(other)),
+            };
+            ([v.r, v.g, v.b], alpha_to_f64(v.alpha))
+        }
+        "rec2020" => {
+            let v: Rec2020 = match c {
+                Color::Rec2020(x) => x,
+                other => convert::<Xyz65, Rec2020>(color_to_xyz65(other)),
+            };
+            ([v.r, v.g, v.b], alpha_to_f64(v.alpha))
+        }
+        "a98" => {
+            let v: A98 = match c {
+                Color::A98(x) => x,
+                other => convert::<Xyz65, A98>(color_to_xyz65(other)),
+            };
+            ([v.r, v.g, v.b], alpha_to_f64(v.alpha))
+        }
+        "prophoto" => {
+            let v: ProphotoRgb = match c {
+                Color::ProphotoRgb(x) => x,
+                other => convert::<Xyz65, ProphotoRgb>(color_to_xyz65(other)),
+            };
+            ([v.r, v.g, v.b], alpha_to_f64(v.alpha))
+        }
+        "cubehelix" => {
+            let v: Cubehelix = match c {
+                Color::Cubehelix(x) => x,
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
+            };
+            ([v.h, v.s, v.l], alpha_to_f64(v.alpha))
+        }
+        "dlab" => {
+            let v: Dlab = match c {
+                Color::Dlab(x) => x,
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
+            };
+            ([v.l, v.a, v.b], alpha_to_f64(v.alpha))
+        }
+        "dlch" => {
+            let v: Dlch = match c {
+                Color::Dlch(x) => x,
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
+            };
+            ([v.l, v.c, v.h], alpha_to_f64(v.alpha))
+        }
+        "jab" => {
+            let v: Jab = match c {
+                Color::Jab(x) => x,
+                Color::Jch(x) => x.into(),
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
+            };
+            ([v.j, v.a, v.b], alpha_to_f64(v.alpha))
+        }
+        "jch" => {
+            let v: Jch = match c {
+                Color::Jch(x) => x,
+                Color::Jab(x) => x.into(),
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
+            };
+            ([v.j, v.c, v.h], alpha_to_f64(v.alpha))
+        }
+        "yiq" => {
+            let v: Yiq = match c {
+                Color::Yiq(x) => x,
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
+            };
+            ([v.y, v.i, v.q], alpha_to_f64(v.alpha))
+        }
+        "hsi" => {
+            let v: Hsi = match c {
+                Color::Hsi(x) => x,
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
+            };
+            ([v.h, v.s, v.i], alpha_to_f64(v.alpha))
+        }
+        "hsluv" => {
+            let v: Hsluv = match c {
+                Color::Hsluv(x) => x,
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
+            };
+            ([v.h, v.s, v.l], alpha_to_f64(v.alpha))
+        }
+        "hpluv" => {
+            let v: Hpluv = match c {
+                Color::Hpluv(x) => x,
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
+            };
+            ([v.h, v.s, v.l], alpha_to_f64(v.alpha))
+        }
+        "okhsl" => {
+            let v: Okhsl = match c {
+                Color::Okhsl(x) => x,
+                Color::Rgb(x) => x.into(),
+                Color::Oklab(x) => x.into(),
+                other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
+            };
+            ([v.h, v.s, v.l], alpha_to_f64(v.alpha))
+        }
+        "okhsv" => {
+            let v: Okhsv = match c {
+                Color::Okhsv(x) => x,
+                Color::Rgb(x) => x.into(),
+                Color::Oklab(x) => x.into(),
+                other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
+            };
+            ([v.h, v.s, v.v], alpha_to_f64(v.alpha))
+        }
+        "itp" => {
+            let v: Itp = match c {
+                Color::Itp(x) => x,
+                other => convert::<Xyz65, Itp>(color_to_xyz65(other)),
+            };
+            ([v.i, v.t, v.p], alpha_to_f64(v.alpha))
+        }
+        "xyb" => {
+            let v: Xyb = match c {
+                Color::Xyb(x) => x,
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, Rgb>(color_to_xyz65(other)).into(),
+            };
+            ([v.x, v.y, v.b], alpha_to_f64(v.alpha))
+        }
+        "luv" => {
+            let v: Luv = match c {
+                Color::Luv(x) => x,
+                Color::Lchuv(x) => x.into(),
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, Luv>(color_to_xyz65(other)),
+            };
+            ([v.l, v.u, v.v], alpha_to_f64(v.alpha))
+        }
+        "lchuv" => {
+            let v: Lchuv = match c {
+                Color::Lchuv(x) => x,
+                Color::Luv(x) => x.into(),
+                Color::Rgb(x) => x.into(),
+                other => convert::<Xyz65, Luv>(color_to_xyz65(other)).into(),
+            };
+            ([v.l, v.c, v.h], alpha_to_f64(v.alpha))
+        }
         _ => unreachable!("mode_info already validated"),
     }
 }
@@ -625,6 +961,120 @@ fn compose(mode: &str, channels: &[f64], alpha: Option<f64>) -> Color {
             x: channels[0],
             y: channels[1],
             z: channels[2],
+            alpha,
+        }),
+        "p3" => Color::P3(P3 {
+            r: channels[0],
+            g: channels[1],
+            b: channels[2],
+            alpha,
+        }),
+        "rec2020" => Color::Rec2020(Rec2020 {
+            r: channels[0],
+            g: channels[1],
+            b: channels[2],
+            alpha,
+        }),
+        "a98" => Color::A98(A98 {
+            r: channels[0],
+            g: channels[1],
+            b: channels[2],
+            alpha,
+        }),
+        "prophoto" => Color::ProphotoRgb(ProphotoRgb {
+            r: channels[0],
+            g: channels[1],
+            b: channels[2],
+            alpha,
+        }),
+        "cubehelix" => Color::Cubehelix(Cubehelix {
+            h: channels[0],
+            s: channels[1],
+            l: channels[2],
+            alpha,
+        }),
+        "dlab" => Color::Dlab(Dlab {
+            l: channels[0],
+            a: channels[1],
+            b: channels[2],
+            alpha,
+        }),
+        "dlch" => Color::Dlch(Dlch {
+            l: channels[0],
+            c: channels[1],
+            h: channels[2],
+            alpha,
+        }),
+        "jab" => Color::Jab(Jab {
+            j: channels[0],
+            a: channels[1],
+            b: channels[2],
+            alpha,
+        }),
+        "jch" => Color::Jch(Jch {
+            j: channels[0],
+            c: channels[1],
+            h: channels[2],
+            alpha,
+        }),
+        "yiq" => Color::Yiq(Yiq {
+            y: channels[0],
+            i: channels[1],
+            q: channels[2],
+            alpha,
+        }),
+        "hsi" => Color::Hsi(Hsi {
+            h: channels[0],
+            s: channels[1],
+            i: channels[2],
+            alpha,
+        }),
+        "hsluv" => Color::Hsluv(Hsluv {
+            h: channels[0],
+            s: channels[1],
+            l: channels[2],
+            alpha,
+        }),
+        "hpluv" => Color::Hpluv(Hpluv {
+            h: channels[0],
+            s: channels[1],
+            l: channels[2],
+            alpha,
+        }),
+        "okhsl" => Color::Okhsl(Okhsl {
+            h: channels[0],
+            s: channels[1],
+            l: channels[2],
+            alpha,
+        }),
+        "okhsv" => Color::Okhsv(Okhsv {
+            h: channels[0],
+            s: channels[1],
+            v: channels[2],
+            alpha,
+        }),
+        "itp" => Color::Itp(Itp {
+            i: channels[0],
+            t: channels[1],
+            p: channels[2],
+            alpha,
+        }),
+        "xyb" => Color::Xyb(Xyb {
+            x: channels[0],
+            y: channels[1],
+            b: channels[2],
+            alpha,
+        }),
+        "luv" => Color::Luv(Luv {
+            l: channels[0],
+            u: channels[1],
+            v: channels[2],
+            alpha,
+        }),
+        "lchuv" => Color::Lchuv(Lchuv {
+            l: channels[0],
+            c: channels[1],
+            h: channels[2],
             alpha,
         }),
         _ => unreachable!("mode_info already validated"),

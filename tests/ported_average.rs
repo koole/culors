@@ -5,7 +5,9 @@
 //! the `node -e` snippets in the wave brief. Each numeric expected value
 //! was produced by `culori.average([...], '<mode>')` and pasted in.
 
-use culor::spaces::{Hsl, Lab, Lch, Oklab, Oklch, Rgb};
+use culor::spaces::{
+    Cubehelix, Hsi, Hsl, Itp, Jab, Jch, Lab, Lch, Lchuv, Oklab, Oklch, Rgb, Xyb, Yiq, P3,
+};
 use culor::{average, average_angle, average_number, parse, Color};
 
 const EPS: f64 = 1e-12;
@@ -451,4 +453,118 @@ fn average_hsl_struct_with_explicit_nan_hue() {
 #[should_panic(expected = "unknown mode")]
 fn average_unknown_mode_panics() {
     let _ = average(&[red()], "nope");
+}
+
+// ----- v0.4 long-tail modes (culori reference values) ------------------
+
+const TOL: f64 = 1e-9;
+
+#[track_caller]
+fn approx_tol(label: &str, a: f64, b: f64) {
+    let diff = (a - b).abs();
+    assert!(
+        diff <= TOL,
+        "{label}: actual={a}, expected={b}, diff={diff}"
+    );
+}
+
+#[test]
+fn average_p3_red_blue_matches_culori() {
+    let out = average(&[red(), blue()], "p3");
+    let Color::P3(P3 { r, g, b, .. }) = out else {
+        panic!("expected P3")
+    };
+    approx_tol("r", r, 0.4587437786625832);
+    approx_tol("g", g, 0.1001434038704231);
+    approx_tol("b", b, 0.5490743089434619);
+}
+
+#[test]
+fn average_cubehelix_red_blue_matches_culori() {
+    let out = average(&[red(), blue()], "cubehelix");
+    let Color::Cubehelix(Cubehelix { h, s, l, .. }) = out else {
+        panic!("expected Cubehelix")
+    };
+    // Hue is a circular mean over -90 and 678.7524... → wraps near 294.376°.
+    approx_tol("h", h, 294.3762167240816);
+    approx_tol("s", s, 3.281642256705994);
+    approx_tol("l", l, 0.20499949744362608);
+}
+
+#[test]
+fn average_hsi_red_blue_matches_culori() {
+    let out = average(&[red(), blue()], "hsi");
+    let Color::Hsi(Hsi { h, s, i, .. }) = out else {
+        panic!("expected Hsi")
+    };
+    // Red h=0, blue h=240 — circular mean = 300°.
+    approx_tol("h", h, 300.0);
+    approx_tol("s", s, 1.0);
+    approx_tol("i", i, 1.0 / 3.0);
+}
+
+#[test]
+fn average_lchuv_red_green_blue_matches_culori() {
+    let out = average(&[red(), green(), blue()], "lchuv");
+    let Color::Lchuv(Lchuv { l, c, h, .. }) = out else {
+        panic!("expected Lchuv")
+    };
+    approx_tol("l", l, 43.378849709298215);
+    approx_tol("c", c, 121.20646152188696);
+    approx_tol("h", h, 326.16018341786383);
+}
+
+#[test]
+fn average_jab_red_blue_matches_culori() {
+    let out = average(&[red(), blue()], "jab");
+    let Color::Jab(Jab { j, a, b, .. }) = out else {
+        panic!("expected Jab")
+    };
+    approx_tol("j", j, 0.11507951159827312);
+    approx_tol("a", a, 0.03851988325365877);
+    approx_tol("b", b, -0.03698808796696061);
+}
+
+#[test]
+fn average_jch_red_blue_matches_culori() {
+    let out = average(&[red(), blue()], "jch");
+    let Color::Jch(Jch { j, c, h, .. }) = out else {
+        panic!("expected Jch")
+    };
+    approx_tol("j", j, 0.11507951159827312);
+    approx_tol("c", c, 0.17640622812012802);
+    approx_tol("h", h, 330.55370450172734);
+}
+
+#[test]
+fn average_itp_red_blue_matches_culori() {
+    let out = average(&[red(), blue()], "itp");
+    let Color::Itp(Itp { i, t, p, .. }) = out else {
+        panic!("expected Itp")
+    };
+    approx_tol("i", i, 0.39193195619466953);
+    approx_tol("t", t, 0.07681489789925641);
+    approx_tol("p", p, 0.0586789248460263);
+}
+
+#[test]
+fn average_xyb_red_blue_matches_culori() {
+    let out = average(&[red(), blue()], "xyb");
+    let Color::Xyb(Xyb { x, y, b, .. }) = out else {
+        panic!("expected Xyb")
+    };
+    approx_tol("x", x, 0.014050041580638661);
+    approx_tol("y", y, 0.3831581991945666);
+    approx_tol("b", b, 0.1857412196980236);
+}
+
+#[test]
+fn average_yiq_red_blue_matches_culori() {
+    let out = average(&[red(), blue()], "yiq");
+    let Color::Yiq(Yiq { y, i, q, .. }) = out else {
+        panic!("expected Yiq")
+    };
+    approx_tol("y", y, 0.20668877000000002);
+    approx_tol("i", i, 0.13708805);
+    approx_tol("q", q, 0.261308555);
 }

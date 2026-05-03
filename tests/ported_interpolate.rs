@@ -4,7 +4,10 @@
 //! { const f = c.interpolate([...], 'mode'); console.log(JSON.stringify(f(t)));
 //! })"` against the version of culori vendored in `node_modules/`.
 
-use culor::spaces::{Hsl, Hwb, Lab, Lch, Oklab, Oklch, Rgb};
+use culor::spaces::{
+    Cubehelix, Dlab, Dlch, Hsi, Hsl, Hwb, Itp, Jab, Jch, Lab, Lch, Lchuv, Luv, Okhsl, Okhsv, Oklab,
+    Oklch, ProphotoRgb, Rec2020, Rgb, Xyb, Yiq, A98, P3,
+};
 use culor::{interpolate, interpolate_with, Color, HueFixup, InterpolateOptions};
 
 const TOL: f64 = 1e-10;
@@ -422,4 +425,238 @@ fn per_channel_easing_only_affects_that_channel() {
     assert_close(out.b, -21.069364863606836, "b (linear)");
     // L at eased t=0.25 should match the linear-quarter L value.
     assert_close(out.l, 48.10998149858844, "l (eased to quarter)");
+}
+
+// ----- v0.4 long-tail modes (culori reference values) ------------------
+
+#[test]
+fn p3_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "p3");
+    let Color::P3(P3 { r, g, b, .. }) = f(0.5) else {
+        panic!("expected P3")
+    };
+    assert_close(r, 0.4587437786625832, "r");
+    assert_close(g, 0.1001434038704231, "g");
+    assert_close(b, 0.5490743089434619, "b");
+}
+
+#[test]
+fn rec2020_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "rec2020");
+    let Color::Rec2020(Rec2020 { r, g, b, .. }) = f(0.5) else {
+        panic!("expected Rec2020")
+    };
+    assert_close(r, 0.4801732411926725, "r");
+    assert_close(g, 0.14105305242959412, "g");
+    assert_close(b, 0.5102727791253909, "b");
+}
+
+#[test]
+fn a98_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "a98");
+    let Color::A98(A98 { r, g, b, .. }) = f(0.5) else {
+        panic!("expected A98")
+    };
+    assert_close(r, 0.42929577333089874, "r");
+    assert_close(g, -4.796489868265625e-8, "g");
+    assert_close(b, 0.4905343872139412, "b");
+}
+
+#[test]
+fn prophoto_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "prophoto");
+    let Color::ProphotoRgb(ProphotoRgb { r, g, b, .. }) = f(0.5) else {
+        panic!("expected ProphotoRgb")
+    };
+    assert_close(r, 0.5192266914172228, "r");
+    assert_close(g, 0.2066753874789284, "g");
+    assert_close(b, 0.5132068387306806, "b");
+}
+
+#[test]
+fn cubehelix_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "cubehelix");
+    let Color::Cubehelix(Cubehelix { h, s, l, .. }) = f(0.5) else {
+        panic!("expected Cubehelix")
+    };
+    assert_close(h, 294.3762167240816, "h");
+    assert_close(s, 3.281642256705994, "s");
+    assert_close(l, 0.20499949744362608, "l");
+}
+
+#[test]
+fn dlab_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "dlab");
+    let Color::Dlab(Dlab { l, a, b, .. }) = f(0.5) else {
+        panic!("expected Dlab")
+    };
+    assert_close(l, 46.65955474529936, "l");
+    assert_close(a, 35.7165035799803, "a");
+    assert_close(b, -4.932428304208742, "b");
+}
+
+#[test]
+fn dlch_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "dlch");
+    let Color::Dlch(Dlch { l, c, h, .. }) = f(0.5) else {
+        panic!("expected Dlch")
+    };
+    assert_close(l, 46.65955474529936, "l");
+    assert_close(c, 50.69955531984588, "c");
+    assert_close(h, -6.98567924934116, "h");
+}
+
+#[test]
+fn jab_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "jab");
+    let Color::Jab(Jab { j, a, b, .. }) = f(0.5) else {
+        panic!("expected Jab")
+    };
+    assert_close(j, 0.11507951159827312, "j");
+    assert_close(a, 0.03851988325365878, "a");
+    assert_close(b, -0.0369880879669606, "b");
+}
+
+#[test]
+fn jch_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "jch");
+    let Color::Jch(Jch { j, c, h, .. }) = f(0.5) else {
+        panic!("expected Jch")
+    };
+    assert_close(j, 0.11507951159827312, "j");
+    assert_close(c, 0.17640622812012802, "c");
+    assert_close(h, -29.446295498272654, "h");
+}
+
+#[test]
+fn yiq_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "yiq");
+    let Color::Yiq(Yiq { y, i, q, .. }) = f(0.5) else {
+        panic!("expected Yiq")
+    };
+    assert_close(y, 0.20668877000000002, "y");
+    assert_close(i, 0.13708805000000002, "i");
+    assert_close(q, 0.261308555, "q");
+}
+
+#[test]
+fn hsi_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "hsi");
+    let Color::Hsi(Hsi { h, s, i, .. }) = f(0.5) else {
+        panic!("expected Hsi")
+    };
+    assert_close(h, -60.0, "h");
+    assert_close(s, 1.0, "s");
+    assert_close(i, 1.0 / 3.0, "i");
+}
+
+#[test]
+fn okhsl_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "okhsl");
+    let Color::Okhsl(Okhsl { h, s, l, .. }) = f(0.5) else {
+        panic!("expected Okhsl")
+    };
+    assert_close(h, -33.35704855200113, "h");
+    assert_close(s, 1.0000000004900826, "s");
+    assert_close(l, 0.46732499775339253, "l");
+}
+
+#[test]
+fn okhsv_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "okhsv");
+    let Color::Okhsv(Okhsv { h, s, v, .. }) = f(0.5) else {
+        panic!("expected Okhsv")
+    };
+    assert_close(h, -33.35704855200113, "h");
+    assert_close(s, 0.9997565431956061, "s");
+    assert_close(v, 1.0, "v");
+}
+
+#[test]
+fn itp_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "itp");
+    let Color::Itp(Itp { i, t, p, .. }) = f(0.5) else {
+        panic!("expected Itp")
+    };
+    assert_close(i, 0.39193195619466953, "i");
+    assert_close(t, 0.07681489789925641, "t");
+    assert_close(p, 0.0586789248460263, "p");
+}
+
+#[test]
+fn xyb_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "xyb");
+    let Color::Xyb(Xyb { x, y, b, .. }) = f(0.5) else {
+        panic!("expected Xyb")
+    };
+    assert_close(x, 0.014050041580638661, "x");
+    assert_close(y, 0.3831581991945666, "y");
+    assert_close(b, 0.1857412196980236, "b");
+}
+
+#[test]
+fn luv_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "luv");
+    let Color::Luv(Luv { l, u, v, .. }) = f(0.5) else {
+        panic!("expected Luv")
+    };
+    assert_close(l, 41.92942005020719, "l");
+    assert_close(u, 81.74575754669908, "u");
+    assert_close(v, -48.00662844150128, "v");
+}
+
+#[test]
+fn lchuv_red_blue_midpoint() {
+    let f = interpolate(&[red(), blue()], "lchuv");
+    let Color::Lchuv(Lchuv { l, c, h, .. }) = f(0.5) else {
+        panic!("expected Lchuv")
+    };
+    assert_close(l, 41.92942005020719, "l");
+    assert_close(c, 149.73090975405557, "c");
+    assert_close(h, -43.486376862254694, "h");
+}
+
+#[test]
+fn p3_red_white_midpoint() {
+    let white = Color::Rgb(Rgb {
+        r: 1.0,
+        g: 1.0,
+        b: 1.0,
+        alpha: None,
+    });
+    let f = interpolate(&[red(), white], "p3");
+    let Color::P3(P3 { r, g, b, .. }) = f(0.5) else {
+        panic!("expected P3")
+    };
+    assert_close(r, 0.9587437786625828, "r");
+    assert_close(g, 0.6001434038704232, "g");
+    assert_close(b, 0.5692802956055569, "b");
+}
+
+#[test]
+fn cubehelix_red_blue_quarter() {
+    let f = interpolate(&[red(), blue()], "cubehelix");
+    let Color::Cubehelix(Cubehelix { h, s, l, .. }) = f(0.25) else {
+        panic!("expected Cubehelix")
+    };
+    assert_close(h, 323.09323924746184, "h");
+    assert_close(s, 2.615269951039131, "s");
+    assert_close(l, 0.25249947137943424, "l");
+}
+
+#[test]
+fn lchuv_red_green_midpoint() {
+    let green = Color::Rgb(Rgb {
+        r: 0.0,
+        g: 1.0,
+        b: 0.0,
+        alpha: None,
+    });
+    let f = interpolate(&[red(), green], "lchuv");
+    let Color::Lchuv(Lchuv { l, c, h, .. }) = f(0.5) else {
+        panic!("expected Lchuv")
+    };
+    assert_close(l, 71.05453963906085, "l");
+    assert_close(c, 149.3488227277694, "c");
+    assert_close(h, 71.33273562157414, "h");
 }
