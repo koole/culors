@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Color interpolation: `interpolate(colors, mode)` returns a closure `Fn(f64) -> Color` that, given `t` in `[0, 1]`, produces an interpolated color in the requested space. `interpolate_with(colors, mode, options)` exposes per-channel easing and hue-fixup configuration.
+- Hue-fixup strategies for cylindrical spaces: `Shorter` (default, CSS Color Module 4), `Longer`, `Increasing`, `Decreasing`, and `Raw`. The fixup is applied incrementally across stops, matching culori 4.0.2.
+- Multi-stop interpolation with even spacing of intermediate colors, plus per-channel easing functions and a global easing override.
+
 ## [0.1.0] - 2026-05-03
 
 ### Added
