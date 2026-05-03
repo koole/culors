@@ -70,11 +70,22 @@ fn parse_method(s: &str) -> Option<Method> {
     }
     let space = iter.next()?.to_ascii_lowercase();
     let mode = space_to_mode(&space)?;
-    let hue = parse_hue_method(&mut iter)?;
+    // Per CSS Color Module 5, <hue-interpolation-method> only follows a
+    // <polar-color-space>. For rectangular spaces any trailing tokens
+    // make the input malformed.
+    let hue = if is_polar(mode) {
+        parse_hue_method(&mut iter)?
+    } else {
+        HueFixup::Shorter
+    };
     if iter.next().is_some() {
         return None;
     }
     Some(Method { mode, hue })
+}
+
+fn is_polar(mode: &str) -> bool {
+    matches!(mode, "hsl" | "hwb" | "lch" | "oklch")
 }
 
 fn parse_hue_method<'a>(iter: &mut impl Iterator<Item = &'a str>) -> Option<HueFixup> {

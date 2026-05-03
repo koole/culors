@@ -365,3 +365,29 @@ fn nested_color_mix_resolves() {
     assert_close("g", c.g, 0.5);
     assert_close("b", c.b, 0.75);
 }
+
+#[test]
+fn color_mix_rejects_hue_method_on_rectangular_space() {
+    // Per CSS Color Module 5, hue-interpolation-method is only valid for
+    // polar color spaces (hsl, hwb, lch, oklch).
+    assert!(parse("color-mix(in srgb shorter hue, red, blue)").is_none());
+    assert!(parse("color-mix(in lab longer hue, red, blue)").is_none());
+    assert!(parse("color-mix(in oklab increasing hue, red, blue)").is_none());
+    assert!(parse("color-mix(in xyz shorter hue, red, blue)").is_none());
+    assert!(parse("color-mix(in srgb-linear longer hue, red, blue)").is_none());
+}
+
+#[test]
+fn color_mix_accepts_hue_method_only_on_polar_space() {
+    assert!(parse("color-mix(in hsl shorter hue, red, blue)").is_some());
+    assert!(parse("color-mix(in oklch longer hue, red, blue)").is_some());
+    assert!(parse("color-mix(in lch increasing hue, red, blue)").is_some());
+    assert!(parse("color-mix(in hwb decreasing hue, red, blue)").is_some());
+}
+
+#[test]
+fn color_mix_rejects_strategy_without_hue_keyword() {
+    // Per the grammar, the literal `hue` keyword is required after the strategy.
+    assert!(parse("color-mix(in hsl shorter, red, blue)").is_none());
+    assert!(parse("color-mix(in oklch longer, red, blue)").is_none());
+}

@@ -34,6 +34,8 @@ const SPACE_TO_MODE = {
   'xyz-d65': 'xyz65',
 };
 
+const POLAR_MODES = new Set(['hsl', 'hwb', 'lch', 'oklch']);
+
 function alphaOf(c) {
   return c.alpha === undefined ? 1 : c.alpha;
 }
@@ -70,12 +72,13 @@ export function mixCss(input) {
   const methodPart = parts[0].trim();
   const c1Part = parts[1].trim();
   const c2Part = parts[2].trim();
-  const methodMatch = methodPart.match(/^in\s+([a-zA-Z0-9-]+)(?:\s+(shorter|longer|increasing|decreasing)(?:\s+hue)?)?$/i);
+  const methodMatch = methodPart.match(/^in\s+([a-zA-Z0-9-]+)(?:\s+(shorter|longer|increasing|decreasing)\s+hue)?$/i);
   if (!methodMatch) throw new Error('bad method');
   const space = methodMatch[1].toLowerCase();
-  const hueStrategy = (methodMatch[2] || 'shorter').toLowerCase();
   const mode = SPACE_TO_MODE[space];
   if (!mode) throw new Error('unsupported space ' + space);
+  if (methodMatch[2] && !POLAR_MODES.has(mode)) throw new Error('hue method only valid for polar spaces');
+  const hueStrategy = (methodMatch[2] || 'shorter').toLowerCase();
 
   const [c1Str, p1] = splitColorAndPct(c1Part);
   const [c2Str, p2] = splitColorAndPct(c2Part);
