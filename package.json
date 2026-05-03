@@ -5,7 +5,8 @@
   "description": "Fixture generator for the culor Rust crate",
   "type": "module",
   "scripts": {
-    "gen-fixtures": "node fixtures-gen/generate.mjs"
+    "gen-fixtures": "node fixtures-gen/generate.mjs",
+    "gen-parse-fixtures": "node fixtures-gen/parse-fixtures.mjs"
   },
   "devDependencies": {
     "culori": "4.0.2"
