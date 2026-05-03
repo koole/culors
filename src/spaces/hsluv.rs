@@ -246,7 +246,6 @@ pub(crate) fn calculate_bounding_lines(l: f64) -> BoundingLines {
     }
 }
 
-#[allow(dead_code)] // used by Hpluv (next commit)
 #[inline]
 fn distance_from_origin(slope: f64, intercept: f64) -> f64 {
     intercept.abs() / (slope.powi(2) + 1.0).sqrt()
@@ -267,7 +266,6 @@ fn min6(a: f64, b: f64, c: f64, d: f64, e: f64, f: f64) -> f64 {
     a.min(b).min(c).min(d).min(e).min(f)
 }
 
-#[allow(dead_code)] // used by Hpluv (next commit)
 pub(crate) fn calc_max_chroma_hpluv(bl: &BoundingLines) -> f64 {
     min6(
         distance_from_origin(bl.r0s, bl.r0i),
