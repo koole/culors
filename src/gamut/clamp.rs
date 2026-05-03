@@ -77,6 +77,7 @@ fn convert_rgb_back_to_source_mode(rgb: Rgb, template: Color) -> Color {
         Color::Jch(_) => Color::Jch(crate::convert(rgb)),
         Color::Yiq(_) => Color::Yiq(rgb.into()),
         Color::Hsi(_) => Color::Hsi(rgb.into()),
+        Color::Hsluv(_) => Color::Hsluv(rgb.into()),
     }
 }
 
@@ -207,6 +208,7 @@ pub(crate) fn to_xyz65(c: Color) -> crate::spaces::Xyz65 {
         Color::Jch(x) => x.to_xyz65(),
         Color::Yiq(x) => x.to_xyz65(),
         Color::Hsi(x) => x.to_xyz65(),
+        Color::Hsluv(x) => x.to_xyz65(),
     }
 }
 
@@ -235,5 +237,6 @@ fn from_xyz65_in_mode_of(xyz: crate::spaces::Xyz65, template: Color) -> Color {
         Color::Jch(_) => Color::Jch(crate::spaces::Jch::from_xyz65(xyz)),
         Color::Yiq(_) => Color::Yiq(crate::spaces::Yiq::from_xyz65(xyz)),
         Color::Hsi(_) => Color::Hsi(crate::spaces::Hsi::from_xyz65(xyz)),
+        Color::Hsluv(_) => Color::Hsluv(crate::spaces::Hsluv::from_xyz65(xyz)),
     }
 }
