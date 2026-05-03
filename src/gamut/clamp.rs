@@ -66,6 +66,10 @@ fn convert_rgb_back_to_source_mode(rgb: Rgb, template: Color) -> Color {
         Color::Oklch(_) => Color::Oklch(rgb.into()),
         Color::Xyz50(_) => Color::Xyz50(crate::convert(rgb)),
         Color::Xyz65(_) => Color::Xyz65(crate::convert(rgb)),
+        Color::P3(_) => Color::P3(crate::convert(rgb)),
+        Color::Rec2020(_) => Color::Rec2020(crate::convert(rgb)),
+        Color::A98(_) => Color::A98(crate::convert(rgb)),
+        Color::ProphotoRgb(_) => Color::ProphotoRgb(crate::convert(rgb)),
     }
 }
 
@@ -185,6 +189,10 @@ pub(crate) fn to_xyz65(c: Color) -> crate::spaces::Xyz65 {
         Color::Oklch(x) => x.to_xyz65(),
         Color::Xyz50(x) => x.to_xyz65(),
         Color::Xyz65(x) => x,
+        Color::P3(x) => x.to_xyz65(),
+        Color::Rec2020(x) => x.to_xyz65(),
+        Color::A98(x) => x.to_xyz65(),
+        Color::ProphotoRgb(x) => x.to_xyz65(),
     }
 }
 
@@ -202,5 +210,9 @@ fn from_xyz65_in_mode_of(xyz: crate::spaces::Xyz65, template: Color) -> Color {
         Color::Oklch(_) => Color::Oklch(Oklch::from_xyz65(xyz)),
         Color::Xyz50(_) => Color::Xyz50(crate::spaces::Xyz50::from_xyz65(xyz)),
         Color::Xyz65(_) => Color::Xyz65(xyz),
+        Color::P3(_) => Color::P3(crate::spaces::P3::from_xyz65(xyz)),
+        Color::Rec2020(_) => Color::Rec2020(crate::spaces::Rec2020::from_xyz65(xyz)),
+        Color::A98(_) => Color::A98(crate::spaces::A98::from_xyz65(xyz)),
+        Color::ProphotoRgb(_) => Color::ProphotoRgb(crate::spaces::ProphotoRgb::from_xyz65(xyz)),
     }
 }

@@ -1,5 +1,6 @@
 //! Color-space implementations. One module per space.
 
+mod a98;
 mod hsl;
 mod hsv;
 mod hwb;
@@ -8,10 +9,14 @@ mod lch;
 mod lrgb;
 mod oklab;
 mod oklch;
+mod p3;
+mod prophoto;
+mod rec2020;
 mod rgb;
 mod xyz50;
 mod xyz65;
 
+pub use a98::A98;
 pub use hsl::Hsl;
 pub use hsv::Hsv;
 pub use hwb::Hwb;
@@ -20,6 +25,9 @@ pub use lch::Lch;
 pub use lrgb::LinearRgb;
 pub use oklab::Oklab;
 pub use oklch::Oklch;
+pub use p3::P3;
+pub use prophoto::ProphotoRgb;
+pub use rec2020::Rec2020;
 pub use rgb::Rgb;
 pub use xyz50::Xyz50;
 pub use xyz65::Xyz65;

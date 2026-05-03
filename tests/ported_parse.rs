@@ -375,11 +375,23 @@ fn color_xyz_d50() {
 }
 
 #[test]
-fn color_unsupported_profiles_return_none() {
-    assert!(parse("color(display-p3 1 0 0)").is_none());
-    assert!(parse("color(rec2020 1 0 0)").is_none());
-    assert!(parse("color(prophoto-rgb 1 0 0)").is_none());
-    assert!(parse("color(a98-rgb 1 0 0)").is_none());
+fn color_wide_gamut_profiles() {
+    let Color::P3(c) = parse("color(display-p3 1 0 0)").unwrap() else {
+        panic!("expected P3");
+    };
+    assert_eq!(c.r, 1.0);
+    assert_eq!(c.g, 0.0);
+    assert_eq!(c.b, 0.0);
+    let Color::Rec2020(_) = parse("color(rec2020 0.25 0.5 0.75)").unwrap() else {
+        panic!("expected Rec2020");
+    };
+    let Color::ProphotoRgb(_) = parse("color(prophoto-rgb 1 1 1)").unwrap() else {
+        panic!("expected ProphotoRgb");
+    };
+    let Color::A98(c) = parse("color(a98-rgb 0.5 0.5 0.5 / 0.4)").unwrap() else {
+        panic!("expected A98");
+    };
+    assert_eq!(c.alpha, Some(0.4));
 }
 
 #[test]

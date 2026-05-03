@@ -16,9 +16,8 @@
 //!    `lab()`, `lch()`, `oklab()`, `oklch()`, `color()`). Function names
 //!    are case-sensitive in culori; we mirror that.
 //!
-//! `color()` profiles supported in v0.1: `srgb`, `srgb-linear`, `xyz`,
-//! `xyz-d50`, `xyz-d65`. Other profiles (`display-p3`, `rec2020`,
-//! `prophoto-rgb`, `a98-rgb`) return `None` until those spaces land.
+//! `color()` profiles supported: `srgb`, `srgb-linear`, `xyz`, `xyz-d50`,
+//! `xyz-d65`, `display-p3`, `rec2020`, `a98-rgb`, `prophoto-rgb`.
 
 pub(crate) mod color_mix;
 pub(crate) mod functional;
@@ -32,9 +31,7 @@ use crate::spaces::Rgb;
 ///
 /// Returns `None` if the input does not parse as any supported syntax.
 /// The grammar matches CSS Color Module 4 with the same set of profiles
-/// culori 4.0.2 ships, except that `color()` profiles for spaces culor
-/// has not yet implemented (`display-p3`, `rec2020`, `prophoto-rgb`,
-/// `a98-rgb`) return `None` until those spaces land.
+/// culori 4.0.2 ships.
 ///
 /// Out-of-range channel values pass through unclamped, mirroring culori.
 /// `none` channels become `f64::NAN` for that channel; `none` for alpha

@@ -185,6 +185,10 @@ fn color_to_xyz65(c: Color) -> Xyz65 {
         Color::Oklch(x) => x.to_xyz65(),
         Color::Xyz50(x) => x.to_xyz65(),
         Color::Xyz65(x) => x,
+        Color::P3(x) => x.to_xyz65(),
+        Color::Rec2020(x) => x.to_xyz65(),
+        Color::A98(x) => x.to_xyz65(),
+        Color::ProphotoRgb(x) => x.to_xyz65(),
     }
 }
 

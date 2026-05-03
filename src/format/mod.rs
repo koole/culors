@@ -58,5 +58,9 @@ pub fn format_css(color: &Color) -> String {
         Color::Lch(c) => css::format_lch_like("lch", c.l, c.c, c.h, c.alpha),
         Color::Oklab(c) => css::format_lab_like("oklab", c.l, c.a, c.b, c.alpha),
         Color::Oklch(c) => css::format_lch_like("oklch", c.l, c.c, c.h, c.alpha),
+        Color::P3(c) => css::format_color_fn("display-p3", &[c.r, c.g, c.b], c.alpha),
+        Color::Rec2020(c) => css::format_color_fn("rec2020", &[c.r, c.g, c.b], c.alpha),
+        Color::A98(c) => css::format_color_fn("a98-rgb", &[c.r, c.g, c.b], c.alpha),
+        Color::ProphotoRgb(c) => css::format_color_fn("prophoto-rgb", &[c.r, c.g, c.b], c.alpha),
     }
 }

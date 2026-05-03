@@ -61,5 +61,9 @@ pub(crate) fn color_to_rgb(c: Color) -> Rgb {
         Color::Oklch(x) => crate::convert::<crate::spaces::Oklch, Rgb>(x),
         Color::Xyz50(x) => crate::convert::<crate::spaces::Xyz50, Rgb>(x),
         Color::Xyz65(x) => crate::convert::<crate::spaces::Xyz65, Rgb>(x),
+        Color::P3(x) => crate::convert::<crate::spaces::P3, Rgb>(x),
+        Color::Rec2020(x) => crate::convert::<crate::spaces::Rec2020, Rgb>(x),
+        Color::A98(x) => crate::convert::<crate::spaces::A98, Rgb>(x),
+        Color::ProphotoRgb(x) => crate::convert::<crate::spaces::ProphotoRgb, Rgb>(x),
     }
 }

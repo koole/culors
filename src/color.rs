@@ -1,6 +1,9 @@
 //! Dynamic color enum.
 
-use crate::spaces::{Hsl, Hsv, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
+use crate::spaces::{
+    Hsl, Hsv, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb, Xyz50, Xyz65, A98,
+    P3,
+};
 
 /// Tagged union over every supported color space. Variants are added as each
 /// space lands.
@@ -28,6 +31,14 @@ pub enum Color {
     Xyz50(Xyz50),
     /// CIE XYZ D65.
     Xyz65(Xyz65),
+    /// Display P3.
+    P3(P3),
+    /// Rec. 2020.
+    Rec2020(Rec2020),
+    /// Adobe RGB (1998).
+    A98(A98),
+    /// ProPhoto RGB.
+    ProphotoRgb(ProphotoRgb),
 }
 
 impl From<Rgb> for Color {
@@ -93,5 +104,29 @@ impl From<Xyz50> for Color {
 impl From<Xyz65> for Color {
     fn from(c: Xyz65) -> Self {
         Color::Xyz65(c)
+    }
+}
+
+impl From<P3> for Color {
+    fn from(c: P3) -> Self {
+        Color::P3(c)
+    }
+}
+
+impl From<Rec2020> for Color {
+    fn from(c: Rec2020) -> Self {
+        Color::Rec2020(c)
+    }
+}
+
+impl From<A98> for Color {
+    fn from(c: A98) -> Self {
+        Color::A98(c)
+    }
+}
+
+impl From<ProphotoRgb> for Color {
+    fn from(c: ProphotoRgb) -> Self {
+        Color::ProphotoRgb(c)
     }
 }

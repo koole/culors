@@ -19,7 +19,9 @@
 //! the field entirely.
 
 use crate::color::Color;
-use crate::spaces::{Hsl, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
+use crate::spaces::{
+    Hsl, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb, Xyz50, Xyz65, A98, P3,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) enum Tok {
@@ -813,8 +815,30 @@ fn parse_color_function(tokens: &[Token]) -> Option<Color> {
             z: c3,
             alpha,
         })),
-        // TODO(v0.4): display-p3, rec2020, prophoto-rgb, a98-rgb once
-        // those spaces land.
+        "display-p3" => Some(Color::P3(P3 {
+            r: c1,
+            g: c2,
+            b: c3,
+            alpha,
+        })),
+        "rec2020" => Some(Color::Rec2020(Rec2020 {
+            r: c1,
+            g: c2,
+            b: c3,
+            alpha,
+        })),
+        "a98-rgb" => Some(Color::A98(A98 {
+            r: c1,
+            g: c2,
+            b: c3,
+            alpha,
+        })),
+        "prophoto-rgb" => Some(Color::ProphotoRgb(ProphotoRgb {
+            r: c1,
+            g: c2,
+            b: c3,
+            alpha,
+        })),
         _ => None,
     }
 }
@@ -1267,10 +1291,18 @@ mod tests {
 
     #[test]
     fn color_unsupported_profile_returns_none() {
-        assert!(parse_functional("color(display-p3 1 0 0)").is_none());
-        assert!(parse_functional("color(rec2020 1 0 0)").is_none());
-        assert!(parse_functional("color(prophoto-rgb 1 0 0)").is_none());
-        assert!(parse_functional("color(a98-rgb 1 0 0)").is_none());
+        let Color::P3(_) = parse_functional("color(display-p3 1 0 0)").unwrap() else {
+            panic!("expected p3");
+        };
+        let Color::Rec2020(_) = parse_functional("color(rec2020 1 0 0)").unwrap() else {
+            panic!("expected rec2020");
+        };
+        let Color::ProphotoRgb(_) = parse_functional("color(prophoto-rgb 1 0 0)").unwrap() else {
+            panic!("expected prophoto");
+        };
+        let Color::A98(_) = parse_functional("color(a98-rgb 1 0 0)").unwrap() else {
+            panic!("expected a98");
+        };
     }
 
     #[test]

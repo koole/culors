@@ -9,7 +9,10 @@
 
 use culor::format_css;
 use culor::parse;
-use culor::spaces::{Hsl, Hsv, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, Rgb, Xyz50, Xyz65};
+use culor::spaces::{
+    Hsl, Hsv, Hwb, Lab, Lch, LinearRgb, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb, Xyz50, Xyz65, A98,
+    P3,
+};
 use culor::Color;
 
 // ---------- sRGB ----------
@@ -454,4 +457,54 @@ fn does_not_panic_on_extremes() {
         b: f64::NAN,
         alpha: None,
     }));
+}
+
+#[test]
+fn format_p3_roundtrip() {
+    let c = Color::P3(P3 {
+        r: 1.0,
+        g: 0.0,
+        b: 0.0,
+        alpha: None,
+    });
+    assert_eq!(format_css(&c), "color(display-p3 1 0 0)");
+    let parsed = parse("color(display-p3 1 0 0)").unwrap();
+    assert_eq!(format_css(&parsed), "color(display-p3 1 0 0)");
+}
+
+#[test]
+fn format_rec2020_with_alpha() {
+    let c = Color::Rec2020(Rec2020 {
+        r: 0.25,
+        g: 0.5,
+        b: 0.75,
+        alpha: Some(0.4),
+    });
+    assert_eq!(format_css(&c), "color(rec2020 0.25 0.5 0.75 / 0.4)");
+}
+
+#[test]
+fn format_a98_roundtrip() {
+    let c = Color::A98(A98 {
+        r: 0.5,
+        g: 0.5,
+        b: 0.5,
+        alpha: None,
+    });
+    assert_eq!(format_css(&c), "color(a98-rgb 0.5 0.5 0.5)");
+    let parsed = parse("color(a98-rgb 0.5 0.5 0.5)").unwrap();
+    assert_eq!(format_css(&parsed), "color(a98-rgb 0.5 0.5 0.5)");
+}
+
+#[test]
+fn format_prophoto_roundtrip() {
+    let c = Color::ProphotoRgb(ProphotoRgb {
+        r: 1.0,
+        g: 1.0,
+        b: 1.0,
+        alpha: None,
+    });
+    assert_eq!(format_css(&c), "color(prophoto-rgb 1 1 1)");
+    let parsed = parse("color(prophoto-rgb 1 1 1)").unwrap();
+    assert_eq!(format_css(&parsed), "color(prophoto-rgb 1 1 1)");
 }
