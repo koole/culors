@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Separable blend modes via `blend(colors, mode)` and the string-keyed `blend_str(colors, mode)`. The `BlendMode` enum covers every separable mode from CSS Compositing Level 1 § 5.7: `Normal`, `Multiply`, `Screen`, `HardLight`, `Overlay`, `Darken`, `Lighten`, `ColorDodge`, `ColorBurn`, `SoftLight`, `Difference`, `Exclusion`. Inputs are converted to sRGB, missing alphas default to `1`, and the stack folds left-to-right with Porter-Duff source-over: `αo = αs + αb·(1-αs)` then per channel `(αs·(1-αb)·s + αs·αb·B(b,s) + (1-αs)·αb·b) / αo` clipped to `[0, 1]`. Output is always `Color::Rgb`. Empty input panics, matching culori's `reduce` error. Per-mode formulae match culori 4.0.2's `src/blend.js` byte-for-byte, including its overlay branch (which differs from the CSS spec's swap-of-hard-light definition). The non-separable modes (`hue`, `saturation`, `color`, `luminosity`) are not implemented because culori 4.0.2 does not implement them.
 - ΔE color-difference factories. Each returns a closure `Fn(&Color, &Color) -> f64`, mirroring culori's curried API:
   - `difference_ciede76()` — Euclidean distance in D65 Lab.
   - `difference_ciede94(textiles)` and `difference_ciede94_with(kL, K1, K2)` — graphic-arts (default) and textile parametric variants.
