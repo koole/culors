@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-05-03
+
+Closes the public-API gap with culori 4.0.2 by adding the D65 Lab/Lch
+pair and three small utilities that round out the difference and palette
+toolset. No breaking changes from 1.0.0; everything below is additive.
+
+### Added
+
+- `Lab65` and `Lch65` color spaces (CIE Lab and CIE Lch with the D65
+  illuminant). Both implement `ColorSpace`, are reachable through the
+  generic `convert()` hub, and round-trip through CSS using the
+  `color(--lab-d65 …)` / `color(--lch-d65 …)` syntax. Direct
+  `Rgb` → `Lab65` / `Lch65` impls carry the same achromatic snap as
+  `Lab::from(Rgb)`.
+- `difference_hyab()` — HyAB color difference (`|ΔL| + √(Δa² + Δb²)`)
+  computed in `lab65`. Matches culori's `differenceHyab`.
+- `difference_hue_naive(mode)` — signed angular hue distance, exposing
+  the previously private `HueDiffKind::Naive` reducer. Mirrors culori's
+  `differenceHueNaive`.
+- `difference_kotsarenko_ramos()` — convenience wrapper for
+  `differenceEuclidean('yiq', [0.5053, 0.299, 0.1957])`.
+- `samples(n)` — `n` evenly spaced values in `[0, 1]`. Matches
+  culori's `samples(n)` for `n ≥ 0`.
+- `round(places)` — factory returning `Fn(f64) -> f64` that rounds to
+  the requested decimal places using `Math.round`-style half-away-from-zero
+  rounding.
+- `nearest(palette, metric)` — palette-search factory returning
+  `Fn(&Color, usize) -> Vec<Color>`, the closest `n` colors under the
+  chosen metric (Euclidean by default).
+
 ## [1.0.0] - 2026-05-03
 
 First stable release. The public API matches culori 4.0.2 across color
