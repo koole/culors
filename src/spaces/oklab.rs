@@ -68,7 +68,7 @@ impl From<LinearRgb> for Oklab {
 /// of 1e-16 in both opponent channels, which feeds a phantom hue into
 /// [`Oklch`](crate::spaces::Oklch).
 ///
-/// The generic [`crate::convert`] still routes through XYZ65 with no fixup,
+/// The generic [`crate::convert()`] still routes through XYZ65 with no fixup,
 /// so callers who want culori's public-API output should call
 /// `Oklab::from(rgb)` directly. `Oklch::from(rgb)` likewise picks up the
 /// snap.

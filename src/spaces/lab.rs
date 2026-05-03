@@ -97,7 +97,7 @@ impl From<Xyz50> for Lab {
 /// residual on the order of 1e-6 in both opponent channels, which feeds a
 /// phantom hue into [`Lch`](crate::spaces::Lch).
 ///
-/// The generic [`crate::convert`] still routes through XYZ65 with no fixup,
+/// The generic [`crate::convert()`] still routes through XYZ65 with no fixup,
 /// so callers who want culori's public-API output should call
 /// `Lab::from(rgb)` directly. `Lch::from(rgb)` likewise picks up the snap.
 impl From<Rgb> for Lab {
