@@ -55,6 +55,21 @@ pub fn format_color_fn(id: &str, channels: &[f64; 3], alpha: Option<f64>) -> Str
     out
 }
 
+/// `color(<id> ch1 ch2 ch3 ch4[ / alpha])` — for spaces with more than
+/// three numeric channels. Used by Prismatic (`l r g b`).
+pub fn format_color_fn_4(id: &str, channels: &[f64; 4], alpha: Option<f64>) -> String {
+    let mut out = String::with_capacity(36);
+    out.push_str("color(");
+    out.push_str(id);
+    for &c in channels {
+        out.push(' ');
+        out.push_str(&channel(c));
+    }
+    out.push_str(&alpha_suffix(alpha));
+    out.push(')');
+    out
+}
+
 pub fn format_hsl(h: f64, s: f64, l: f64, alpha: Option<f64>) -> String {
     let mut out = String::with_capacity(24);
     write!(

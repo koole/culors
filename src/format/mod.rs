@@ -79,5 +79,8 @@ pub fn format_css(color: &Color) -> String {
         Color::Xyb(c) => css::format_color_fn("--xyb", &[c.x, c.y, c.b], c.alpha),
         Color::Luv(c) => css::format_color_fn("--luv", &[c.l, c.u, c.v], c.alpha),
         Color::Lchuv(c) => css::format_color_fn("--lchuv", &[c.l, c.c, c.h], c.alpha),
+        Color::Prismatic(c) => {
+            css::format_color_fn_4("--prismatic", &[c.l, c.r, c.g, c.b], c.alpha)
+        }
     }
 }

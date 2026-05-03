@@ -2,8 +2,8 @@
 
 use crate::spaces::{
     Cubehelix, Dlab, Dlch, Hpluv, Hsi, Hsl, Hsluv, Hsv, Hwb, Itp, Jab, Jch, Lab, Lab65, Lch, Lch65,
-    Lchuv, LinearRgb, Luv, Okhsl, Okhsv, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb, Xyb, Xyz50,
-    Xyz65, Yiq, A98, P3,
+    Lchuv, LinearRgb, Luv, Okhsl, Okhsv, Oklab, Oklch, Prismatic, ProphotoRgb, Rec2020, Rgb, Xyb,
+    Xyz50, Xyz65, Yiq, A98, P3,
 };
 
 /// Tagged union over every supported color space. Variants are added as each
@@ -74,6 +74,9 @@ pub enum Color {
     Luv(Luv),
     /// CIELChuv (polar form of CIELUV).
     Lchuv(Lchuv),
+    /// Prismatic (intensity + barycentric chromaticity, Hauke 2009).
+    /// culor extension; not in culori 4.0.2.
+    Prismatic(Prismatic),
 }
 
 impl From<Rgb> for Color {
@@ -265,5 +268,11 @@ impl From<Luv> for Color {
 impl From<Lchuv> for Color {
     fn from(c: Lchuv) -> Self {
         Color::Lchuv(c)
+    }
+}
+
+impl From<Prismatic> for Color {
+    fn from(c: Prismatic) -> Self {
+        Color::Prismatic(c)
     }
 }

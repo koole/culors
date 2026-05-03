@@ -289,6 +289,7 @@ pub(crate) fn to_xyz65(c: Color) -> Xyz65 {
         Color::Xyb(x) => x.to_xyz65(),
         Color::Luv(x) => x.to_xyz65(),
         Color::Lchuv(x) => x.to_xyz65(),
+        Color::Prismatic(x) => x.to_xyz65(),
     }
 }
 

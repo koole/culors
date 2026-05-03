@@ -1,7 +1,7 @@
 //! A Rust port of [culori](https://github.com/evercoder/culori), the
 //! JavaScript color library by Dan Burzo.
 //!
-//! culor implements 30 color spaces, conversion between any pair of
+//! culor implements 30+ color spaces, conversion between any pair of
 //! them, a CSS Color Module 4 string parser and matching formatter,
 //! interpolation, gamut mapping, ΔE, separable blend modes, mode-aware
 //! averaging, WCAG contrast, and the CSS filter set. Output values
@@ -40,8 +40,8 @@
 //!
 //! # Supported color spaces
 //!
-//! Thirty spaces are exposed as plain structs in [`spaces`] and as
-//! variants of [`Color`].
+//! Spaces are exposed as plain structs in [`spaces`] and as variants of
+//! [`Color`].
 //!
 //! | Family | Spaces |
 //! |---|---|
@@ -53,7 +53,10 @@
 //! | DIN99o | [`Color::Dlab`], [`Color::Dlch`] |
 //! | JzAzBz / ICtCp | [`Color::Jab`], [`Color::Jch`], [`Color::Itp`] |
 //! | HSLuv | [`Color::Hsluv`], [`Color::Hpluv`] |
-//! | Other | [`Color::Cubehelix`], [`Color::Hsi`], [`Color::Yiq`], [`Color::Xyb`] |
+//! | Other | [`Color::Cubehelix`], [`Color::Hsi`], [`Color::Yiq`], [`Color::Xyb`], [`Color::Prismatic`] |
+//!
+//! [`Color::Prismatic`] is a culor extension; culori 4.0.2 has no
+//! Prismatic mode.
 //!
 //! # Public API tour
 //!
