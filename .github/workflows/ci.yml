@@ -20,6 +20,8 @@ jobs:
         run: cargo build --verbose
       - name: Build (all features)
         run: cargo build --all-features --verbose
+      - name: Build (no default features)
+        run: cargo build --no-default-features --verbose
       - name: Test (default features)
         run: cargo test --verbose
       - name: Test (all features)
@@ -36,8 +38,14 @@ jobs:
           components: rustfmt, clippy
       - name: rustfmt
         run: cargo fmt -- --check
-      - name: clippy
+      - name: clippy (all features)
         run: cargo clippy --all-features --all-targets -- -D warnings
+      - name: clippy (no default features)
+        run: cargo clippy --no-default-features --all-targets -- -D warnings
+      - name: doc (warnings as errors)
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc --all-features --no-deps
 
   fixtures:
     runs-on: ubuntu-latest
@@ -46,6 +54,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - uses: dtolnay/rust-toolchain@stable
       - run: npm ci
       - name: Generate conversion fixtures
         run: npm run gen-fixtures
@@ -60,3 +69,13 @@ jobs:
             git diff tests/fixtures/
             exit 1
           fi
+      - name: Run color-mix reference (smoke check, no fixture file)
+        run: node fixtures-gen/color-mix-ref.mjs > /dev/null
+
+  publish-dry-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: cargo publish --dry-run
+        run: cargo publish --dry-run
