@@ -155,6 +155,7 @@ pub mod filter;
 pub mod format;
 pub mod gamut;
 pub mod interpolate;
+pub mod nearest;
 pub mod parse;
 pub mod round;
 pub mod samples;
@@ -181,6 +182,7 @@ pub use filter::{
 pub use format::format_css;
 pub use gamut::{clamp_chroma, clamp_gamut, in_gamut, to_gamut};
 pub use interpolate::{interpolate, interpolate_with, HueFixup, InterpolateOptions};
+pub use nearest::nearest;
 pub use parse::parse;
 pub use round::round;
 pub use samples::samples;
