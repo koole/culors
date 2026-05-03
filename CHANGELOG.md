@@ -26,6 +26,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `map.js`. `mapper` accepts a `preserve_mode` flag that round-trips the
   result back to the source color's mode, matching culori's third
   positional argument.
+- `format_hex(&Color) -> String` and `format_hex8(&Color) -> String` —
+  legacy `#rrggbb` / `#rrggbbaa` serializers mirroring culori's `formatHex`
+  / `formatHex8`. The input is converted to sRGB; channels are clamped to
+  0..=255 with `Math.round`-style rounding (NaN → 0).
+- `format_rgb(&Color) -> String` — legacy comma-form `rgb(R, G, B)` /
+  `rgba(R, G, B, A)` serializer mirroring culori's `formatRgb`. Alpha is
+  rendered with up to two decimal places; opaque colors omit the alpha
+  component.
+- `format_hsl(&Color) -> String` — legacy comma-form `hsl(H, S%, L%)` /
+  `hsla(H, S%, L%, A)` serializer mirroring culori's `formatHsl`. Hue
+  passes through unchanged when finite (negatives and values >360 are
+  preserved); saturation and lightness are clamped to [0, 100] %.
 
 ## [1.2.0] - 2026-05-03
 
