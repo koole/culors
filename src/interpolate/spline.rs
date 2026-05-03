@@ -183,27 +183,26 @@ fn sgn(v: f64) -> f64 {
     }
 }
 
-// Returns `(s, p, yp)` arrays. Mirrors culori's `mono` helper. `s` has
-// length `n`, `p` and `yp` have length `n` with the boundary entries set
-// to `NaN` (culori uses `undefined`); the boundary entries are overwritten
-// by each public variant before being passed to `evaluate_monotone`.
+// Returns `(s, p, yp)`. Mirrors culori's `mono` helper. `s` has length `n`
+// (`= arr.len() - 1`); culori's loop populates `p` and `yp` only at indices
+// `1..n`, leaving `[0]` and `[n]` as `undefined`. Each caller then writes
+// those boundary entries before the inner interpolator runs, which reads
+// `yp[i + 1]` up to `yp[n]`. We allocate `p` and `yp` with length `n + 1`
+// and pre-fill the boundary slots with `NaN` so the callers can overwrite
+// in place.
 fn mono(arr: &[f64]) -> (Vec<f64>, Vec<f64>, Vec<f64>) {
     let n = (arr.len() - 1) as f64;
     let len = arr.len() - 1;
     let mut s = Vec::with_capacity(len);
-    let mut p = Vec::with_capacity(len);
-    let mut yp = Vec::with_capacity(len);
+    let mut p = vec![f64::NAN; len + 1];
+    let mut yp = vec![f64::NAN; len + 1];
     for i in 0..len {
         s.push((arr[i + 1] - arr[i]) * n);
         if i > 0 {
             let p_i = 0.5 * (arr[i + 1] - arr[i - 1]) * n;
-            p.push(p_i);
-            yp.push(
-                (sgn(s[i - 1]) + sgn(s[i])) * s[i - 1].abs().min(s[i].abs()).min(0.5 * p_i.abs()),
-            );
-        } else {
-            p.push(f64::NAN);
-            yp.push(f64::NAN);
+            p[i] = p_i;
+            yp[i] =
+                (sgn(s[i - 1]) + sgn(s[i])) * s[i - 1].abs().min(s[i].abs()).min(0.5 * p_i.abs());
         }
     }
     (s, p, yp)
