@@ -1,6 +1,6 @@
 //! Evenly spaced ramp samples.
 //!
-//! Mirrors culori 4.0.2's `samples.js` with the default linear gamma:
+//! Mirrors culori 4.0.2's `samples.js`:
 //!
 //! ```js
 //! const samples = (n = 2, γ = 1) => {
@@ -16,10 +16,11 @@
 //! };
 //! ```
 //!
-//! With γ = 1 the easing is the identity, so the output is `[0]` and `[1]`
-//! for the endpoints and `i / (n - 1)` for the interior.
+//! [`samples`] keeps the linear (γ = 1) shorthand for backwards compatibility.
+//! [`samples_with_easing`] takes any `Fn(f64) -> f64`, letting callers plug in
+//! [`crate::easing_gamma`], smoothstep, or a custom curve.
 
-/// Returns `n` evenly spaced values in `[0, 1]`.
+/// Returns `n` evenly spaced values in `[0, 1]` (linear, γ = 1).
 ///
 /// Edge cases (matching culori exactly):
 /// - `n == 0` returns an empty vector.
@@ -37,9 +38,25 @@
 /// assert_eq!(stops.len(), 11);
 /// ```
 pub fn samples(n: usize) -> Vec<f64> {
+    samples_with_easing(n, |t| t)
+}
+
+/// `n` evenly spaced ramp positions, each transformed by `easing`.
+///
+/// Equivalent to culori's `samples(n, γ)` when `easing` is
+/// [`crate::easing_gamma(γ)`](crate::easing_gamma); the broader signature
+/// accepts any easing curve including [`crate::easing_smoothstep`].
+///
+/// ```rust
+/// use culors::{easing_gamma, samples_with_easing};
+/// // culori: samples(5, 2.2)
+/// let v = samples_with_easing(5, easing_gamma(2.2));
+/// assert!((v[2] - 0.217637640824031).abs() < 1e-12);
+/// ```
+pub fn samples_with_easing<F: Fn(f64) -> f64>(n: usize, easing: F) -> Vec<f64> {
     if n < 2 {
-        return if n == 0 { Vec::new() } else { vec![0.5] };
+        return if n == 0 { Vec::new() } else { vec![easing(0.5)] };
     }
     let denom = (n - 1) as f64;
-    (0..n).map(|i| i as f64 / denom).collect()
+    (0..n).map(|i| easing(i as f64 / denom)).collect()
 }
