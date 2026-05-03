@@ -2,7 +2,7 @@
 
 use crate::spaces::{
     Cubehelix, Dlab, Dlch, Hpluv, Hsi, Hsl, Hsluv, Hsv, Hwb, Itp, Jab, Jch, Lab, Lch, LinearRgb,
-    Okhsl, Okhsv, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb, Xyb, Xyz50, Xyz65, Yiq, A98, P3,
+    Luv, Okhsl, Okhsv, Oklab, Oklch, ProphotoRgb, Rec2020, Rgb, Xyb, Xyz50, Xyz65, Yiq, A98, P3,
 };
 
 /// Tagged union over every supported color space. Variants are added as each
@@ -65,6 +65,8 @@ pub enum Color {
     Itp(Itp),
     /// XYB (JPEG XL).
     Xyb(Xyb),
+    /// CIELUV (D50).
+    Luv(Luv),
 }
 
 impl From<Rgb> for Color {
@@ -232,5 +234,11 @@ impl From<Itp> for Color {
 impl From<Xyb> for Color {
     fn from(c: Xyb) -> Self {
         Color::Xyb(c)
+    }
+}
+
+impl From<Luv> for Color {
+    fn from(c: Luv) -> Self {
+        Color::Luv(c)
     }
 }

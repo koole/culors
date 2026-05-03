@@ -78,5 +78,6 @@ pub(crate) fn color_to_rgb(c: Color) -> Rgb {
         Color::Okhsv(x) => crate::convert::<crate::spaces::Okhsv, Rgb>(x),
         Color::Itp(x) => crate::convert::<crate::spaces::Itp, Rgb>(x),
         Color::Xyb(x) => Rgb::from(x),
+        Color::Luv(x) => crate::convert::<crate::spaces::Luv, Rgb>(x),
     }
 }
