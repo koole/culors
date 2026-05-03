@@ -2,7 +2,8 @@
 
 mod a98;
 mod cubehelix;
-mod dlab;
+pub(crate) mod dlab;
+mod dlch;
 mod hsl;
 mod hsv;
 mod hwb;
@@ -21,6 +22,7 @@ mod xyz65;
 pub use a98::A98;
 pub use cubehelix::Cubehelix;
 pub use dlab::Dlab;
+pub use dlch::Dlch;
 pub use hsl::Hsl;
 pub use hsv::Hsv;
 pub use hwb::Hwb;

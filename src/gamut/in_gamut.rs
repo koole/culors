@@ -67,5 +67,6 @@ pub(crate) fn color_to_rgb(c: Color) -> Rgb {
         Color::ProphotoRgb(x) => crate::convert::<crate::spaces::ProphotoRgb, Rgb>(x),
         Color::Cubehelix(x) => Rgb::from(x),
         Color::Dlab(x) => crate::convert::<crate::spaces::Dlab, Rgb>(x),
+        Color::Dlch(x) => crate::convert::<crate::spaces::Dlch, Rgb>(x),
     }
 }

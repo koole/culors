@@ -8,7 +8,7 @@
 
 #![allow(clippy::excessive_precision)]
 
-use crate::spaces::Xyz65;
+use crate::spaces::{Rgb, Xyz65};
 use crate::traits::ColorSpace;
 use crate::util::{lab65_to_xyz65, normalize_hue, xyz65_to_lab65};
 
@@ -81,6 +81,38 @@ impl ColorSpace for Dlab {
             a,
             b,
             alpha: xyz.alpha,
+        }
+    }
+}
+
+/// Direct `Rgb` → `Dlab` matching culori's `rgb → lab65 → dlab` path with
+/// the achromatic-RGB snap from `convertRgbToLab65.js`. Without the snap a
+/// gray sRGB input picks up a residual a/b on the order of 1e-15 from
+/// `convertRgbToXyz65` ∘ `convertXyz65ToLab65`, which then feeds a phantom
+/// hue into [`Dlch`].
+impl From<Rgb> for Dlab {
+    fn from(c: Rgb) -> Self {
+        use crate::traits::ColorSpace;
+        let xyz = c.to_xyz65();
+        let (mut l, mut a, mut b) = xyz65_to_lab65(xyz.x, xyz.y, xyz.z);
+        if c.r == c.g && c.g == c.b {
+            a = 0.0;
+            b = 0.0;
+            // l unchanged; the snap zeroes only a and b in culori.
+            let _ = &mut l; // silence unused-mut lint when l == l
+        }
+        let (dl, dc, dh) = lab65_to_dlch(l, a, b);
+        let (a_out, b_out) = if dh.is_nan() {
+            (0.0, 0.0)
+        } else {
+            let hr = dh.to_radians();
+            (dc * hr.cos(), dc * hr.sin())
+        };
+        Self {
+            l: dl,
+            a: a_out,
+            b: b_out,
+            alpha: c.alpha,
         }
     }
 }
