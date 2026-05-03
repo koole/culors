@@ -30,8 +30,15 @@ use crate::Color;
 
 mod hue_fixup;
 mod lerp;
+mod spline;
 
 pub use hue_fixup::HueFixup;
+pub use spline::{
+    interpolator_spline_basis, interpolator_spline_basis_closed, interpolator_spline_monotone,
+    interpolator_spline_monotone_2, interpolator_spline_monotone_closed,
+    interpolator_spline_natural, interpolator_spline_natural_closed, ChannelInterp,
+    ChannelInterpFactory,
+};
 
 use hue_fixup::fixup_alpha;
 use lerp::linear_interpolator;
@@ -48,6 +55,12 @@ pub struct InterpolateOptions {
     /// `"h"`). When set for a channel, overrides the global easing for that
     /// channel. Alpha is keyed as `"alpha"`.
     pub channel_easings: HashMap<&'static str, Box<dyn Fn(f64) -> f64 + Send + Sync>>,
+    /// Per-channel interpolator factories. When set for a channel, replaces
+    /// the default linear-piecewise interpolator with a custom one (e.g.
+    /// one of the `interpolator_spline_*` factories). Alpha is keyed as
+    /// `"alpha"`. Channels without an entry fall back to the linear
+    /// interpolator that mirrors culori's default.
+    pub channel_interpolators: HashMap<&'static str, ChannelInterpFactory>,
 }
 
 impl std::fmt::Debug for InterpolateOptions {
@@ -63,6 +76,14 @@ impl std::fmt::Debug for InterpolateOptions {
                     .copied()
                     .collect::<Vec<&'static str>>(),
             )
+            .field(
+                "channel_interpolators",
+                &self
+                    .channel_interpolators
+                    .keys()
+                    .copied()
+                    .collect::<Vec<&'static str>>(),
+            )
             .finish()
     }
 }
@@ -73,6 +94,7 @@ impl Default for InterpolateOptions {
             hue_fixup: HueFixup::Shorter,
             easing: None,
             channel_easings: HashMap::new(),
+            channel_interpolators: HashMap::new(),
         }
     }
 }
@@ -104,6 +126,19 @@ impl InterpolateOptions {
         F: Fn(f64) -> f64 + Send + Sync + 'static,
     {
         self.channel_easings.insert(channel, Box::new(easing));
+        self
+    }
+
+    /// Set a per-channel interpolator factory. The factory builds a sampler
+    /// from the channel's stop slice. Use one of the
+    /// `interpolator_spline_*` constructors to swap the default linear
+    /// sampler for a spline.
+    pub fn channel_interpolator(
+        mut self,
+        channel: &'static str,
+        factory: ChannelInterpFactory,
+    ) -> Self {
+        self.channel_interpolators.insert(channel, factory);
         self
     }
 }
@@ -186,17 +221,29 @@ pub fn interpolate_with(
     let last_channels: Vec<f64> = channels.iter().map(|c| c[last_idx]).collect();
     let last_alpha = alphas[last_idx];
 
-    // Build per-channel piecewise linear interpolators.
+    let channel_names: Vec<&'static str> = info.channels.iter().map(|c| c.name).collect();
+
+    // Build per-channel interpolators. Default to linear; allow per-channel
+    // override via `options.channel_interpolators`.
     let interps: Vec<Box<dyn Fn(f64) -> f64 + Send + Sync>> = fixed
         .into_iter()
-        .map(|stops| {
-            let f = linear_interpolator(stops);
-            Box::new(f) as Box<dyn Fn(f64) -> f64 + Send + Sync>
+        .enumerate()
+        .map(|(i, stops)| {
+            let name = channel_names[i];
+            if let Some(factory) = options.channel_interpolators.get(name) {
+                factory(&stops)
+            } else {
+                Box::new(linear_interpolator(stops)) as Box<dyn Fn(f64) -> f64 + Send + Sync>
+            }
         })
         .collect();
-    let alpha_interp = linear_interpolator(fixed_alpha);
+    let alpha_interp: Box<dyn Fn(f64) -> f64 + Send + Sync> =
+        if let Some(factory) = options.channel_interpolators.get("alpha") {
+            factory(&fixed_alpha)
+        } else {
+            Box::new(linear_interpolator(fixed_alpha))
+        };
 
-    let channel_names: Vec<&'static str> = info.channels.iter().map(|c| c.name).collect();
     let mode_owned = info.mode_str;
     let easing = options.easing;
     let channel_easings = options.channel_easings;

@@ -194,7 +194,13 @@ pub use filter::{
 };
 pub use format::{format_css, format_hex, format_hex8, format_hsl, format_rgb};
 pub use gamut::{clamp_chroma, clamp_gamut, clamp_rgb, displayable, in_gamut, to_gamut};
-pub use interpolate::{interpolate, interpolate_with, HueFixup, InterpolateOptions};
+pub use interpolate::{
+    interpolate, interpolate_with, interpolator_spline_basis, interpolator_spline_basis_closed,
+    interpolator_spline_monotone, interpolator_spline_monotone_2,
+    interpolator_spline_monotone_closed, interpolator_spline_natural,
+    interpolator_spline_natural_closed, ChannelInterp, ChannelInterpFactory, HueFixup,
+    InterpolateOptions,
+};
 pub use lerp::{blerp, lerp, trilerp, unlerp};
 pub use map::{
     map_alpha_divide, map_alpha_multiply, map_transfer_gamma, map_transfer_linear, mapper,
