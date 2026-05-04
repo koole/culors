@@ -1,6 +1,6 @@
 [package]
 name = "culors"
-version = "1.5.0"
+version = "1.6.0"
 edition = "2021"
 rust-version = "1.75"
 description = "Rust port of the culori color library — color spaces, parsing, conversion"
