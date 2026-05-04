@@ -473,3 +473,80 @@ fn hsl_legacy_requires_percentage_sl() {
     assert_eq!(bare.s, 0.5);
     assert_eq!(bare.l, 0.5);
 }
+
+// Edge cases for the `color()` functional notation, ported from culori
+// 4.0.2's `test/color-syntax.test.js`. Each expectation comes from running
+// `node -e "import('culori').then(c => console.log(JSON.stringify(c.parse(<input>))))"`.
+
+#[test]
+fn color_syntax_too_few_values_is_none() {
+    // culori: every entry returns `undefined`.
+    assert!(parse("color(srgb)").is_none());
+    assert!(parse("color(srgb )").is_none());
+    assert!(parse("color(srgb/)").is_none());
+    assert!(parse("color(srgb /0.5)").is_none());
+    assert!(parse("color(srgb 0.25)").is_none());
+    assert!(parse("color(srgb 0.25 50%)").is_none());
+    assert!(parse("color( srgb 25% .5 / 0.2)").is_none());
+    // Two channels, no alpha-divider.
+    assert!(parse("color(srgb 1 0)").is_none());
+}
+
+#[test]
+fn color_syntax_too_many_values_is_none() {
+    // culori: returns `undefined` for any extra channel before the slash.
+    assert!(parse("color(srgb 25% .5 75% 0.33 0.66)").is_none());
+    assert!(parse("color(srgb 25% .5 75% 0.33 0.66 / 70% )").is_none());
+    assert!(parse("color(srgb 25% .5 75% 0.33 / 0.7)").is_none());
+    // Four channels with no slash before alpha-like value.
+    assert!(parse("color(srgb 1 0 0 0)").is_none());
+}
+
+#[test]
+fn color_syntax_hue_units_in_rgb_channels_rejected() {
+    // culori: `color(srgb 0.5 0.5 0deg)` -> `undefined` (rgb has no hue).
+    assert!(parse("color(srgb 0.5 0.5 0deg)").is_none());
+}
+
+#[test]
+fn color_syntax_clamps_negative_alpha() {
+    // culori reference:
+    //   parse('color(srgb 1 0 0 / -0.5)')
+    //   -> { mode: 'rgb', r: 1, g: 0, b: 0, alpha: 0 }
+    let parsed = parse("color(srgb 1 0 0 / -0.5)").expect("parses");
+    let r = rgb(parsed);
+    assert_eq!(r.alpha, Some(0.0));
+    assert_eq!(r.r, 1.0);
+    assert_eq!(r.g, 0.0);
+    assert_eq!(r.b, 0.0);
+}
+
+#[test]
+fn color_syntax_clamps_alpha_above_one() {
+    // culori reference:
+    //   parse('color(srgb 1 0 0 / 1.5)')
+    //   -> { mode: 'rgb', r: 1, g: 0, b: 0, alpha: 1 }
+    let parsed = parse("color(srgb 1 0 0 / 1.5)").expect("parses");
+    let r = rgb(parsed);
+    assert_eq!(r.alpha, Some(1.0));
+}
+
+#[test]
+fn color_syntax_alpha_clamp_preserves_out_of_range_channels() {
+    // culori reference:
+    //   parse('color(srgb 1.5 -0.4 0.2 / -0.5)')
+    //   -> { mode: 'rgb', r: 1.5, g: -0.4, b: 0.2, alpha: 0 }
+    //   parse('color(srgb 1.5 -0.4 0.2 / 1.5)')
+    //   -> { mode: 'rgb', r: 1.5, g: -0.4, b: 0.2, alpha: 1 }
+    let neg = rgb(parse("color(srgb 1.5 -0.4 0.2 / -0.5)").expect("parses"));
+    assert_eq!(neg.r, 1.5);
+    assert_eq!(neg.g, -0.4);
+    assert_eq!(neg.b, 0.2);
+    assert_eq!(neg.alpha, Some(0.0));
+
+    let big = rgb(parse("color(srgb 1.5 -0.4 0.2 / 1.5)").expect("parses"));
+    assert_eq!(big.r, 1.5);
+    assert_eq!(big.g, -0.4);
+    assert_eq!(big.b, 0.2);
+    assert_eq!(big.alpha, Some(1.0));
+}
