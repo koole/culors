@@ -138,9 +138,10 @@
 //!
 //! # Status
 //!
-//! As of v1.4 culors is in maintenance/upstream-tracking mode. The
-//! library tracks culori 4.0.2 with feature parity for everything
-//! Rust-idiomatic. New features land in
+//! As of v1.5 culors tracks culori 4.0.2 at full feature parity, modulo
+//! the intentional divergences listed in the
+//! [README](https://github.com/koole/culors#intentional-divergences-from-culori).
+//! The library is in maintenance mode: new features land in
 //! [culori](https://github.com/Evercoder/culori) first; once accepted
 //! upstream they're mirrored here. Bug fixes and culori version bumps
 //! remain in scope.

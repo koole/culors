@@ -10,19 +10,19 @@ Used in production by [Spectralite](https://spectralite.studio), a lighting-cont
 
 ## Status
 
-As of v1.4 culors is in maintenance/upstream-tracking mode. The library tracks culori 4.0.2 with feature parity for everything Rust-idiomatic. New features land in [culori](https://github.com/Evercoder/culori) first; once accepted upstream they're mirrored here. Bug fixes and culori version bumps remain in scope.
+As of v1.5 culors tracks culori 4.0.2 at full feature parity, modulo the [intentional divergences](#intentional-divergences-from-culori) listed below. The library is in maintenance mode: new features land in [culori](https://github.com/Evercoder/culori) first; once accepted upstream they're mirrored here. Bug fixes and culori version bumps remain in scope.
 
-## Features (v1.4)
+## Features (v1.5)
 
 | Feature | Coverage |
 |---|---|
 | Color spaces (33) | rgb, lrgb, hsl, hsv, hwb, lab (D50), lch (D50), lab65, lch65, oklab, oklch, xyz50, xyz65, p3, rec2020, a98, prophoto-rgb, cubehelix, dlab, dlch, jab, jch, yiq, hsi, hsluv, hpluv, okhsl, okhsv, itp, xyb, luv, lchuv, prismatic |
-| Conversion | three flavors: direct `From` (typed, zero-overhead, bit-exact culori parity), generic `convert<A, B>` (typed, always XYZ-D65 hub, ~1e-14 drift), and dynamic `Color::convert_to(mode)` / typed `convert_culori<A, B>` (culori's per-pair routing — closes the 1e-14 gap with byte-for-byte parity) |
+| Conversion | three flavors: direct `From` (typed, zero-overhead, bit-exact culori parity), generic `convert<A, B>` (typed, always XYZ-D65 hub, ~1e-14 drift), and dynamic `Color::convert_to(mode)` / typed `convert_culori<A, B>` / reusable `converter(mode)` closure (culori's per-pair routing — closes the 1e-14 gap with byte-for-byte parity) |
 | CSS parser | named colors, hex, functional `rgb`/`hsl`/`hwb`/`lab`/`lch`/`oklab`/`oklch`, `color()` with `srgb`/`srgb-linear`/`xyz`/`xyz-d50`/`xyz-d65`/`display-p3`/`rec2020`/`a98-rgb`/`prophoto-rgb`/`--lab-d65`/`--lch-d65`, plus `color-mix()` |
 | CSS formatters | `format_css` (canonical CSS Color Module 4 round-trip), plus legacy `format_hex`, `format_hex8`, `format_rgb`, `format_hsl` |
-| Interpolation | `interpolate` / `interpolate_with` over all 33 spaces, hue-fixup (shorter / longer / increasing / decreasing / raw), per-channel easing, 7 spline interpolators (basis, basis-closed, natural, natural-closed, monotone, monotone-2, monotone-closed), and `interpolate_with_premultiplied_alpha` for clean transparent-to-color gradients |
+| Interpolation | `interpolate` / `interpolate_with` over all 33 spaces, hue-fixup (shorter / longer / increasing / decreasing / raw), per-channel easing, 7 spline interpolators (basis, basis-closed, natural, natural-closed, monotone, monotone-2, monotone-closed), `interpolator_piecewise` higher-order factory, and `interpolate_with_premultiplied_alpha` for clean transparent-to-color gradients |
 | Easing | `easing_midpoint`, `easing_smoothstep`, `easing_smoothstep_inverse`, `easing_smootherstep`, `easing_in_out_sine`, `easing_gamma` |
-| Gamut mapping | `in_gamut`, `displayable`, `clamp_gamut`, `clamp_rgb`, `clamp_chroma`, `to_gamut` (CSS Color Module 4 with ΔE OK). Accepts sRGB-family modes plus wide-gamut `p3` / `rec2020` / `a98` / `prophoto` |
+| Gamut mapping | `in_gamut`, `displayable`, `clamp_gamut`, `clamp_rgb`, `clamp_chroma`, `to_gamut` (CSS Color Module 4 with ΔE OK). Accepts every culori-supported mode: sRGB family, wide-gamut `p3`/`rec2020`/`a98`/`prophoto`, and the unbounded spaces (lab/jab/itp/luv/…) which pass through unchanged, matching culori 4.0.2's `getMode(mode).gamut` table |
 | ΔE | `ciede76`, `ciede94`, `ciede2000`, `cmc`, `euclidean`, `hyab`, `hue_chroma`, `hue_saturation`, `hue_naive`, `ok`, `jz`, `itp`, `euclidean_xyz`, `kotsarenko_ramos` |
 | Blending | 16 modes — 12 separable (normal, multiply, screen, hard-light, overlay, darken, lighten, color-dodge, color-burn, soft-light, difference, exclusion) plus 4 non-separable from CSS Compositing 1 § 5.8 (hue, saturation, color, luminosity) |
 | Averaging | `average`, `average_number`, `average_angle` (mode-aware, hue-circular). Same mode list as `interpolate` |
@@ -32,7 +32,7 @@ As of v1.4 culors is in maintenance/upstream-tracking mode. The library tracks c
 | WCAG | `wcag_luminance`, `wcag_contrast` |
 | CSS filters | `brightness`, `contrast`, `grayscale`, `hue-rotate`, `invert`, `saturate`, `sepia`, plus CVD `prot` / `deuter` / `trit` |
 | Fixture coverage | 110 conversion pairs, 365 parse cases, 303 format round-trips, plus per-pair `convert_to` parity fixtures, all verified against culori 4.0.2 |
-| Tests | 1162 |
+| Tests | 1188 |
 
 ## Installation
 
@@ -134,15 +134,36 @@ closures with the same shape.
 | `filterBrightness` … `filterDeficiencyTrit` | `filter_brightness` … `filter_deficiency_trit` |
 | `colorsNamed` table | `parse(name)` (built-in) |
 
-## Known divergences from culori
+## Intentional divergences from culori
 
-- `Prismatic` follows the Hauke 2009 definition because culori 4.0.2
-  ships no `prismatic` mode against which to fixture-test. The
-  literature contains other definitions under the same name; this
-  one is documented as a culors extension rather than a culori port.
-  `interpolate` and `average` accept `"prismatic"` and operate on the
-  four channels directly; the reference values for those tests are
-  hand-computed rather than derived from culori.
+- **No runtime plugin registry**: culori exposes `useMode`, `getMode`,
+  `useParser`, and `removeParser` so JS callers can inject custom color
+  spaces at runtime. culors is statically typed; new spaces are added at
+  compile time. This is a language-design difference, not a missing
+  feature.
+- **Sub-parsers and sub-serializers are private**: culori re-exports
+  `parseHex`, `parseRgb`, `parseLab`, …, `serializeHex`, `serializeRgb`,
+  etc. for monkey-patching the parse/format chain. culors keeps these as
+  `pub(crate)`; the canonical entry points are `parse()` and the
+  `format_*` family. Behavior is fully equivalent.
+- **`colorsNamed` is internal**: culori exposes the named-color map as a
+  public dictionary. culors' equivalent is a `pub(crate)` lookup table
+  behind `parse(name)`.
+- **NaN channels render as `none`**: culori emits `"NaN"` for NaN channels
+  in `color()` formatting; culors emits `"none"` (CSS Color Module 4
+  spec-compliant). Cosmetic, applies only to artificially constructed
+  inputs since culori's own pipeline never produces NaN.
+- **Three culors-only color spaces**: `Hsluv`, `Hpluv`, and `Prismatic`
+  are not in culori 4.0.2. Hsluv/Hpluv track the official
+  `hsluv-javascript` reference; Prismatic follows Hauke 2009.
+- **Three culors-only ΔE variants**: `difference_ok`, `difference_jz`,
+  and `difference_euclidean_xyz` are not exposed as named symbols by
+  culori 4.0.2 (their math is reachable through
+  `differenceEuclidean(mode, weights)` instead).
+- **Maintenance mode**: as of v1.4, culors tracks culori 4.0.2 with the
+  parity guarantees above. New features land in culori first; once
+  accepted upstream they're mirrored here. Bug fixes and culori version
+  bumps remain in scope.
 
 ## Documentation
 
