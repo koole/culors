@@ -185,7 +185,7 @@ pub use average::{average, average_angle, average_number};
 pub use blend::{blend, blend_str, BlendMode};
 pub use color::{Color, ColorVariantMismatch};
 pub use contrast::{wcag_contrast, wcag_luminance};
-pub use convert::{convert, convert_culori};
+pub use convert::{convert, convert_culori, converter};
 pub use difference::{
     difference_ciede2000, difference_ciede76, difference_ciede94, difference_ciede94_with,
     difference_cmc, difference_euclidean, difference_euclidean_with, difference_euclidean_xyz,

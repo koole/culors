@@ -101,6 +101,39 @@ where
     B::try_from(result).expect("convert_to returns the requested mode")
 }
 
+/// Build a reusable closure that converts any [`Color`] into `mode`.
+///
+/// Mirrors culori 4.0.2's `converter(mode)`: returns a function that the
+/// caller can keep around and apply to many inputs. Each application takes
+/// the same per-pair path that culori uses (the same path
+/// [`Color::convert_to`] follows internally).
+///
+/// Returns `None` for unknown mode strings. The set of accepted modes
+/// matches [`Color::convert_to`].
+///
+/// # Example
+///
+/// ```rust
+/// use culors::{converter, parse, Color};
+///
+/// let to_lab = converter("lab").expect("lab is a known mode");
+/// let red = parse("red").unwrap();
+/// let blue = parse("blue").unwrap();
+/// let red_lab = to_lab(&red);
+/// let blue_lab = to_lab(&blue);
+/// matches!(red_lab, Color::Lab(_));
+/// matches!(blue_lab, Color::Lab(_));
+/// ```
+pub fn converter(mode: &'static str) -> Option<impl Fn(&Color) -> Color> {
+    if !is_known_mode(mode) {
+        return None;
+    }
+    Some(move |c: &Color| {
+        c.convert_to(mode)
+            .expect("mode validated at converter() call")
+    })
+}
+
 // ---------- helpers used by the dispatch table ----------
 
 #[inline]

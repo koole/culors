@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   per-channel sampler over a stop slice. Slots into
   `InterpolateOptions::channel_interpolator` so callers can mix custom
   interpolators with the default linear-piecewise one.
+- `converter(mode)` — reusable-closure factory matching culori 4.0.2's
+  `converter`. Returns `Some(impl Fn(&Color) -> Color)` for known modes
+  and `None` otherwise. The closure repeats `Color::convert_to` per call
+  but is cheap to keep around and reuse, removing the per-call mode-string
+  validation from hot loops.
 
 ### Fixed
 
