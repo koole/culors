@@ -38,6 +38,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `lrgb` now checks its own linear-RGB unit cube. Truly unknown mode
   strings degrade through rgb instead of panicking.
 
+### Changed
+
+- README: replaced "Known divergences from culori" with an "Intentional
+  divergences" section that enumerates the deliberate departures from
+  culori 4.0.2 (no runtime plugin registry, private sub-parsers and
+  sub-serializers, internal `colorsNamed`, `none` rendering for NaN
+  channels, three culors-only color spaces, three culors-only ΔE
+  variants, maintenance-mode commitment).
+- README: bumped feature heading and test count to v1.5 (1200 tests),
+  added the `interpolator_piecewise` and `converter(mode)` entries to
+  the feature matrix, and clarified the gamut row to reflect the
+  expanded mode-table coverage.
+
+### Tests
+
+- Ported culori 4.0.2's `test/fixupAlpha.test.js` cases verbatim.
+- Ported the `color()`-syntax edge cases from culori's
+  `test/color-syntax.test.js` (alpha clamping below 0 and above 1,
+  arity mismatches, hue units in rgb-channel positions).
+
 ## [1.4.0]
 
 ### Added

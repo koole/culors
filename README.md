@@ -32,7 +32,7 @@ As of v1.5 culors tracks culori 4.0.2 at full feature parity, modulo the [intent
 | WCAG | `wcag_luminance`, `wcag_contrast` |
 | CSS filters | `brightness`, `contrast`, `grayscale`, `hue-rotate`, `invert`, `saturate`, `sepia`, plus CVD `prot` / `deuter` / `trit` |
 | Fixture coverage | 110 conversion pairs, 365 parse cases, 303 format round-trips, plus per-pair `convert_to` parity fixtures, all verified against culori 4.0.2 |
-| Tests | 1188 |
+| Tests | 1200 |
 
 ## Installation
 
