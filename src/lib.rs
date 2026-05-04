@@ -209,8 +209,8 @@ pub use interpolate::{
     interpolate, interpolate_with, interpolate_with_premultiplied_alpha, interpolator_piecewise,
     interpolator_spline_basis, interpolator_spline_basis_closed, interpolator_spline_monotone,
     interpolator_spline_monotone_2, interpolator_spline_monotone_closed,
-    interpolator_spline_natural, interpolator_spline_natural_closed, ChannelInterp,
-    ChannelInterpFactory, HueFixup, InterpolateOptions,
+    interpolator_spline_natural, interpolator_spline_natural_closed, normalize_positions,
+    ChannelInterp, ChannelInterpFactory, HueFixup, InterpolateOptions,
 };
 pub use lerp::{blerp, lerp, trilerp, unlerp};
 pub use map::{
