@@ -739,3 +739,59 @@ fn prismatic_red_blue_t_zero_returns_red() {
     assert_close(g, 0.0, "g");
     assert_close(b, 0.0, "b");
 }
+
+// Issue culori#140 — an easing function that returns values outside
+// `[0, 1]` (e.g. `back-in-out`, which overshoots both ends) must not
+// produce NaN channels. The eased `t` selects a piecewise segment that
+// extrapolates past the endpoints linearly, exactly as the linear
+// interpolator already handles for raw `t > 1` / `t < 0`.
+#[test]
+fn easing_returning_outside_unit_range_does_not_nan() {
+    // `back-in-out` cubic from <https://github.com/mattdesl/eases/blob/master/back-in-out.js>:
+    fn back_in_out(mut t: f64) -> f64 {
+        let s = 1.701_58 * 1.525;
+        t *= 2.0;
+        if t < 1.0 {
+            0.5 * (t * t * ((s + 1.0) * t - s))
+        } else {
+            t -= 2.0;
+            0.5 * (t * t * ((s + 1.0) * t + s) + 2.0)
+        }
+    }
+
+    let stops = [
+        // #ff0000
+        Color::Rgb(Rgb {
+            r: 1.0,
+            g: 0.0,
+            b: 0.0,
+            alpha: None,
+        }),
+        // #cc8833
+        Color::Rgb(Rgb {
+            r: 0xcc as f64 / 255.0,
+            g: 0x88 as f64 / 255.0,
+            b: 0x33 as f64 / 255.0,
+            alpha: None,
+        }),
+        // #3344cc
+        Color::Rgb(Rgb {
+            r: 0x33 as f64 / 255.0,
+            g: 0x44 as f64 / 255.0,
+            b: 0xcc as f64 / 255.0,
+            alpha: None,
+        }),
+    ];
+    let opts = InterpolateOptions::new().easing(back_in_out);
+    let f = interpolate_with(&stops, "rgb", opts);
+    // Sweep across the range — back-in-out overshoots near both ends.
+    for &t in &[0.05, 0.1, 0.5, 0.9, 0.95] {
+        let out = f(t);
+        let Color::Rgb(c) = out else {
+            panic!("expected Rgb");
+        };
+        assert!(!c.r.is_nan(), "r is NaN at t={t}");
+        assert!(!c.g.is_nan(), "g is NaN at t={t}");
+        assert!(!c.b.is_nan(), "b is NaN at t={t}");
+    }
+}

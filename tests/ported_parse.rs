@@ -550,3 +550,141 @@ fn color_syntax_alpha_clamp_preserves_out_of_range_channels() {
     assert_eq!(big.b, 0.2);
     assert_eq!(big.alpha, Some(1.0));
 }
+
+// --- v1.6: parse edge cases flagged in the v1.5 audit -------------------
+//
+// Each expected value comes from running culori 4.0.2's `parse()` against
+// the same input string. The audit identified that culors covers the
+// underlying behaviour (alpha clamping was tested for `color()` only,
+// hex no-hash was implicitly accepted, bare-numeric `hsl` was implicitly
+// rejected in legacy form) but did not have direct test pins.
+
+#[test]
+fn transparent_keyword_uppercase_rejected() {
+    // culori treats `transparent` like a named color but does NOT
+    // lowercase the input before lookup; only the exact spelling
+    // `transparent` is recognized.
+    assert!(parse("TRANSPARENT").is_none());
+    assert!(parse("Transparent").is_none());
+    assert!(parse(" transparent").is_none());
+}
+
+#[test]
+fn no_hash_hex_three_six_eight_digit() {
+    // culori's `parseHex` accepts strings of length 3, 4, 6, 8 with no
+    // leading `#`. Each maps to the same value as the `#`-prefixed form.
+    //
+    // 3-digit:  parse('369') === { r: 0.2, g: 0.4, b: 0.6 }
+    let three = rgb(parse("369").expect("parses"));
+    common::assert_close(three.r, 0.2, EPS);
+    common::assert_close(three.g, 0.4, EPS);
+    common::assert_close(three.b, 0.6, EPS);
+    assert_eq!(three.alpha, None);
+    // Six-digit (no hash) round-trips through the hash form.
+    assert_eq!(parse("ffffff"), parse("#ffffff"));
+    assert_eq!(parse("369abc"), parse("#369abc"));
+    assert_eq!(parse("369ABC"), parse("#369abc"));
+}
+
+#[test]
+fn no_hash_hex_four_and_eight_digit_with_alpha() {
+    // 4-digit no-hash: alpha is the fourth nibble.
+    //   parse('1234') === { r: 1/15, g: 2/15, b: 3/15, alpha: 4/15 }
+    let four = rgb(parse("1234").expect("parses"));
+    common::assert_close(four.r, 1.0 / 15.0, EPS);
+    common::assert_close(four.g, 2.0 / 15.0, EPS);
+    common::assert_close(four.b, 3.0 / 15.0, EPS);
+    assert_eq!(four.alpha, Some(4.0 / 15.0));
+    // 8-digit: same as the `#`-prefixed form.
+    assert_eq!(parse("12345678"), parse("#12345678"));
+}
+
+#[test]
+fn invalid_hex_lengths_rejected() {
+    // Lengths other than 3, 4, 6, 8 are not legal hex.
+    assert!(parse("12345").is_none());
+    assert!(parse("1234567").is_none());
+    assert!(parse("12").is_none());
+    assert!(parse("1").is_none());
+}
+
+#[test]
+fn hsl_modern_accepts_bare_numbers_legacy_rejects() {
+    // Modern hsl interprets bare numbers as percentages divided by 100;
+    // legacy form requires the `%` suffix on saturation and lightness.
+    let modern = hsl(parse("hsl(180 50 50)").expect("parses"));
+    assert_eq!(modern.h, 180.0);
+    assert_eq!(modern.s, 0.5);
+    assert_eq!(modern.l, 0.5);
+
+    // culori reference: parse('hsl(180 0.5 0.5)') === { s: 0.005, l: 0.005 }
+    // (bare number / 100 -> 0.005, *not* the literal 0.5).
+    let small = hsl(parse("hsl(180 0.5 0.5)").expect("parses"));
+    assert_eq!(small.s, 0.005);
+    assert_eq!(small.l, 0.005);
+
+    // Legacy comma form rejects bare numbers (already covered by
+    // `hsl_legacy_requires_percentage_sl`, retained here for the audit
+    // checklist).
+    assert!(parse("hsl(180, 50, 50)").is_none());
+}
+
+#[test]
+fn rgb_modern_alpha_clamps_above_one_and_below_zero() {
+    // culori reference:
+    //   parse('rgb(255 0 0 / 1.5)') -> alpha: 1
+    //   parse('rgb(255 0 0 / -1)')  -> alpha: 0
+    let big = rgb(parse("rgb(255 0 0 / 1.5)").expect("parses"));
+    assert_eq!(big.alpha, Some(1.0));
+    let neg = rgb(parse("rgb(255 0 0 / -1)").expect("parses"));
+    assert_eq!(neg.alpha, Some(0.0));
+}
+
+#[test]
+fn hsl_modern_alpha_clamps_above_one() {
+    let big = hsl(parse("hsl(180 50% 50% / 1.5)").expect("parses"));
+    assert_eq!(big.alpha, Some(1.0));
+}
+
+#[test]
+fn hwb_alpha_clamps_below_zero() {
+    let neg = hwb(parse("hwb(180 30% 30% / -0.3)").expect("parses"));
+    assert_eq!(neg.alpha, Some(0.0));
+}
+
+#[test]
+fn lab_alpha_clamps_in_modern_syntax() {
+    // culori reference:
+    //   parse('lab(50 0 0 / 1.5)') -> alpha: 1
+    //   parse('lab(50 0 0 / -0.5)') -> alpha: 0
+    let big = lab(parse("lab(50 0 0 / 1.5)").expect("parses"));
+    assert_eq!(big.alpha, Some(1.0));
+    let neg = lab(parse("lab(50 0 0 / -0.5)").expect("parses"));
+    assert_eq!(neg.alpha, Some(0.0));
+}
+
+#[test]
+fn lch_alpha_clamps_in_modern_syntax() {
+    let big = lch(parse("lch(50% 30 60 / 1.5)").expect("parses"));
+    assert_eq!(big.alpha, Some(1.0));
+}
+
+#[test]
+fn oklab_alpha_clamps_in_modern_syntax() {
+    let neg = oklab(parse("oklab(0.5 0 0 / -0.3)").expect("parses"));
+    assert_eq!(neg.alpha, Some(0.0));
+}
+
+#[test]
+fn oklch_alpha_clamps_in_modern_syntax() {
+    let big = oklch(parse("oklch(0.7 0.1 30 / 2)").expect("parses"));
+    assert_eq!(big.alpha, Some(1.0));
+}
+
+#[test]
+fn xyz_color_alpha_clamps_above_one() {
+    // culori reference:
+    //   parse('color(xyz 0.5 0.5 0.5 / 1.5)') -> alpha: 1
+    let big = xyz65(parse("color(xyz 0.5 0.5 0.5 / 1.5)").expect("parses"));
+    assert_eq!(big.alpha, Some(1.0));
+}
