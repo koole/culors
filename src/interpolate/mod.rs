@@ -33,7 +33,7 @@ mod lerp;
 mod piecewise;
 mod spline;
 
-pub use hue_fixup::HueFixup;
+pub use hue_fixup::{fixup_alpha, HueFixup};
 pub use piecewise::interpolator_piecewise;
 pub use spline::{
     interpolator_spline_basis, interpolator_spline_basis_closed, interpolator_spline_monotone,
@@ -42,7 +42,6 @@ pub use spline::{
     ChannelInterpFactory,
 };
 
-use hue_fixup::fixup_alpha;
 use lerp::linear_interpolator;
 
 /// Configuration for [`interpolate_with`]. Defaults mirror culori: hue

@@ -89,7 +89,19 @@ pub(crate) fn apply(hues: &[f64], strategy: HueFixup) -> Vec<f64> {
 /// Fix up alpha stops the way culori does: if any alpha is set, missing
 /// values become 1; if none are set, leave them missing. The interpolation
 /// closure uses NaN as the "missing" marker.
-pub(crate) fn fixup_alpha(alphas: &[f64]) -> Vec<f64> {
+///
+/// Mirrors culori 4.0.2's `fixupAlpha`
+/// (`node_modules/culori/src/fixup/alpha.js`):
+///
+/// ```text
+/// fixupAlpha([NaN, 0, NaN])     == [1, 0, 1]
+/// fixupAlpha([NaN, NaN, NaN])   == [NaN, NaN, NaN]   // unchanged
+/// ```
+///
+/// Exposed publicly so callers building custom interpolation pipelines can
+/// reuse the same alpha-handling rule the standard `interpolate` family
+/// applies internally.
+pub fn fixup_alpha(alphas: &[f64]) -> Vec<f64> {
     let any_defined = alphas.iter().any(|a| !a.is_nan());
     if !any_defined {
         return alphas.to_vec();

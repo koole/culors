@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `None` otherwise. The closure repeats `Color::convert_to` per call
   but is cheap to keep around and reuse, removing the per-call mode-string
   validation from hot loops.
+- `interpolate::fixup_alpha` — promoted from `pub(crate)` to `pub`. Mirrors
+  culori's `fixupAlpha` (`fixup/alpha.js`) so callers building custom
+  interpolation pipelines can apply the same alpha-handling rule the
+  built-in `interpolate` family uses.
 
 ### Fixed
 
