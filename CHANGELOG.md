@@ -9,6 +9,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.6.0]
 
+### Added
+
+- Four hue-fixup strategies promoted from the private `apply` dispatch
+  to the public surface: `fixup_hue_shorter`, `fixup_hue_longer`,
+  `fixup_hue_increasing`, `fixup_hue_decreasing`. Each mirrors culori
+  4.0.2's matching `fixupHue*` export byte-for-byte. The internal
+  `apply(strategy)` routing through `InterpolateOptions::hue_fixup` is
+  unchanged.
+- `normalize_positions(&mut [f64])` — the CSS Images Module 4
+  stop-fixup algorithm. Mirrors culori 4.0.2's
+  `util/normalizePositions.js`. `f64::NAN` stands in for culori's
+  `undefined` missing marker.
+
+### Tests
+
+- Ported culori 4.0.2's `test/fixupHue.test.js` to
+  `tests/ported_fixup_hue.rs`. 25 cases cover the four culori fixtures
+  plus empty/single inputs, repeated values, the exact-180 boundary,
+  large negative inputs, and NaN-as-missing chain breaks across all
+  four strategies.
+- Ported culori 4.0.2's `test/normalizePositions.test.js` to
+  `tests/ported_normalize_positions.rs`. 15 cases cover the two culori
+  fixtures plus first/last/middle-only-defined variants, nested gaps,
+  out-of-unit-range anchors, and longer monotone-clamping runs.
+- Ported culori 4.0.2's `test/interpolatorLinear.test.js` to
+  `tests/ported_interpolator_linear.rs` via
+  `interpolator_piecewise(lerp)`. 9 cases cover the published 1ULP-
+  accurate `samples(10)` sweep, the four `outside [0, 1] range`
+  extrapolation values, boundary samples, the `samples(11)` two-stop
+  sweep, empty / single-stop returns, and the NaN-as-missing
+  endpoint-propagation rule.
+- Extended `tests/ported_parse.rs` with the v1.5 audit's flagged parse
+  edge cases: `transparent` case-insensitivity (culori is strict),
+  no-hash hex of every legal length (3/4/6/8) plus illegal-length
+  rejection, `hsl` modern accepting bare numbers, and alpha clamping
+  above 1 / below 0 in modern `rgb`, `hsl`, `hwb`, `lab`, `lch`,
+  `oklab`, `oklch`, and `color(xyz ... / ?)`.
+- Extended `tests/ported_interpolate.rs` with culori issue #140 — an
+  easing function that overshoots `[0, 1]` (e.g. `back-in-out`) must
+  not turn channel outputs into NaN.
+
 ## [1.5.0]
 
 ### Added
