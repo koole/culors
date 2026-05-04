@@ -12,23 +12,27 @@ Used in production by [Spectralite](https://spectralite.studio), a lighting-cont
 
 As of v1.4 culors is in maintenance/upstream-tracking mode. The library tracks culori 4.0.2 with feature parity for everything Rust-idiomatic. New features land in [culori](https://github.com/Evercoder/culori) first; once accepted upstream they're mirrored here. Bug fixes and culori version bumps remain in scope.
 
-## Features (v1.2)
+## Features (v1.4)
 
 | Feature | Coverage |
 |---|---|
 | Color spaces (33) | rgb, lrgb, hsl, hsv, hwb, lab (D50), lch (D50), lab65, lch65, oklab, oklch, xyz50, xyz65, p3, rec2020, a98, prophoto-rgb, cubehelix, dlab, dlch, jab, jch, yiq, hsi, hsluv, hpluv, okhsl, okhsv, itp, xyb, luv, lchuv, prismatic |
 | Conversion | three flavors: direct `From` (typed, zero-overhead, bit-exact culori parity), generic `convert<A, B>` (typed, always XYZ-D65 hub, ~1e-14 drift), and dynamic `Color::convert_to(mode)` / typed `convert_culori<A, B>` (culori's per-pair routing — closes the 1e-14 gap with byte-for-byte parity) |
 | CSS parser | named colors, hex, functional `rgb`/`hsl`/`hwb`/`lab`/`lch`/`oklab`/`oklch`, `color()` with `srgb`/`srgb-linear`/`xyz`/`xyz-d50`/`xyz-d65`/`display-p3`/`rec2020`/`a98-rgb`/`prophoto-rgb`/`--lab-d65`/`--lch-d65`, plus `color-mix()` |
-| CSS formatter | round-trip stable for canonical CSS Color Module 4 forms, including wide-gamut `color()` profiles and the `--lab-d65` / `--lch-d65` custom profiles |
-| Interpolation | `interpolate` / `interpolate_with` over rgb, lrgb, hsl, hsv, hwb, lab, lab65, lch, lch65, oklab, oklch, xyz50, xyz65, p3, rec2020, a98, prophoto, cubehelix, dlab, dlch, jab, jch, yiq, hsi, hsluv, hpluv, okhsl, okhsv, itp, xyb, luv, lchuv, prismatic. Hue-fixup (shorter / longer / increasing / decreasing / raw), per-channel easing |
-| Gamut mapping | `in_gamut`, `clamp_gamut`, `clamp_chroma`, `to_gamut` (CSS Color Module 4 with ΔE OK) |
+| CSS formatters | `format_css` (canonical CSS Color Module 4 round-trip), plus legacy `format_hex`, `format_hex8`, `format_rgb`, `format_hsl` |
+| Interpolation | `interpolate` / `interpolate_with` over all 33 spaces, hue-fixup (shorter / longer / increasing / decreasing / raw), per-channel easing, 7 spline interpolators (basis, basis-closed, natural, natural-closed, monotone, monotone-2, monotone-closed), and `interpolate_with_premultiplied_alpha` for clean transparent-to-color gradients |
+| Easing | `easing_midpoint`, `easing_smoothstep`, `easing_smoothstep_inverse`, `easing_smootherstep`, `easing_in_out_sine`, `easing_gamma` |
+| Gamut mapping | `in_gamut`, `displayable`, `clamp_gamut`, `clamp_rgb`, `clamp_chroma`, `to_gamut` (CSS Color Module 4 with ΔE OK). Accepts sRGB-family modes plus wide-gamut `p3` / `rec2020` / `a98` / `prophoto` |
 | ΔE | `ciede76`, `ciede94`, `ciede2000`, `cmc`, `euclidean`, `hyab`, `hue_chroma`, `hue_saturation`, `hue_naive`, `ok`, `jz`, `itp`, `euclidean_xyz`, `kotsarenko_ramos` |
 | Blending | 16 modes — 12 separable (normal, multiply, screen, hard-light, overlay, darken, lighten, color-dodge, color-burn, soft-light, difference, exclusion) plus 4 non-separable from CSS Compositing 1 § 5.8 (hue, saturation, color, luminosity) |
 | Averaging | `average`, `average_number`, `average_angle` (mode-aware, hue-circular). Same mode list as `interpolate` |
-| Palette utilities | `samples(n)`, `nearest(palette, metric)`, `round(places)` |
+| Palette utilities | `samples(n)` / `samples_with_easing(n, fn)`, `nearest(palette, metric)`, `round(places)`, `random(mode)` / `random_with_constraints` |
+| Channel pipeline | `mapper`, `map_alpha_multiply`, `map_alpha_divide`, `map_transfer_linear`, `map_transfer_gamma` |
+| Lerp utilities | `lerp`, `unlerp`, `blerp`, `trilerp` |
 | WCAG | `wcag_luminance`, `wcag_contrast` |
 | CSS filters | `brightness`, `contrast`, `grayscale`, `hue-rotate`, `invert`, `saturate`, `sepia`, plus CVD `prot` / `deuter` / `trit` |
-| Fixture coverage | 110 conversion pairs, 365 parse cases, 303 format round-trips, all verified against culori 4.0.2 |
+| Fixture coverage | 110 conversion pairs, 365 parse cases, 303 format round-trips, plus per-pair `convert_to` parity fixtures, all verified against culori 4.0.2 |
+| Tests | 1162 |
 
 ## Installation
 
