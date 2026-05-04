@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.5.0]
 
+### Fixed
+
+- `in_gamut` and `clamp_gamut` no longer panic on modes outside the sRGB
+  family or the four wide-gamut RGB profiles. The full culori 4.0.2 mode
+  table is now respected: `lab`/`lch`/`oklab`/`oklch`/`xyz*`/`jab`/`jch`/
+  `dlab`/`dlch`/`itp`/`xyb`/`luv`/`lchuv`/`cubehelix`/`yiq`/`lab65`/`lch65`
+  return `true` / pass through (no `gamut` field), while `hsi`/`okhsl`/
+  `okhsv`/`hsluv`/`hpluv`/`prismatic` route through the rgb gamut box.
+  `lrgb` now checks its own linear-RGB unit cube. Truly unknown mode
+  strings degrade through rgb instead of panicking.
+
 ## [1.4.0]
 
 ### Added

@@ -8,24 +8,44 @@ use crate::Color;
 ///
 /// Mirrors culori 4.0.2's `inGamut(mode)` (`node_modules/culori/src/clamp.js`):
 ///
-/// - `"rgb"`, `"hsl"`, `"hsv"`, `"hwb"` — convert `color` to sRGB and
-///   require every channel in `[0, 1]`. The cylindrical modes have
-///   `gamut: 'rgb'` in their definitions, so they share the sRGB box.
+/// - `"rgb"`, `"hsl"`, `"hsv"`, `"hwb"`, `"hsi"`, `"okhsl"`, `"okhsv"` —
+///   convert `color` to sRGB and require every channel in `[0, 1]`. These
+///   modes carry `gamut: 'rgb'` in culori's mode table.
+/// - `"lrgb"` — gamut is the linear-RGB unit cube; check the lrgb channels
+///   directly (culori's `lrgb` mode has `gamut: true`).
 /// - `"p3"`, `"rec2020"`, `"a98"`, `"prophoto"` — convert `color` to that
 ///   wide-gamut RGB space and require every channel in `[0, 1]`.
-/// - any other mode (`"lab"`, `"lch"`, `"oklab"`, `"oklch"`, `"lrgb"`,
-///   `"xyz50"`, `"xyz65"`) — culori's mode definition has no `gamut`
-///   field, and `inGamut` returns the constant `true`.
+/// - any unbounded mode (`"lab"`, `"lab65"`, `"lch"`, `"lch65"`, `"oklab"`,
+///   `"oklch"`, `"xyz50"`, `"xyz65"`, `"jab"`, `"jch"`, `"dlab"`, `"dlch"`,
+///   `"itp"`, `"xyb"`, `"luv"`, `"lchuv"`, `"cubehelix"`, `"yiq"`) —
+///   culori's mode definition has no `gamut` field, and `inGamut` returns
+///   the constant `true`.
+/// - the three culors-only modes (`"hsluv"`, `"hpluv"`, `"prismatic"`) are
+///   not in culori 4.0.2; they fall through to the rgb gamut box, matching
+///   the spirit of "convert and check sRGB" rather than panicking.
 ///
-/// Panics on an unknown mode string. Callers should validate `mode` up
-/// front; the gamut-bearing modes are sRGB / its cylindricals plus the
-/// four wide-gamut RGB profiles.
+/// Any other (genuinely unknown) mode string falls back to checking the
+/// rgb gamut. Earlier versions panicked on every mode not listed above;
+/// the v1.5 surface no longer does.
 pub fn in_gamut(color: &Color, mode: &str) -> bool {
     match mode {
-        "rgb" | "hsl" | "hsv" | "hwb" => {
+        // gamut: 'rgb' (sRGB cylindricals plus the cylindrical-look-alikes).
+        "rgb" | "hsl" | "hsv" | "hwb" | "hsi" | "okhsl" | "okhsv" | "hsluv" | "hpluv"
+        | "prismatic" => {
             let rgb = color_to_rgb(*color);
             inrange_rgb_channels(rgb.r, rgb.g, rgb.b)
         }
+        // gamut: true (linear-RGB cube on its own channels).
+        "lrgb" => {
+            let v = match *color {
+                Color::LinearRgb(x) => x,
+                other => crate::convert::convert::<crate::spaces::Xyz65, crate::spaces::LinearRgb>(
+                    super::clamp::to_xyz65(other),
+                ),
+            };
+            inrange_rgb_channels(v.r, v.g, v.b)
+        }
+        // Wide-gamut RGB profiles: each is a [0, 1] cube in its own space.
         "p3" => {
             let v: P3 = color_to_p3(*color);
             inrange_rgb_channels(v.r, v.g, v.b)
@@ -42,8 +62,18 @@ pub fn in_gamut(color: &Color, mode: &str) -> bool {
             let v: ProphotoRgb = color_to_prophoto(*color);
             inrange_rgb_channels(v.r, v.g, v.b)
         }
-        "lrgb" | "lab" | "lch" | "oklab" | "oklch" | "xyz50" | "xyz65" => true,
-        other => panic!("in_gamut: unknown mode '{other}'"),
+        // No `gamut` field in culori — always in gamut.
+        "lab" | "lab65" | "lch" | "lch65" | "oklab" | "oklch" | "xyz50" | "xyz65" | "jab"
+        | "jch" | "dlab" | "dlch" | "itp" | "xyb" | "luv" | "lchuv" | "cubehelix" | "yiq" => true,
+        // Truly unknown mode: degrade gracefully through the rgb gamut box
+        // rather than panicking. Matches culori's spirit (`getMode` would
+        // throw before `inGamut` returns anything; we choose a softer
+        // default than a panic so callers handling user-supplied mode
+        // strings stay sane).
+        _ => {
+            let rgb = color_to_rgb(*color);
+            inrange_rgb_channels(rgb.r, rgb.g, rgb.b)
+        }
     }
 }
 

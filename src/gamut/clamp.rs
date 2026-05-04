@@ -12,19 +12,50 @@ use crate::Color;
 /// Mirrors culori's `clampGamut(mode)`: convert the color to the gamut's
 /// underlying RGB space, clamp each channel to `[0, 1]`, then convert back
 /// to the source mode. For `mode` values without a gamut definition
-/// (`lab`/`lch`/`oklab`/`oklch`/`lrgb`/`xyz*`) the input is returned as-is.
+/// (`lab`/`lch`/`oklab`/`oklch`/`xyz*`/`jab`/`jch`/`dlab`/`dlch`/`itp`/
+/// `xyb`/`luv`/`lchuv`/`cubehelix`/`yiq`/`lab65`/`lch65`) the input is
+/// returned as-is, matching culori's `if (!gamut) return color => prepare(color)`.
 ///
 /// The output stays in the source mode (the variant of the input
 /// `Color`). Hue is not preserved — per-channel clipping shifts both
 /// chroma and hue.
 pub fn clamp_gamut(color: Color, mode: &str) -> Color {
     match mode {
-        "rgb" | "hsl" | "hsv" | "hwb" => {
+        // gamut: 'rgb' — sRGB cylindricals plus the cylindrical-look-alikes
+        // (`hsi`, `okhsl`, `okhsv`) and the culors-only spaces that route
+        // their gamut check through rgb.
+        "rgb" | "hsl" | "hsv" | "hwb" | "hsi" | "okhsl" | "okhsv" | "hsluv" | "hpluv"
+        | "prismatic" => {
             if in_gamut(&color, mode) {
                 return color;
             }
             let clamped_rgb = clamp_rgb_channels(color_to_rgb(color));
             convert_rgb_back_to_source_mode(clamped_rgb, color)
+        }
+        // gamut: true on `lrgb` — clamp on linear-RGB channels.
+        "lrgb" => {
+            if in_gamut(&color, mode) {
+                return color;
+            }
+            let v = match color {
+                Color::LinearRgb(x) => x,
+                other => crate::convert::convert::<crate::spaces::Xyz65, crate::spaces::LinearRgb>(
+                    to_xyz65(other),
+                ),
+            };
+            let clamped = crate::spaces::LinearRgb {
+                r: clamp01(v.r),
+                g: clamp01(v.g),
+                b: clamp01(v.b),
+                alpha: v.alpha,
+            };
+            // Same source mode short-circuit; otherwise round-trip via XYZ.
+            if let Color::LinearRgb(_) = color {
+                Color::LinearRgb(clamped)
+            } else {
+                let xyz = to_xyz65(Color::LinearRgb(clamped));
+                from_xyz65_in_mode_of(xyz, color)
+            }
         }
         "p3" => clamp_wide_gamut(color, mode, color_to_p3, |v| {
             Color::P3(P3 {
@@ -58,8 +89,18 @@ pub fn clamp_gamut(color: Color, mode: &str) -> Color {
                 alpha: v.alpha,
             })
         }),
-        "lrgb" | "lab" | "lch" | "oklab" | "oklch" | "xyz50" | "xyz65" => color,
-        other => panic!("clamp_gamut: unknown mode '{other}'"),
+        // No gamut definition in culori — pass through. Mirrors culori's
+        // `if (!gamut) return color => prepare(color)`.
+        "lab" | "lab65" | "lch" | "lch65" | "oklab" | "oklch" | "xyz50" | "xyz65" | "jab"
+        | "jch" | "dlab" | "dlch" | "itp" | "xyb" | "luv" | "lchuv" | "cubehelix" | "yiq" => color,
+        // Truly unknown — degrade through rgb rather than panic.
+        _ => {
+            if in_gamut(&color, "rgb") {
+                return color;
+            }
+            let clamped_rgb = clamp_rgb_channels(color_to_rgb(color));
+            convert_rgb_back_to_source_mode(clamped_rgb, color)
+        }
     }
 }
 

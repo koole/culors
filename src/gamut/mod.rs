@@ -12,13 +12,22 @@
 //!   culori's `toGamut(dest, mode)`.
 //!
 //! The `mode` argument names the destination gamut. Modes that carry a
-//! gamut definition in culori: `"rgb"`, `"hsl"`, `"hsv"`, `"hwb"`, plus
-//! the four wide-gamut RGB profiles (`"p3"`, `"rec2020"`, `"a98"`,
-//! `"prophoto"`). Every other mode returns `true` from `in_gamut` and is a
-//! no-op for `clamp_gamut`. The gamut for the cylindrical sRGB modes
-//! (`hsl` / `hsv` / `hwb`) is `"rgb"`, so those four mode strings collapse
-//! to the same boundary check; each wide-gamut profile defines its own
-//! `[0, 1]` linear-RGB box.
+//! gamut definition in culori 4.0.2:
+//!
+//! - sRGB family (`"rgb"`, `"hsl"`, `"hsv"`, `"hwb"`, `"hsi"`, `"okhsl"`,
+//!   `"okhsv"`) — `gamut: 'rgb'`, evaluated on the sRGB unit cube.
+//! - linear sRGB (`"lrgb"`) — `gamut: true`, evaluated on its own channels.
+//! - wide-gamut RGB (`"p3"`, `"rec2020"`, `"a98"`, `"prophoto"`) — each
+//!   defines its own `[0, 1]` linear-RGB box.
+//!
+//! Every other culori mode (`lab`, `lch`, `oklab`, `oklch`, `xyz*`, `jab`,
+//! `dlab`, `itp`, `xyb`, `luv`, …) has no gamut field, so `in_gamut`
+//! returns `true` and `clamp_gamut` returns the input unchanged. The three
+//! culors-only modes (`hsluv`, `hpluv`, `prismatic`) share rgb's gamut box
+//! since they have no culori entry to reference.
+//!
+//! Truly unknown mode strings degrade through the rgb gamut rather than
+//! panicking; v1.5 dropped the panic from earlier versions.
 
 mod clamp;
 mod in_gamut;

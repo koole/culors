@@ -357,3 +357,92 @@ fn to_gamut_alpha_passthrough() {
     let out2 = unwrap_rgb(to_gamut(c2, "rgb"));
     assert_eq!(out2.alpha, Some(0.25));
 }
+
+// ----- in_gamut: previously-panicking modes now graceful -----
+//
+// culori's `inGamut(mode)` looks up the mode definition and returns a
+// constant `true` when the mode has no `gamut` field, or routes through the
+// referenced gamut (typically 'rgb') when one is present. The earlier culors
+// implementation panicked on every mode that wasn't explicitly listed.
+//
+// Reference values produced with:
+//   node -e "import('culori').then(c => console.log(c.inGamut(MODE)(COLOR)))"
+
+#[test]
+fn in_gamut_lab65_returns_true_unconditionally() {
+    // culori: `getMode('lab65').gamut` is undefined -> always true.
+    assert!(in_gamut(&rgb(1.5, 0.5, 0.5), "lab65"));
+    assert!(in_gamut(&rgb(0.5, 0.5, 0.5), "lab65"));
+}
+
+#[test]
+fn in_gamut_jab_returns_true_unconditionally() {
+    assert!(in_gamut(&rgb(1.5, 0.5, 0.5), "jab"));
+    assert!(in_gamut(&rgb(-0.4, 0.5, 0.5), "jab"));
+}
+
+#[test]
+fn in_gamut_cubehelix_returns_true_unconditionally() {
+    assert!(in_gamut(&rgb(1.5, 0.5, 0.5), "cubehelix"));
+}
+
+#[test]
+fn in_gamut_dlab_dlch_jch_yiq_xyb_itp_lchuv_luv_lch65_return_true() {
+    let c = rgb(1.5, 0.5, 0.5);
+    for mode in [
+        "dlab", "dlch", "jch", "yiq", "xyb", "itp", "lchuv", "luv", "lch65",
+    ] {
+        assert!(in_gamut(&c, mode), "in_gamut(_, {mode}) should be true");
+    }
+}
+
+#[test]
+fn in_gamut_hsi_routes_through_rgb() {
+    // culori: hsi has `gamut: 'rgb'` -> converts via rgb, checks channels.
+    assert!(!in_gamut(&rgb(1.5, 0.5, 0.5), "hsi"));
+    assert!(in_gamut(&rgb(0.5, 0.5, 0.5), "hsi"));
+}
+
+#[test]
+fn in_gamut_okhsl_okhsv_route_through_rgb() {
+    assert!(!in_gamut(&rgb(1.5, 0.5, 0.5), "okhsl"));
+    assert!(in_gamut(&rgb(0.5, 0.5, 0.5), "okhsl"));
+    assert!(!in_gamut(&rgb(1.5, 0.5, 0.5), "okhsv"));
+    assert!(in_gamut(&rgb(0.5, 0.5, 0.5), "okhsv"));
+}
+
+// ----- clamp_gamut: previously-panicking modes now graceful -----
+
+#[test]
+fn clamp_gamut_lab65_passes_through() {
+    // No gamut -> input returned unchanged.
+    let out = unwrap_rgb(clamp_gamut(rgb(1.5, 0.5, 0.5), "lab65"));
+    assert_eq!(out.r, 1.5);
+    assert_eq!(out.g, 0.5);
+    assert_eq!(out.b, 0.5);
+}
+
+#[test]
+fn clamp_gamut_jab_passes_through() {
+    let out = unwrap_rgb(clamp_gamut(rgb(1.5, 0.5, 0.5), "jab"));
+    assert_eq!(out.r, 1.5);
+    assert_eq!(out.g, 0.5);
+    assert_eq!(out.b, 0.5);
+}
+
+#[test]
+fn clamp_gamut_hsi_routes_through_rgb() {
+    // gamut: 'rgb' -> channel-wise clip in rgb, return in source mode (Rgb).
+    let out = unwrap_rgb(clamp_gamut(rgb(1.5, 0.5, 0.5), "hsi"));
+    assert_eq!(out.r, 1.0);
+    assert_eq!(out.g, 0.5);
+    assert_eq!(out.b, 0.5);
+}
+
+#[test]
+fn clamp_gamut_okhsl_okhsv_route_through_rgb() {
+    let out = unwrap_rgb(clamp_gamut(rgb(1.5, 0.5, 0.5), "okhsl"));
+    assert_eq!(out.r, 1.0);
+    let out2 = unwrap_rgb(clamp_gamut(rgb(1.5, 0.5, 0.5), "okhsv"));
+    assert_eq!(out2.r, 1.0);
+}
