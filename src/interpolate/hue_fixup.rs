@@ -66,24 +66,87 @@ fn apply_with<F: Fn(f64) -> f64>(hues: &[f64], delta_fn: F) -> Vec<f64> {
 
 pub(crate) fn apply(hues: &[f64], strategy: HueFixup) -> Vec<f64> {
     match strategy {
-        HueFixup::Shorter => apply_with(hues, |d| {
-            if d.abs() <= 180.0 {
-                d
-            } else {
-                d - 360.0 * d.signum()
-            }
-        }),
-        HueFixup::Longer => apply_with(hues, |d| {
-            if d.abs() >= 180.0 || d == 0.0 {
-                d
-            } else {
-                d - 360.0 * d.signum()
-            }
-        }),
-        HueFixup::Increasing => apply_with(hues, |d| if d >= 0.0 { d } else { d + 360.0 }),
-        HueFixup::Decreasing => apply_with(hues, |d| if d <= 0.0 { d } else { d - 360.0 }),
+        HueFixup::Shorter => fixup_hue_shorter(hues),
+        HueFixup::Longer => fixup_hue_longer(hues),
+        HueFixup::Increasing => fixup_hue_increasing(hues),
+        HueFixup::Decreasing => fixup_hue_decreasing(hues),
         HueFixup::Raw => hues.to_vec(),
     }
+}
+
+/// Take the shorter arc between consecutive hues. CSS Color Module 4 default.
+///
+/// Mirrors culori 4.0.2's `fixupHueShorter` (`fixup/hue.js`). Each non-`NaN`
+/// hue is reduced to `[0, 360)`, the delta to the previous defined hue is
+/// rewritten to lie within `[-180, 180]`, then deltas are accumulated into
+/// absolute angles. `NaN` (culori `undefined`) passes through and resets the
+/// running anchor on the next defined value.
+///
+/// ```rust
+/// use culors::fixup_hue_shorter;
+/// assert_eq!(fixup_hue_shorter(&[0.0, 340.0, 30.0, 0.0, 170.0]),
+///            vec![0.0, -20.0, 30.0, 0.0, 170.0]);
+/// ```
+pub fn fixup_hue_shorter(hues: &[f64]) -> Vec<f64> {
+    apply_with(hues, |d| {
+        if d.abs() <= 180.0 {
+            d
+        } else {
+            d - 360.0 * d.signum()
+        }
+    })
+}
+
+/// Take the longer arc between consecutive hues.
+///
+/// Mirrors culori 4.0.2's `fixupHueLonger` (`fixup/hue.js`). The delta is
+/// rewritten so that arcs strictly shorter than 180° flip to their long-way
+/// counterpart; equal-magnitude arcs (exactly 180°) and zero arcs pass
+/// through unchanged.
+///
+/// ```rust
+/// use culors::fixup_hue_longer;
+/// assert_eq!(fixup_hue_longer(&[0.0, 340.0, 30.0, 0.0, 170.0]),
+///            vec![0.0, 340.0, 30.0, 360.0, 170.0]);
+/// ```
+pub fn fixup_hue_longer(hues: &[f64]) -> Vec<f64> {
+    apply_with(hues, |d| {
+        if d.abs() >= 180.0 || d == 0.0 {
+            d
+        } else {
+            d - 360.0 * d.signum()
+        }
+    })
+}
+
+/// Always rotate counter-clockwise (positive hue direction).
+///
+/// Mirrors culori 4.0.2's `fixupHueIncreasing` (`fixup/hue.js`). Negative
+/// deltas are shifted by `+360°` so that every consecutive arc is
+/// non-negative; the accumulated output is monotonically non-decreasing.
+///
+/// ```rust
+/// use culors::fixup_hue_increasing;
+/// assert_eq!(fixup_hue_increasing(&[0.0, 340.0, 30.0, 0.0, 170.0]),
+///            vec![0.0, 340.0, 390.0, 720.0, 890.0]);
+/// ```
+pub fn fixup_hue_increasing(hues: &[f64]) -> Vec<f64> {
+    apply_with(hues, |d| if d >= 0.0 { d } else { d + 360.0 })
+}
+
+/// Always rotate clockwise (negative hue direction).
+///
+/// Mirrors culori 4.0.2's `fixupHueDecreasing` (`fixup/hue.js`). Positive
+/// deltas are shifted by `-360°` so that every consecutive arc is
+/// non-positive; the accumulated output is monotonically non-increasing.
+///
+/// ```rust
+/// use culors::fixup_hue_decreasing;
+/// assert_eq!(fixup_hue_decreasing(&[0.0, 340.0, 30.0, 0.0, 170.0]),
+///            vec![0.0, -20.0, -330.0, -360.0, -550.0]);
+/// ```
+pub fn fixup_hue_decreasing(hues: &[f64]) -> Vec<f64> {
+    apply_with(hues, |d| if d <= 0.0 { d } else { d - 360.0 })
 }
 
 /// Fix up alpha stops the way culori does: if any alpha is set, missing

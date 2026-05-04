@@ -205,12 +205,12 @@ pub use filter::{
 pub use format::{format_css, format_hex, format_hex8, format_hsl, format_rgb};
 pub use gamut::{clamp_chroma, clamp_gamut, clamp_rgb, displayable, in_gamut, to_gamut};
 pub use interpolate::{
-    fixup_alpha, interpolate, interpolate_with, interpolate_with_premultiplied_alpha,
-    interpolator_piecewise, interpolator_spline_basis, interpolator_spline_basis_closed,
-    interpolator_spline_monotone, interpolator_spline_monotone_2,
-    interpolator_spline_monotone_closed, interpolator_spline_natural,
-    interpolator_spline_natural_closed, ChannelInterp, ChannelInterpFactory, HueFixup,
-    InterpolateOptions,
+    fixup_alpha, fixup_hue_decreasing, fixup_hue_increasing, fixup_hue_longer, fixup_hue_shorter,
+    interpolate, interpolate_with, interpolate_with_premultiplied_alpha, interpolator_piecewise,
+    interpolator_spline_basis, interpolator_spline_basis_closed, interpolator_spline_monotone,
+    interpolator_spline_monotone_2, interpolator_spline_monotone_closed,
+    interpolator_spline_natural, interpolator_spline_natural_closed, ChannelInterp,
+    ChannelInterpFactory, HueFixup, InterpolateOptions,
 };
 pub use lerp::{blerp, lerp, trilerp, unlerp};
 pub use map::{

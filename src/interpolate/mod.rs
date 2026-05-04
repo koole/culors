@@ -33,7 +33,10 @@ mod lerp;
 mod piecewise;
 mod spline;
 
-pub use hue_fixup::{fixup_alpha, HueFixup};
+pub use hue_fixup::{
+    fixup_alpha, fixup_hue_decreasing, fixup_hue_increasing, fixup_hue_longer, fixup_hue_shorter,
+    HueFixup,
+};
 pub use piecewise::interpolator_piecewise;
 pub use spline::{
     interpolator_spline_basis, interpolator_spline_basis_closed, interpolator_spline_monotone,
