@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.5.0]
 
+### Added
+
+- `interpolator_piecewise(f)` — higher-order channel-interpolator factory
+  matching culori 4.0.2's `interpolatorPiecewise`. Given a per-segment
+  function `f(a, b, t)`, returns a `ChannelInterpFactory` that builds a
+  per-channel sampler over a stop slice. Slots into
+  `InterpolateOptions::channel_interpolator` so callers can mix custom
+  interpolators with the default linear-piecewise one.
+
 ### Fixed
 
 - `in_gamut` and `clamp_gamut` no longer panic on modes outside the sRGB

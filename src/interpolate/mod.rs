@@ -30,9 +30,11 @@ use crate::Color;
 
 mod hue_fixup;
 mod lerp;
+mod piecewise;
 mod spline;
 
 pub use hue_fixup::HueFixup;
+pub use piecewise::interpolator_piecewise;
 pub use spline::{
     interpolator_spline_basis, interpolator_spline_basis_closed, interpolator_spline_monotone,
     interpolator_spline_monotone_2, interpolator_spline_monotone_closed,
